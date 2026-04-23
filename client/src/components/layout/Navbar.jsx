@@ -30,10 +30,10 @@ export function Navbar() {
   };
 
   return (
-    <header className="nav-shell">
+    <header className="nav">
       <div className="nav-top">
-        <button className="brand" onClick={() => navigate("/")}>
-          Gram<span>Bazaar</span>
+        <button className="nav-logo" onClick={() => navigate("/")}>
+          🛒 Gram<span>Bazaar</span>
         </button>
         <form className="nav-search" onSubmit={handleSearch}>
           <select name="category" defaultValue={categoryValue}>
@@ -43,20 +43,59 @@ export function Navbar() {
               </option>
             ))}
           </select>
-          <input name="search" placeholder="Search honey, tea, copper..." defaultValue={searchValue} />
-          <button type="submit">Search</button>
+          <input
+            name="search"
+            placeholder="Search products, brands..."
+            defaultValue={searchValue}
+          />
+          <button className="nav-search-btn" type="submit">
+            🔍
+          </button>
         </form>
-        <nav className="nav-actions">
-          <NavLink to="/wishlist">Wishlist ({wishlistIds.length})</NavLink>
-          <NavLink to="/cart">Cart ({cart.summary.itemCount})</NavLink>
-          <NavLink to={user ? "/account" : "/auth"}>{user ? user.name.split(" ")[0] : "Sign in"}</NavLink>
-        </nav>
+        <div className="nav-icons">
+          {user ? (
+            <>
+              <button className="nav-icon-btn" onClick={() => navigate("/account")}>
+                <span className="icon">👤</span>
+                <span className="lbl">{user.name.split(" ")[0]}</span>
+              </button>
+              <button className="nav-icon-btn" onClick={() => navigate("/admin")}>
+                <span className="icon">⚙️</span>
+                <span className="lbl">Admin</span>
+              </button>
+            </>
+          ) : (
+            <button className="nav-icon-btn" onClick={() => navigate("/auth")}>
+              <span className="icon">👤</span>
+              <span className="lbl">Sign In</span>
+            </button>
+          )}
+
+          <button className="nav-icon-btn" onClick={() => navigate("/wishlist")}>
+            <span className="nav-icon-wrap">
+              <span className="icon">❤️</span>
+              {wishlistIds.length > 0 ? <span className="nav-badge">{wishlistIds.length}</span> : null}
+            </span>
+            <span className="lbl">Wishlist</span>
+          </button>
+
+          <button className="nav-icon-btn" onClick={() => navigate("/cart")}>
+            <span className="nav-icon-wrap">
+              <span className="icon">🛒</span>
+              {cart.summary.itemCount > 0 ? (
+                <span className="nav-badge">{cart.summary.itemCount}</span>
+              ) : null}
+            </span>
+            <span className="lbl">Cart</span>
+          </button>
+        </div>
       </div>
-      <div className="nav-links">
+      <div className="nav-bottom">
         <NavLink to="/">Home</NavLink>
-        <NavLink to="/shop">Shop</NavLink>
-        <NavLink to="/orders">Orders</NavLink>
-        <NavLink to="/admin">Admin</NavLink>
+        <NavLink to="/shop">Shop All</NavLink>
+        <NavLink to="/orders">My Orders</NavLink>
+        <NavLink to="/wishlist">Wishlist</NavLink>
+        <NavLink to={user ? "/account" : "/auth"}>Account</NavLink>
       </div>
     </header>
   );

@@ -2,28 +2,34 @@ import { formatCurrency } from "../../utils/formatCurrency";
 import { Button } from "../ui/Button";
 
 export function CartSummary({ summary, discount = 0, onCheckout, code = "" }) {
-  const total = Math.max(summary.subtotal - discount, 0);
+  const shipping = summary.subtotal >= 500 || summary.subtotal === 0 ? 0 : 49;
+  const total = Math.max(summary.subtotal + shipping - discount, 0);
 
   return (
-    <aside className="summary-card">
+    <aside className="order-summary">
       <h3>Order Summary</h3>
-      <div className="summary-row">
-        <span>Subtotal</span>
-        <strong>{formatCurrency(summary.subtotal)}</strong>
+      <div className="sum-row">
+        <span>Subtotal ({summary.itemCount} items)</span>
+        <span>{formatCurrency(summary.subtotal)}</span>
       </div>
-      <div className="summary-row">
+      <div className="sum-row">
         <span>Shipping</span>
-        <strong>Free</strong>
+        <span>{shipping === 0 ? "FREE 🎉" : formatCurrency(shipping)}</span>
       </div>
-      <div className="summary-row">
-        <span>Discount {code ? `(${code})` : ""}</span>
-        <strong>-{formatCurrency(discount)}</strong>
-      </div>
-      <div className="summary-row summary-total">
+      {discount > 0 ? (
+        <div className="sum-row save">
+          <span>Promo Discount {code ? `(${code})` : ""}</span>
+          <span>-{formatCurrency(discount)}</span>
+        </div>
+      ) : null}
+      <div className="sum-row total">
         <span>Total</span>
-        <strong>{formatCurrency(total)}</strong>
+        <span>{formatCurrency(total)}</span>
       </div>
-      <Button onClick={onCheckout}>Proceed to Checkout</Button>
+      <Button className="checkout-cta" onClick={onCheckout}>
+        Proceed to Checkout →
+      </Button>
+      <div className="secure-icons">🔒 Secure · 💳 All Cards · 📦 Easy Returns</div>
     </aside>
   );
 }

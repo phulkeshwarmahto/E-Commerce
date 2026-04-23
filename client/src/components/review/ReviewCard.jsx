@@ -4,18 +4,17 @@ import { ReviewMedia } from "./ReviewMedia";
 
 export function ReviewCard({ review }) {
   return (
-    <article className="review-card">
-      <div className="review-head">
+    <article className="rcard">
+      <div className="rcard-head">
         <div>
-          <h4>{review.title}</h4>
-          <p>{review.name}</p>
+          <span className="rcard-name">{review.title || review.name}</span>
         </div>
-        <div className="review-rating">
+        <div style={{ display: "flex", alignItems: "center", gap: ".5rem" }}>
           <StarRating rating={review.rating} />
-          <span>{formatDate(review.createdAt)}</span>
+          <span className="rcard-date">{formatDate(review.createdAt)}</span>
         </div>
       </div>
-      <p>{review.body}</p>
+      <div className="rcard-text">{review.body}</div>
       <ReviewMedia media={review.media} />
     </article>
   );

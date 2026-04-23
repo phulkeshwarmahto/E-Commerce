@@ -40,17 +40,48 @@ export function AdminPage() {
   }
 
   return (
-    <section className="page-content admin-layout">
-      <AdminSidebar section={section} onChange={setSection} />
-      <div className="stack">
-        {section === "overview" && dashboard ? (
-          <>
-            <div className="stats-grid">
-              <StatCard label="Revenue" value={dashboard.stats.revenue} currency />
-              <StatCard label="Orders" value={dashboard.stats.orders} />
-              <StatCard label="Products" value={dashboard.stats.products} />
-              <StatCard label="Users" value={dashboard.stats.users} />
-            </div>
+    <section className="page-content admin-page">
+      <div className="admin-page-head">
+        <div>
+          <div className="sec-label">Admin Panel</div>
+          <h1 className="page-title">Store Control Center</h1>
+        </div>
+      </div>
+      <div className="admin-layout">
+        <AdminSidebar section={section} onChange={setSection} />
+        <div className="stack">
+          {section === "overview" && dashboard ? (
+            <>
+              <div className="stats-grid">
+                <StatCard label="Revenue" value={dashboard.stats.revenue} currency />
+                <StatCard label="Orders" value={dashboard.stats.orders} />
+                <StatCard label="Products" value={dashboard.stats.products} />
+                <StatCard label="Users" value={dashboard.stats.users} />
+              </div>
+              <OrderTable
+                orders={dashboard.recentOrders}
+                onUpdateStatus={async (id, status) => {
+                  await updateOrderStatusRequest(id, status);
+                  notify("Order status updated.");
+                  loadDashboard().catch(() => {});
+                }}
+              />
+            </>
+          ) : null}
+
+          {section === "products" && dashboard ? (
+            <>
+              <div className="section-head">
+                <h1 className="page-title">Products</h1>
+                <button className="button button-primary" onClick={() => setShowCreateModal(true)}>
+                  Add product
+                </button>
+              </div>
+              <ProductTable products={dashboard.products} onEdit={setEditingProduct} />
+            </>
+          ) : null}
+
+          {section === "orders" && dashboard ? (
             <OrderTable
               orders={dashboard.recentOrders}
               onUpdateStatus={async (id, status) => {
@@ -59,42 +90,21 @@ export function AdminPage() {
                 loadDashboard().catch(() => {});
               }}
             />
-          </>
-        ) : null}
+          ) : null}
 
-        {section === "products" && dashboard ? (
-          <>
-            <div className="section-head">
-              <h1 className="page-title">Products</h1>
-              <button className="button button-primary" onClick={() => setShowCreateModal(true)}>
-                Add product
-              </button>
+          {section === "reviews" && dashboard ? (
+            <div className="stack">
+              {dashboard.reviews.map((review) => (
+                <article key={review.id} className="rcard">
+                  <div className="rcard-head">
+                    <span className="rcard-name">{review.title}</span>
+                  </div>
+                  <div className="rcard-text">{review.body}</div>
+                </article>
+              ))}
             </div>
-            <ProductTable products={dashboard.products} onEdit={setEditingProduct} />
-          </>
-        ) : null}
-
-        {section === "orders" && dashboard ? (
-          <OrderTable
-            orders={dashboard.recentOrders}
-            onUpdateStatus={async (id, status) => {
-              await updateOrderStatusRequest(id, status);
-              notify("Order status updated.");
-              loadDashboard().catch(() => {});
-            }}
-          />
-        ) : null}
-
-        {section === "reviews" && dashboard ? (
-          <div className="stack">
-            {dashboard.reviews.map((review) => (
-              <article key={review.id} className="review-card">
-                <h4>{review.title}</h4>
-                <p>{review.body}</p>
-              </article>
-            ))}
-          </div>
-        ) : null}
+          ) : null}
+        </div>
       </div>
 
       {editingProduct ? (

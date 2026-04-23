@@ -16,6 +16,7 @@ export function ReviewForm({ productId, onSubmit }) {
 
   return (
     <form className="review-form" onSubmit={handleSubmit}>
+      <h3>✍️ Write a Review</h3>
       <div className="form-row">
         <Input
           label="Title"
@@ -43,14 +44,16 @@ export function ReviewForm({ productId, onSubmit }) {
       <label className="field">
         <span className="field-label">Review</span>
         <textarea
-          className="input textarea"
+          className="review-textarea"
           value={form.body}
           onChange={(event) => setForm((current) => ({ ...current, body: event.target.value }))}
           placeholder="How did it feel, taste, or perform?"
           required
         />
       </label>
-      <Button type="submit">Submit Review</Button>
+      <Button className="review-submit-btn" type="submit">
+        Post Review →
+      </Button>
     </form>
   );
 }

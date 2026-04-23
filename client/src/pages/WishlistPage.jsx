@@ -9,10 +9,18 @@ export function WishlistPage() {
 
   return (
     <section className="page-content">
-      <div className="section-head">
-        <h1 className="page-title">Wishlist</h1>
+      <div className="wishlist-page">
+        <h2>❤️ My Wishlist ({items.length})</h2>
+        {items.length ? (
+          <ProductGrid products={items} />
+        ) : (
+          <div className="empty-state">
+            <p>❤️</p>
+            <h3>Your wishlist is empty</h3>
+            <small>Heart products to save them here.</small>
+          </div>
+        )}
       </div>
-      {items.length ? <ProductGrid products={items} /> : <p>Your wishlist is still empty.</p>}
     </section>
   );
 }

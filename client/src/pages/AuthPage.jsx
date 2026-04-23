@@ -25,17 +25,19 @@ export function AuthPage() {
   return (
     <section className="page-content auth-shell">
       <form className="auth-card" onSubmit={handleSubmit}>
-        <p className="eyebrow">Authentication</p>
-        <h1 className="page-title">{mode === "signin" ? "Sign in" : "Create account"}</h1>
+        <p className="sec-label">Authentication</p>
+        <h1 className="auth-title">{mode === "signin" ? "Sign in" : "Create account"}</h1>
         {mode === "signup" ? (
           <Input label="Full name" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} required />
         ) : null}
         <Input label="Email" type="email" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} required />
         <Input label="Password" type="password" value={form.password} onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))} required />
-        <Button type="submit">{mode === "signin" ? "Sign in" : "Create account"}</Button>
+        <Button className="hero-cta auth-submit" type="submit">
+          {mode === "signin" ? "Sign in →" : "Create account →"}
+        </Button>
         <button
           type="button"
-          className="link-button"
+          className="auth-switch"
           onClick={() => setMode((current) => (current === "signin" ? "signup" : "signin"))}
         >
           {mode === "signin" ? "Need an account?" : "Already have an account?"}

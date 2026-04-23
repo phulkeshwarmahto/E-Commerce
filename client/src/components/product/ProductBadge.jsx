@@ -5,5 +5,5 @@ export function ProductBadge({ badge }) {
     return null;
   }
 
-  return <Badge tone={badge === "sale" ? "accent" : "success"}>{badge}</Badge>;
+  return <Badge tone={badge}>{badge}</Badge>;
 }

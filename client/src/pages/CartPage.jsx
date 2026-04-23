@@ -11,11 +11,10 @@ export function CartPage() {
   const [promo, setPromo] = useState({ code: "", discount: 0 });
 
   return (
-    <section className="page-content two-column">
-      <div className="stack">
-        <div className="section-head">
-          <h1 className="page-title">Your cart</h1>
-        </div>
+    <section className="page-content">
+      <div className="cart-layout">
+        <div>
+          <div className="cart-title">🛒 My Cart ({cart.summary.itemCount} items)</div>
         {cart.items.map((item) => (
           <CartItem
             key={item.id}
@@ -27,7 +26,13 @@ export function CartPage() {
             }}
           />
         ))}
-        {!cart.items.length ? <p>Your cart is empty.</p> : null}
+          {!cart.items.length ? (
+            <div className="empty-state">
+              <p>🛒</p>
+              <h3>Your cart is empty</h3>
+              <small>Add some products to get started.</small>
+            </div>
+          ) : null}
         <PromoCode
           subtotal={cart.summary.subtotal}
           onApply={(nextPromo) => {
@@ -35,13 +40,14 @@ export function CartPage() {
             notify(nextPromo.message);
           }}
         />
+        </div>
+        <CartSummary
+          summary={cart.summary}
+          discount={promo.discount}
+          code={promo.code}
+          onCheckout={() => navigate("/checkout", { state: promo })}
+        />
       </div>
-      <CartSummary
-        summary={cart.summary}
-        discount={promo.discount}
-        code={promo.code}
-        onCheckout={() => navigate("/checkout", { state: promo })}
-      />
     </section>
   );
 }
