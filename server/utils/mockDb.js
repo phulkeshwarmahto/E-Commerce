@@ -126,4 +126,6 @@ export const db = {
   ],
 };
 
+export const findUserById = (id) => db.users.find((user) => user.id === id);
+export const findProductById = (id) => db.products.find((product) => product.id === id);
 export { saveProducts };
