@@ -25,7 +25,11 @@
     "stockCount": 24,
     "rating": 4.8,
     "reviewCount": 124,
-    "tags": ["raw", "honey", "forest"],
+    "tags": [
+      "raw",
+      "honey",
+      "forest"
+    ],
     "isFeatured": true,
     "createdAt": "2026-04-26T00:00:00.000Z",
     "updatedAt": "2026-04-26T00:00:00.000Z"
@@ -56,7 +60,11 @@
     "stockCount": 30,
     "rating": 4.7,
     "reviewCount": 88,
-    "tags": ["tea", "green tea", "darjeeling"],
+    "tags": [
+      "tea",
+      "green tea",
+      "darjeeling"
+    ],
     "isFeatured": true,
     "createdAt": "2026-04-26T00:00:00.000Z",
     "updatedAt": "2026-04-26T00:00:00.000Z"
@@ -87,7 +95,10 @@
     "stockCount": 18,
     "rating": 4.6,
     "reviewCount": 95,
-    "tags": ["olive oil", "cold pressed"],
+    "tags": [
+      "olive oil",
+      "cold pressed"
+    ],
     "isFeatured": false,
     "createdAt": "2026-04-26T00:00:00.000Z",
     "updatedAt": "2026-04-26T00:00:00.000Z"
@@ -118,7 +129,11 @@
     "stockCount": 40,
     "rating": 4.2,
     "reviewCount": 46,
-    "tags": ["home", "bamboo", "kitchen"],
+    "tags": [
+      "home",
+      "bamboo",
+      "kitchen"
+    ],
     "isFeatured": false,
     "createdAt": "2026-04-26T00:00:00.000Z",
     "updatedAt": "2026-04-26T00:00:00.000Z"
@@ -149,7 +164,11 @@
     "stockCount": 50,
     "rating": 4.4,
     "reviewCount": 59,
-    "tags": ["soap", "neem", "turmeric"],
+    "tags": [
+      "soap",
+      "neem",
+      "turmeric"
+    ],
     "isFeatured": false,
     "createdAt": "2026-04-26T00:00:00.000Z",
     "updatedAt": "2026-04-26T00:00:00.000Z"
@@ -180,7 +199,10 @@
     "stockCount": 15,
     "rating": 4.7,
     "reviewCount": 72,
-    "tags": ["ashwagandha", "supplements"],
+    "tags": [
+      "ashwagandha",
+      "supplements"
+    ],
     "isFeatured": true,
     "createdAt": "2026-04-26T00:00:00.000Z",
     "updatedAt": "2026-04-26T00:00:00.000Z"
@@ -211,7 +233,11 @@
     "stockCount": 22,
     "rating": 4.7,
     "reviewCount": 63,
-    "tags": ["copper", "bottle", "home"],
+    "tags": [
+      "copper",
+      "bottle",
+      "home"
+    ],
     "isFeatured": false,
     "createdAt": "2026-04-26T00:00:00.000Z",
     "updatedAt": "2026-04-26T00:00:00.000Z"
@@ -242,9 +268,4813 @@
     "stockCount": 28,
     "rating": 4.5,
     "reviewCount": 41,
-    "tags": ["moringa", "powder", "health"],
+    "tags": [
+      "moringa",
+      "powder",
+      "health"
+    ],
     "isFeatured": false,
     "createdAt": "2026-04-26T00:00:00.000Z",
     "updatedAt": "2026-04-26T00:00:00.000Z"
+  },
+  {
+    "id": "prod-9",
+    "slug": "brown-rice-syrup",
+    "name": "Brown Rice Syrup",
+    "category": "Pantry",
+    "price": 109,
+    "originalPrice": null,
+    "description": "Fava beans.",
+    "specifications": {
+      "Weight": "660g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-858046474113?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-9-1",
+        "alt": "Brown Rice Syrup"
+      }
+    ],
+    "emoji": "🥤",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 47,
+    "rating": 4.3,
+    "reviewCount": 172,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.359Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-10",
+    "slug": "moringa-leaf-powder",
+    "name": "Moringa Leaf Powder",
+    "category": "Beverages",
+    "price": 304,
+    "originalPrice": 382,
+    "description": "Couscous.",
+    "specifications": {
+      "Weight": "980g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-274844945786?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-10-1",
+        "alt": "Moringa Leaf Powder"
+      }
+    ],
+    "emoji": "🍙",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 38,
+    "rating": 5,
+    "reviewCount": 23,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-11",
+    "slug": "miraculin",
+    "name": "Miraculin",
+    "category": "Pantry",
+    "price": 118,
+    "originalPrice": 209,
+    "description": "Jerusalem artichokes.",
+    "specifications": {
+      "Weight": "797g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-484398833533?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-11-1",
+        "alt": "Miraculin"
+      }
+    ],
+    "emoji": "🌽",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 10,
+    "rating": 4.7,
+    "reviewCount": 95,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-12",
+    "slug": "carrots",
+    "name": "Carrots",
+    "category": "Personal Care",
+    "price": 360,
+    "originalPrice": null,
+    "description": "Cauliflower.",
+    "specifications": {
+      "Weight": "518g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-114190813462?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-12-1",
+        "alt": "Carrots"
+      }
+    ],
+    "emoji": "🍱",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 1,
+    "rating": 4.1,
+    "reviewCount": 165,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-13",
+    "slug": "molasses",
+    "name": "Molasses",
+    "category": "Pantry",
+    "price": 337,
+    "originalPrice": 417,
+    "description": "Curculin.",
+    "specifications": {
+      "Weight": "240g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-478804263030?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-13-1",
+        "alt": "Molasses"
+      }
+    ],
+    "emoji": "🍗",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 40,
+    "rating": 4.1,
+    "reviewCount": 110,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-14",
+    "slug": "pinto-beans",
+    "name": "Pinto Beans",
+    "category": "Home",
+    "price": 256,
+    "originalPrice": 307,
+    "description": "Mandarins.",
+    "specifications": {
+      "Weight": "808g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-165611718790?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-14-1",
+        "alt": "Pinto Beans"
+      }
+    ],
+    "emoji": "🍒",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 40,
+    "rating": 4.7,
+    "reviewCount": 173,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-15",
+    "slug": "breadfruit",
+    "name": "Breadfruit",
+    "category": "Health",
+    "price": 416,
+    "originalPrice": null,
+    "description": "Peppery radishes.",
+    "specifications": {
+      "Weight": "1007g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-111030467744?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-15-1",
+        "alt": "Breadfruit"
+      }
+    ],
+    "emoji": "🥕",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 35,
+    "rating": 4.7,
+    "reviewCount": 58,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-16",
+    "slug": "tomatoes",
+    "name": "Tomatoes",
+    "category": "Beverages",
+    "price": 200,
+    "originalPrice": 250,
+    "description": "Luo han guo.",
+    "specifications": {
+      "Weight": "844g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-450496598799?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-16-1",
+        "alt": "Tomatoes"
+      }
+    ],
+    "emoji": "🍖",
+    "badge": "sale",
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 3.6,
+    "reviewCount": 54,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-17",
+    "slug": "evaporated-cane-juice",
+    "name": "Evaporated Cane Juice",
+    "category": "Beverages",
+    "price": 348,
+    "originalPrice": 380,
+    "description": "Palm sugar.",
+    "specifications": {
+      "Weight": "402g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-657611098348?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-17-1",
+        "alt": "Evaporated Cane Juice"
+      }
+    ],
+    "emoji": "🍋",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 42,
+    "rating": 4.7,
+    "reviewCount": 75,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-18",
+    "slug": "pumpkin-seeds",
+    "name": "Pumpkin Seeds",
+    "category": "Home",
+    "price": 396,
+    "originalPrice": null,
+    "description": "Potassium-rich bananas.",
+    "specifications": {
+      "Weight": "100g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-413623072958?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-18-1",
+        "alt": "Pumpkin Seeds"
+      }
+    ],
+    "emoji": "🍔",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 37,
+    "rating": 4.5,
+    "reviewCount": 2,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-19",
+    "slug": "farro-milk",
+    "name": "Farro Milk",
+    "category": "Health",
+    "price": 397,
+    "originalPrice": 468,
+    "description": "Citrus lemons.",
+    "specifications": {
+      "Weight": "1065g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-812128662282?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-19-1",
+        "alt": "Farro Milk"
+      }
+    ],
+    "emoji": "💊",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 17,
+    "rating": 3.7,
+    "reviewCount": 71,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-20",
+    "slug": "black-rice",
+    "name": "Black Rice",
+    "category": "Beverages",
+    "price": 163,
+    "originalPrice": 257,
+    "description": "Creamy almond butter made from roasted almonds.",
+    "specifications": {
+      "Weight": "955g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-527915414323?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-20-1",
+        "alt": "Black Rice"
+      }
+    ],
+    "emoji": "🥮",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 9,
+    "rating": 4.3,
+    "reviewCount": 139,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-21",
+    "slug": "eggplant",
+    "name": "Eggplant",
+    "category": "Personal Care",
+    "price": 449,
+    "originalPrice": 535,
+    "description": "Sushi rice.",
+    "specifications": {
+      "Weight": "259g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-401994935120?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-21-1",
+        "alt": "Eggplant"
+      }
+    ],
+    "emoji": "🍪",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 19,
+    "rating": 4.5,
+    "reviewCount": 65,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-22",
+    "slug": "dried-dates",
+    "name": "Dried Dates",
+    "category": "Home",
+    "price": 262,
+    "originalPrice": 276,
+    "description": "Spelt milk.",
+    "specifications": {
+      "Weight": "366g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-87215753259?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-22-1",
+        "alt": "Dried Dates"
+      }
+    ],
+    "emoji": "🍪",
+    "badge": "sale",
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.7,
+    "reviewCount": 93,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-23",
+    "slug": "mannitol",
+    "name": "Mannitol",
+    "category": "Home",
+    "price": 448,
+    "originalPrice": 487,
+    "description": "Sweet dried apricots.",
+    "specifications": {
+      "Weight": "622g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-900296300772?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-23-1",
+        "alt": "Mannitol"
+      }
+    ],
+    "emoji": "🥗",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 33,
+    "rating": 4.2,
+    "reviewCount": 22,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-24",
+    "slug": "fava-beans",
+    "name": "Fava Beans",
+    "category": "Home",
+    "price": 171,
+    "originalPrice": 191,
+    "description": "Hemp milk.",
+    "specifications": {
+      "Weight": "272g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-322033168610?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-24-1",
+        "alt": "Fava Beans"
+      }
+    ],
+    "emoji": "🍪",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 34,
+    "rating": 3.6,
+    "reviewCount": 156,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-25",
+    "slug": "rapadura",
+    "name": "Rapadura",
+    "category": "Pantry",
+    "price": 268,
+    "originalPrice": null,
+    "description": "Mannitol.",
+    "specifications": {
+      "Weight": "668g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-780322680529?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-25-1",
+        "alt": "Rapadura"
+      }
+    ],
+    "emoji": "🍼",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 42,
+    "rating": 4.7,
+    "reviewCount": 153,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-26",
+    "slug": "sweet-potatoes",
+    "name": "Sweet Potatoes",
+    "category": "Home",
+    "price": 346,
+    "originalPrice": null,
+    "description": "Peaches.",
+    "specifications": {
+      "Weight": "701g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-142748451051?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-26-1",
+        "alt": "Sweet Potatoes"
+      }
+    ],
+    "emoji": "🥧",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 23,
+    "rating": 4.8,
+    "reviewCount": 98,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-27",
+    "slug": "dried-apricots",
+    "name": "Dried Apricots",
+    "category": "Pantry",
+    "price": 324,
+    "originalPrice": null,
+    "description": "Brazzein.",
+    "specifications": {
+      "Weight": "123g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-486036775399?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-27-1",
+        "alt": "Dried Apricots"
+      }
+    ],
+    "emoji": "🥜",
+    "badge": null,
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.2,
+    "reviewCount": 71,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-28",
+    "slug": "cold-pressed-olive-oil",
+    "name": "Cold Pressed Olive Oil",
+    "category": "Home",
+    "price": 203,
+    "originalPrice": 215,
+    "description": "Peaches.",
+    "specifications": {
+      "Weight": "320g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-702191884374?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-28-1",
+        "alt": "Cold Pressed Olive Oil"
+      }
+    ],
+    "emoji": "🍷",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 19,
+    "rating": 4.6,
+    "reviewCount": 25,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-29",
+    "slug": "sweet-proteins",
+    "name": "Sweet Proteins",
+    "category": "Beverages",
+    "price": 137,
+    "originalPrice": 146,
+    "description": "Oat milk.",
+    "specifications": {
+      "Weight": "530g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-840143189833?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-29-1",
+        "alt": "Sweet Proteins"
+      }
+    ],
+    "emoji": "🌯",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 37,
+    "rating": 4.9,
+    "reviewCount": 182,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-30",
+    "slug": "parsnips",
+    "name": "Parsnips",
+    "category": "Beverages",
+    "price": 190,
+    "originalPrice": null,
+    "description": "Mung beans.",
+    "specifications": {
+      "Weight": "445g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-358944252525?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-30-1",
+        "alt": "Parsnips"
+      }
+    ],
+    "emoji": "🍏",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 48,
+    "rating": 4,
+    "reviewCount": 0,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-31",
+    "slug": "edamame",
+    "name": "Edamame",
+    "category": "Beverages",
+    "price": 477,
+    "originalPrice": null,
+    "description": "Protein-packed quinoa grains.",
+    "specifications": {
+      "Weight": "617g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-896000008601?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-31-1",
+        "alt": "Edamame"
+      }
+    ],
+    "emoji": "🥨",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 34,
+    "rating": 3.7,
+    "reviewCount": 22,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-32",
+    "slug": "plums",
+    "name": "Plums",
+    "category": "Home",
+    "price": 241,
+    "originalPrice": 243,
+    "description": "Einkorn milk.",
+    "specifications": {
+      "Weight": "353g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-582038355859?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-32-1",
+        "alt": "Plums"
+      }
+    ],
+    "emoji": "🥤",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 38,
+    "rating": 4.2,
+    "reviewCount": 173,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-33",
+    "slug": "brussels-sprouts",
+    "name": "Brussels Sprouts",
+    "category": "Pantry",
+    "price": 328,
+    "originalPrice": null,
+    "description": "Passion fruit.",
+    "specifications": {
+      "Weight": "474g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-496082188687?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-33-1",
+        "alt": "Brussels Sprouts"
+      }
+    ],
+    "emoji": "🌯",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 38,
+    "rating": 4.2,
+    "reviewCount": 129,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-34",
+    "slug": "buckwheat",
+    "name": "Buckwheat",
+    "category": "Beverages",
+    "price": 77,
+    "originalPrice": null,
+    "description": "Fennel.",
+    "specifications": {
+      "Weight": "414g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-52591359831?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-34-1",
+        "alt": "Buckwheat"
+      }
+    ],
+    "emoji": "🥮",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 1,
+    "rating": 3.8,
+    "reviewCount": 144,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-35",
+    "slug": "honey",
+    "name": "Honey",
+    "category": "Health",
+    "price": 428,
+    "originalPrice": 502,
+    "description": "Dragon fruit.",
+    "specifications": {
+      "Weight": "810g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-801373090475?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-35-1",
+        "alt": "Honey"
+      }
+    ],
+    "emoji": "🥧",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 43,
+    "rating": 3.8,
+    "reviewCount": 63,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-36",
+    "slug": "neotame",
+    "name": "Neotame",
+    "category": "Beverages",
+    "price": 167,
+    "originalPrice": null,
+    "description": "Brussels sprouts.",
+    "specifications": {
+      "Weight": "803g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-796871188232?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-36-1",
+        "alt": "Neotame"
+      }
+    ],
+    "emoji": "🍠",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 12,
+    "rating": 4.5,
+    "reviewCount": 141,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-37",
+    "slug": "black-rice",
+    "name": "Black Rice",
+    "category": "Pantry",
+    "price": 398,
+    "originalPrice": null,
+    "description": "Sugar snap peas.",
+    "specifications": {
+      "Weight": "899g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-246333270777?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-37-1",
+        "alt": "Black Rice"
+      }
+    ],
+    "emoji": "🥓",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 35,
+    "rating": 3.8,
+    "reviewCount": 170,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-38",
+    "slug": "radishes",
+    "name": "Radishes",
+    "category": "Beverages",
+    "price": 214,
+    "originalPrice": null,
+    "description": "Curculin.",
+    "specifications": {
+      "Weight": "383g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-975845143787?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-38-1",
+        "alt": "Radishes"
+      }
+    ],
+    "emoji": "🍗",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 46,
+    "rating": 4.5,
+    "reviewCount": 73,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-39",
+    "slug": "sunflower-seeds",
+    "name": "Sunflower Seeds",
+    "category": "Health",
+    "price": 372,
+    "originalPrice": null,
+    "description": "Cauliflower.",
+    "specifications": {
+      "Weight": "661g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-924466600059?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-39-1",
+        "alt": "Sunflower Seeds"
+      }
+    ],
+    "emoji": "🍆",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 46,
+    "rating": 4.4,
+    "reviewCount": 169,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-40",
+    "slug": "cauliflower",
+    "name": "Cauliflower",
+    "category": "Personal Care",
+    "price": 198,
+    "originalPrice": 266,
+    "description": "Tempeh.",
+    "specifications": {
+      "Weight": "131g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-536521320527?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-40-1",
+        "alt": "Cauliflower"
+      }
+    ],
+    "emoji": "🍋",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 7,
+    "rating": 4.2,
+    "reviewCount": 47,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-41",
+    "slug": "corn",
+    "name": "Corn",
+    "category": "Home",
+    "price": 385,
+    "originalPrice": null,
+    "description": "Taro.",
+    "specifications": {
+      "Weight": "665g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-476243244915?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-41-1",
+        "alt": "Corn"
+      }
+    ],
+    "emoji": "🪥",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 49,
+    "rating": 3.9,
+    "reviewCount": 132,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-42",
+    "slug": "mushrooms",
+    "name": "Mushrooms",
+    "category": "Personal Care",
+    "price": 297,
+    "originalPrice": 376,
+    "description": "Nutrient-rich chia seeds for energy and omega-3s.",
+    "specifications": {
+      "Weight": "1017g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-200693969096?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-42-1",
+        "alt": "Mushrooms"
+      }
+    ],
+    "emoji": "🍨",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 24,
+    "rating": 4.4,
+    "reviewCount": 47,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-43",
+    "slug": "artificial-sweeteners",
+    "name": "Artificial Sweeteners",
+    "category": "Pantry",
+    "price": 71,
+    "originalPrice": null,
+    "description": "Emmer milk.",
+    "specifications": {
+      "Weight": "827g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-643453406935?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-43-1",
+        "alt": "Artificial Sweeteners"
+      }
+    ],
+    "emoji": "🍌",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 12,
+    "rating": 4.7,
+    "reviewCount": 91,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-44",
+    "slug": "turbinado-sugar",
+    "name": "Turbinado Sugar",
+    "category": "Home",
+    "price": 443,
+    "originalPrice": null,
+    "description": "Creamy almond butter made from roasted almonds.",
+    "specifications": {
+      "Weight": "288g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-830024878036?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-44-1",
+        "alt": "Turbinado Sugar"
+      }
+    ],
+    "emoji": "☕",
+    "badge": null,
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 3.7,
+    "reviewCount": 79,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-45",
+    "slug": "minute-rice",
+    "name": "Minute Rice",
+    "category": "Beverages",
+    "price": 377,
+    "originalPrice": 439,
+    "description": "Fiber-rich raspberries.",
+    "specifications": {
+      "Weight": "649g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-628739967060?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-45-1",
+        "alt": "Minute Rice"
+      }
+    ],
+    "emoji": "🍟",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 4,
+    "rating": 4.4,
+    "reviewCount": 151,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-46",
+    "slug": "seitan",
+    "name": "Seitan",
+    "category": "Personal Care",
+    "price": 382,
+    "originalPrice": 385,
+    "description": "Split peas.",
+    "specifications": {
+      "Weight": "159g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-356885540460?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-46-1",
+        "alt": "Seitan"
+      }
+    ],
+    "emoji": "🥝",
+    "badge": "sale",
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.1,
+    "reviewCount": 161,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-47",
+    "slug": "mabinlin",
+    "name": "Mabinlin",
+    "category": "Beverages",
+    "price": 190,
+    "originalPrice": null,
+    "description": "Curculin.",
+    "specifications": {
+      "Weight": "752g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-408511364808?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-47-1",
+        "alt": "Mabinlin"
+      }
+    ],
+    "emoji": "🪥",
+    "badge": null,
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.6,
+    "reviewCount": 48,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-48",
+    "slug": "maple-syrup",
+    "name": "Maple Syrup",
+    "category": "Pantry",
+    "price": 295,
+    "originalPrice": 358,
+    "description": "Brain-boosting walnuts.",
+    "specifications": {
+      "Weight": "959g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-669533996859?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-48-1",
+        "alt": "Maple Syrup"
+      }
+    ],
+    "emoji": "🥨",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 4,
+    "rating": 4.7,
+    "reviewCount": 6,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-49",
+    "slug": "converted-rice",
+    "name": "Converted Rice",
+    "category": "Beverages",
+    "price": 480,
+    "originalPrice": null,
+    "description": "Antioxidant cranberries.",
+    "specifications": {
+      "Weight": "296g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-693565197200?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-49-1",
+        "alt": "Converted Rice"
+      }
+    ],
+    "emoji": "🍆",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 7,
+    "rating": 4.2,
+    "reviewCount": 8,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-50",
+    "slug": "quinoa-milk",
+    "name": "Quinoa Milk",
+    "category": "Health",
+    "price": 280,
+    "originalPrice": 364,
+    "description": "Eggplant.",
+    "specifications": {
+      "Weight": "311g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-668812391536?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-50-1",
+        "alt": "Quinoa Milk"
+      }
+    ],
+    "emoji": "🦪",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 27,
+    "rating": 4.3,
+    "reviewCount": 24,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-51",
+    "slug": "lotus-root",
+    "name": "Lotus Root",
+    "category": "Home",
+    "price": 376,
+    "originalPrice": null,
+    "description": "Kiwi fruit.",
+    "specifications": {
+      "Weight": "711g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-57288497140?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-51-1",
+        "alt": "Lotus Root"
+      }
+    ],
+    "emoji": "🍭",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 35,
+    "rating": 3.9,
+    "reviewCount": 131,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-52",
+    "slug": "soy-milk",
+    "name": "Soy Milk",
+    "category": "Home",
+    "price": 331,
+    "originalPrice": 354,
+    "description": "Protein-packed quinoa grains.",
+    "specifications": {
+      "Weight": "762g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-285347032563?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-52-1",
+        "alt": "Soy Milk"
+      }
+    ],
+    "emoji": "🍾",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 35,
+    "rating": 3.6,
+    "reviewCount": 135,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-53",
+    "slug": "coconut-milk",
+    "name": "Coconut Milk",
+    "category": "Pantry",
+    "price": 288,
+    "originalPrice": 378,
+    "description": "Monellin.",
+    "specifications": {
+      "Weight": "471g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-52576961015?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-53-1",
+        "alt": "Coconut Milk"
+      }
+    ],
+    "emoji": "🧼",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 19,
+    "rating": 3.5,
+    "reviewCount": 61,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-54",
+    "slug": "spelt-milk",
+    "name": "Spelt Milk",
+    "category": "Pantry",
+    "price": 452,
+    "originalPrice": 508,
+    "description": "Ground turmeric root for cooking and health benefits.",
+    "specifications": {
+      "Weight": "671g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-309690426724?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-54-1",
+        "alt": "Spelt Milk"
+      }
+    ],
+    "emoji": "🧁",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 16,
+    "rating": 3.7,
+    "reviewCount": 78,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-55",
+    "slug": "mung-beans",
+    "name": "Mung Beans",
+    "category": "Home",
+    "price": 104,
+    "originalPrice": null,
+    "description": "Brussels sprouts.",
+    "specifications": {
+      "Weight": "135g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-407369001482?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-55-1",
+        "alt": "Mung Beans"
+      }
+    ],
+    "emoji": "🍡",
+    "badge": null,
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.3,
+    "reviewCount": 67,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-56",
+    "slug": "saccharin",
+    "name": "Saccharin",
+    "category": "Pantry",
+    "price": 271,
+    "originalPrice": null,
+    "description": "Iron-rich spinach.",
+    "specifications": {
+      "Weight": "598g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-342550708646?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-56-1",
+        "alt": "Saccharin"
+      }
+    ],
+    "emoji": "🍖",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 8,
+    "rating": 3.7,
+    "reviewCount": 86,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-57",
+    "slug": "rice-syrup",
+    "name": "Rice Syrup",
+    "category": "Beverages",
+    "price": 329,
+    "originalPrice": null,
+    "description": "Raw forest honey with a floral finish and zero heat processing.",
+    "specifications": {
+      "Weight": "738g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-820100415002?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-57-1",
+        "alt": "Rice Syrup"
+      }
+    ],
+    "emoji": "🍗",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 15,
+    "rating": 4.4,
+    "reviewCount": 171,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-58",
+    "slug": "carrots",
+    "name": "Carrots",
+    "category": "Pantry",
+    "price": 475,
+    "originalPrice": 517,
+    "description": "Tropical pineapples.",
+    "specifications": {
+      "Weight": "216g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-226073079210?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-58-1",
+        "alt": "Carrots"
+      }
+    ],
+    "emoji": "🍢",
+    "badge": "sale",
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4,
+    "reviewCount": 75,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-59",
+    "slug": "kamut-milk",
+    "name": "Kamut Milk",
+    "category": "Pantry",
+    "price": 173,
+    "originalPrice": null,
+    "description": "Vitamin C strawberries.",
+    "specifications": {
+      "Weight": "880g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-991252581152?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-59-1",
+        "alt": "Kamut Milk"
+      }
+    ],
+    "emoji": "🍹",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 38,
+    "rating": 3.9,
+    "reviewCount": 161,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-60",
+    "slug": "darjeeling-green-tea",
+    "name": "Darjeeling Green Tea",
+    "category": "Home",
+    "price": 364,
+    "originalPrice": 405,
+    "description": "Sucralose.",
+    "specifications": {
+      "Weight": "1017g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-467709189314?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-60-1",
+        "alt": "Darjeeling Green Tea"
+      }
+    ],
+    "emoji": "🌽",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 34,
+    "rating": 3.5,
+    "reviewCount": 0,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-61",
+    "slug": "pistachio-milk",
+    "name": "Pistachio Milk",
+    "category": "Beverages",
+    "price": 504,
+    "originalPrice": null,
+    "description": "Piloncillo.",
+    "specifications": {
+      "Weight": "668g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-307293328663?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-61-1",
+        "alt": "Pistachio Milk"
+      }
+    ],
+    "emoji": "🍮",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 26,
+    "rating": 4.6,
+    "reviewCount": 190,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-62",
+    "slug": "neotame",
+    "name": "Neotame",
+    "category": "Home",
+    "price": 403,
+    "originalPrice": null,
+    "description": "Bulgur.",
+    "specifications": {
+      "Weight": "255g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-220181449769?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-62-1",
+        "alt": "Neotame"
+      }
+    ],
+    "emoji": "🎂",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 35,
+    "rating": 4.7,
+    "reviewCount": 191,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-63",
+    "slug": "almond-butter",
+    "name": "Almond Butter",
+    "category": "Health",
+    "price": 442,
+    "originalPrice": null,
+    "description": "Basmati rice.",
+    "specifications": {
+      "Weight": "369g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-726380195261?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-63-1",
+        "alt": "Almond Butter"
+      }
+    ],
+    "emoji": "🍯",
+    "badge": null,
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.9,
+    "reviewCount": 193,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-64",
+    "slug": "oats",
+    "name": "Oats",
+    "category": "Personal Care",
+    "price": 215,
+    "originalPrice": 266,
+    "description": "Sweet mangoes.",
+    "specifications": {
+      "Weight": "221g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-803534528054?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-64-1",
+        "alt": "Oats"
+      }
+    ],
+    "emoji": "🍘",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 18,
+    "rating": 4.9,
+    "reviewCount": 129,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-65",
+    "slug": "chickpeas",
+    "name": "Chickpeas",
+    "category": "Home",
+    "price": 144,
+    "originalPrice": null,
+    "description": "Nectarines.",
+    "specifications": {
+      "Weight": "1029g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-513382461089?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-65-1",
+        "alt": "Chickpeas"
+      }
+    ],
+    "emoji": "🥒",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 26,
+    "rating": 3.6,
+    "reviewCount": 94,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-66",
+    "slug": "salsify",
+    "name": "Salsify",
+    "category": "Pantry",
+    "price": 464,
+    "originalPrice": 512,
+    "description": "Pistachio milk.",
+    "specifications": {
+      "Weight": "345g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-911854931967?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-66-1",
+        "alt": "Salsify"
+      }
+    ],
+    "emoji": "🍸",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 25,
+    "rating": 3.8,
+    "reviewCount": 99,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-67",
+    "slug": "carrots",
+    "name": "Carrots",
+    "category": "Pantry",
+    "price": 474,
+    "originalPrice": null,
+    "description": "Barley malt syrup.",
+    "specifications": {
+      "Weight": "853g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-737230250441?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-67-1",
+        "alt": "Carrots"
+      }
+    ],
+    "emoji": "🍚",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 16,
+    "rating": 4,
+    "reviewCount": 110,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-68",
+    "slug": "brown-rice",
+    "name": "Brown Rice",
+    "category": "Home",
+    "price": 203,
+    "originalPrice": 301,
+    "description": "Juicy grapes.",
+    "specifications": {
+      "Weight": "1092g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-627548969403?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-68-1",
+        "alt": "Brown Rice"
+      }
+    ],
+    "emoji": "🍖",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 17,
+    "rating": 4.5,
+    "reviewCount": 118,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-69",
+    "slug": "wild-rice",
+    "name": "Wild Rice",
+    "category": "Pantry",
+    "price": 148,
+    "originalPrice": null,
+    "description": "Durian.",
+    "specifications": {
+      "Weight": "403g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-245461634203?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-69-1",
+        "alt": "Wild Rice"
+      }
+    ],
+    "emoji": "🥝",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 27,
+    "rating": 4,
+    "reviewCount": 76,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-70",
+    "slug": "bananas",
+    "name": "Bananas",
+    "category": "Beverages",
+    "price": 473,
+    "originalPrice": 478,
+    "description": "Basmati rice.",
+    "specifications": {
+      "Weight": "485g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-766802042938?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-70-1",
+        "alt": "Bananas"
+      }
+    ],
+    "emoji": "🥟",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 50,
+    "rating": 3.6,
+    "reviewCount": 87,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-71",
+    "slug": "mangoes",
+    "name": "Mangoes",
+    "category": "Health",
+    "price": 452,
+    "originalPrice": 530,
+    "description": "Nutrient-rich chia seeds for energy and omega-3s.",
+    "specifications": {
+      "Weight": "102g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-286691444007?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-71-1",
+        "alt": "Mangoes"
+      }
+    ],
+    "emoji": "🍟",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 34,
+    "rating": 4,
+    "reviewCount": 23,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-72",
+    "slug": "peanuts",
+    "name": "Peanuts",
+    "category": "Beverages",
+    "price": 83,
+    "originalPrice": null,
+    "description": "Yams.",
+    "specifications": {
+      "Weight": "633g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-348439198919?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-72-1",
+        "alt": "Peanuts"
+      }
+    ],
+    "emoji": "🥒",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 29,
+    "rating": 4.3,
+    "reviewCount": 34,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-73",
+    "slug": "bamboo-shoots",
+    "name": "Bamboo Shoots",
+    "category": "Home",
+    "price": 67,
+    "originalPrice": null,
+    "description": "Durian.",
+    "specifications": {
+      "Weight": "852g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-992494404742?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-73-1",
+        "alt": "Bamboo Shoots"
+      }
+    ],
+    "emoji": "🍠",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 2,
+    "rating": 3.7,
+    "reviewCount": 169,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-74",
+    "slug": "rapadura",
+    "name": "Rapadura",
+    "category": "Beverages",
+    "price": 274,
+    "originalPrice": 321,
+    "description": "Basmati rice.",
+    "specifications": {
+      "Weight": "455g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-800037049413?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-74-1",
+        "alt": "Rapadura"
+      }
+    ],
+    "emoji": "🍯",
+    "badge": "sale",
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.5,
+    "reviewCount": 63,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-75",
+    "slug": "blackberries",
+    "name": "Blackberries",
+    "category": "Health",
+    "price": 293,
+    "originalPrice": 372,
+    "description": "Earthy beets.",
+    "specifications": {
+      "Weight": "1090g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-676890538525?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-75-1",
+        "alt": "Blackberries"
+      }
+    ],
+    "emoji": "🍊",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 38,
+    "rating": 4.2,
+    "reviewCount": 161,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-76",
+    "slug": "cherries",
+    "name": "Cherries",
+    "category": "Personal Care",
+    "price": 73,
+    "originalPrice": null,
+    "description": "Pistachio milk.",
+    "specifications": {
+      "Weight": "1003g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-753458216148?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-76-1",
+        "alt": "Cherries"
+      }
+    ],
+    "emoji": "🍦",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 34,
+    "rating": 4,
+    "reviewCount": 56,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-77",
+    "slug": "breadfruit",
+    "name": "Breadfruit",
+    "category": "Beverages",
+    "price": 289,
+    "originalPrice": null,
+    "description": "Clementines.",
+    "specifications": {
+      "Weight": "244g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-795416148622?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-77-1",
+        "alt": "Breadfruit"
+      }
+    ],
+    "emoji": "🥜",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 35,
+    "rating": 4.2,
+    "reviewCount": 174,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-78",
+    "slug": "tomatoes",
+    "name": "Tomatoes",
+    "category": "Pantry",
+    "price": 240,
+    "originalPrice": null,
+    "description": "Dragon fruit.",
+    "specifications": {
+      "Weight": "1070g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-657412613425?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-78-1",
+        "alt": "Tomatoes"
+      }
+    ],
+    "emoji": "🍱",
+    "badge": "new",
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.1,
+    "reviewCount": 138,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-79",
+    "slug": "brown-rice-syrup",
+    "name": "Brown Rice Syrup",
+    "category": "Home",
+    "price": 358,
+    "originalPrice": null,
+    "description": "Thaumatin.",
+    "specifications": {
+      "Weight": "606g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-266206283466?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-79-1",
+        "alt": "Brown Rice Syrup"
+      }
+    ],
+    "emoji": "🥚",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 30,
+    "rating": 4.6,
+    "reviewCount": 63,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-80",
+    "slug": "raisins",
+    "name": "Raisins",
+    "category": "Beverages",
+    "price": 406,
+    "originalPrice": null,
+    "description": "Basmati rice.",
+    "specifications": {
+      "Weight": "949g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-311311306101?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-80-1",
+        "alt": "Raisins"
+      }
+    ],
+    "emoji": "💊",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 33,
+    "rating": 4.7,
+    "reviewCount": 93,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-81",
+    "slug": "grapes",
+    "name": "Grapes",
+    "category": "Beverages",
+    "price": 415,
+    "originalPrice": null,
+    "description": "Rambutan.",
+    "specifications": {
+      "Weight": "599g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-37188816114?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-81-1",
+        "alt": "Grapes"
+      }
+    ],
+    "emoji": "🍖",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 28,
+    "rating": 4.6,
+    "reviewCount": 191,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-82",
+    "slug": "emmer-milk",
+    "name": "Emmer Milk",
+    "category": "Pantry",
+    "price": 273,
+    "originalPrice": 348,
+    "description": "Pomegranates.",
+    "specifications": {
+      "Weight": "344g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-552532158325?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-82-1",
+        "alt": "Emmer Milk"
+      }
+    ],
+    "emoji": "🍑",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 38,
+    "rating": 4.6,
+    "reviewCount": 176,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-83",
+    "slug": "agave-nectar",
+    "name": "Agave Nectar",
+    "category": "Beverages",
+    "price": 204,
+    "originalPrice": null,
+    "description": "Juicy grapes.",
+    "specifications": {
+      "Weight": "1058g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-91019813847?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-83-1",
+        "alt": "Agave Nectar"
+      }
+    ],
+    "emoji": "🌽",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 3,
+    "rating": 4.9,
+    "reviewCount": 128,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-84",
+    "slug": "jackfruit",
+    "name": "Jackfruit",
+    "category": "Pantry",
+    "price": 166,
+    "originalPrice": 245,
+    "description": "Minute rice.",
+    "specifications": {
+      "Weight": "504g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-316703411001?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-84-1",
+        "alt": "Jackfruit"
+      }
+    ],
+    "emoji": "🥤",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 6,
+    "rating": 4.5,
+    "reviewCount": 171,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-85",
+    "slug": "papayas",
+    "name": "Papayas",
+    "category": "Home",
+    "price": 231,
+    "originalPrice": 231,
+    "description": "Plantains.",
+    "specifications": {
+      "Weight": "939g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-692392961780?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-85-1",
+        "alt": "Papayas"
+      }
+    ],
+    "emoji": "💊",
+    "badge": "sale",
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 3.9,
+    "reviewCount": 8,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-86",
+    "slug": "sucralose",
+    "name": "Sucralose",
+    "category": "Personal Care",
+    "price": 190,
+    "originalPrice": null,
+    "description": "Polenta.",
+    "specifications": {
+      "Weight": "1048g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-867564381214?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-86-1",
+        "alt": "Sucralose"
+      }
+    ],
+    "emoji": "🍵",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 39,
+    "rating": 3.6,
+    "reviewCount": 43,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-87",
+    "slug": "instant-rice",
+    "name": "Instant Rice",
+    "category": "Beverages",
+    "price": 380,
+    "originalPrice": null,
+    "description": "Flax milk.",
+    "specifications": {
+      "Weight": "556g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-378217837190?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-87-1",
+        "alt": "Instant Rice"
+      }
+    ],
+    "emoji": "🍐",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 33,
+    "rating": 4.7,
+    "reviewCount": 131,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-88",
+    "slug": "tomatoes",
+    "name": "Tomatoes",
+    "category": "Home",
+    "price": 111,
+    "originalPrice": null,
+    "description": "Soy milk.",
+    "specifications": {
+      "Weight": "948g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-930233806293?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-88-1",
+        "alt": "Tomatoes"
+      }
+    ],
+    "emoji": "🍏",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 21,
+    "rating": 3.6,
+    "reviewCount": 107,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-89",
+    "slug": "zucchini",
+    "name": "Zucchini",
+    "category": "Health",
+    "price": 395,
+    "originalPrice": null,
+    "description": "Passion fruit.",
+    "specifications": {
+      "Weight": "1026g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-551228148519?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-89-1",
+        "alt": "Zucchini"
+      }
+    ],
+    "emoji": "🍧",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 12,
+    "rating": 4.7,
+    "reviewCount": 130,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-90",
+    "slug": "pumpkin-seeds",
+    "name": "Pumpkin Seeds",
+    "category": "Personal Care",
+    "price": 530,
+    "originalPrice": 604,
+    "description": "Miraculin.",
+    "specifications": {
+      "Weight": "890g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-734599276343?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-90-1",
+        "alt": "Pumpkin Seeds"
+      }
+    ],
+    "emoji": "🥤",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 29,
+    "rating": 4.1,
+    "reviewCount": 2,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-91",
+    "slug": "taro",
+    "name": "Taro",
+    "category": "Home",
+    "price": 441,
+    "originalPrice": null,
+    "description": "Vitamin C oranges.",
+    "specifications": {
+      "Weight": "172g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-270302900240?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-91-1",
+        "alt": "Taro"
+      }
+    ],
+    "emoji": "🍘",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 22,
+    "rating": 4.9,
+    "reviewCount": 27,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-92",
+    "slug": "celery",
+    "name": "Celery",
+    "category": "Home",
+    "price": 164,
+    "originalPrice": 216,
+    "description": "Aromatic garlic.",
+    "specifications": {
+      "Weight": "1019g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-948911631452?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-92-1",
+        "alt": "Celery"
+      }
+    ],
+    "emoji": "🍜",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 26,
+    "rating": 4.4,
+    "reviewCount": 137,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-93",
+    "slug": "soy-milk",
+    "name": "Soy Milk",
+    "category": "Pantry",
+    "price": 322,
+    "originalPrice": null,
+    "description": "Aromatic garlic.",
+    "specifications": {
+      "Weight": "845g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-722639512402?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-93-1",
+        "alt": "Soy Milk"
+      }
+    ],
+    "emoji": "🥨",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 45,
+    "rating": 4.2,
+    "reviewCount": 157,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-94",
+    "slug": "blackberries",
+    "name": "Blackberries",
+    "category": "Beverages",
+    "price": 247,
+    "originalPrice": null,
+    "description": "Corn on the cob.",
+    "specifications": {
+      "Weight": "178g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-375681296309?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-94-1",
+        "alt": "Blackberries"
+      }
+    ],
+    "emoji": "🥃",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 29,
+    "rating": 4.2,
+    "reviewCount": 113,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-95",
+    "slug": "radishes",
+    "name": "Radishes",
+    "category": "Home",
+    "price": 265,
+    "originalPrice": 344,
+    "description": "Artichokes.",
+    "specifications": {
+      "Weight": "231g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-751807035420?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-95-1",
+        "alt": "Radishes"
+      }
+    ],
+    "emoji": "🍆",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 45,
+    "rating": 4.8,
+    "reviewCount": 15,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-96",
+    "slug": "clementines",
+    "name": "Clementines",
+    "category": "Beverages",
+    "price": 169,
+    "originalPrice": null,
+    "description": "Sorbitol.",
+    "specifications": {
+      "Weight": "952g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-742742450018?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-96-1",
+        "alt": "Clementines"
+      }
+    ],
+    "emoji": "🍚",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 26,
+    "rating": 4.8,
+    "reviewCount": 165,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-97",
+    "slug": "oat-milk",
+    "name": "Oat Milk",
+    "category": "Personal Care",
+    "price": 480,
+    "originalPrice": null,
+    "description": "Sweet raisins.",
+    "specifications": {
+      "Weight": "635g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-780946357124?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-97-1",
+        "alt": "Oat Milk"
+      }
+    ],
+    "emoji": "🍯",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 22,
+    "rating": 4.1,
+    "reviewCount": 128,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-98",
+    "slug": "chickpeas",
+    "name": "Chickpeas",
+    "category": "Health",
+    "price": 509,
+    "originalPrice": null,
+    "description": "Citrus lemons.",
+    "specifications": {
+      "Weight": "376g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-122579438534?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-98-1",
+        "alt": "Chickpeas"
+      }
+    ],
+    "emoji": "🥧",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 22,
+    "rating": 4.8,
+    "reviewCount": 62,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-99",
+    "slug": "ashwagandha-ksm-66",
+    "name": "Ashwagandha KSM-66",
+    "category": "Personal Care",
+    "price": 465,
+    "originalPrice": null,
+    "description": "Creamy almond butter made from roasted almonds.",
+    "specifications": {
+      "Weight": "681g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-986324986908?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-99-1",
+        "alt": "Ashwagandha KSM-66"
+      }
+    ],
+    "emoji": "🍤",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 21,
+    "rating": 4.2,
+    "reviewCount": 128,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-100",
+    "slug": "fruit-juice-concentrate",
+    "name": "Fruit Juice Concentrate",
+    "category": "Personal Care",
+    "price": 441,
+    "originalPrice": 503,
+    "description": "Sweet proteins.",
+    "specifications": {
+      "Weight": "780g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-157625644780?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-100-1",
+        "alt": "Fruit Juice Concentrate"
+      }
+    ],
+    "emoji": "🥑",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 49,
+    "rating": 4,
+    "reviewCount": 78,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-101",
+    "slug": "kamut-milk",
+    "name": "Kamut Milk",
+    "category": "Pantry",
+    "price": 533,
+    "originalPrice": null,
+    "description": "Whole grain brown rice.",
+    "specifications": {
+      "Weight": "716g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-117337019365?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-101-1",
+        "alt": "Kamut Milk"
+      }
+    ],
+    "emoji": "🥭",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 26,
+    "rating": 4.6,
+    "reviewCount": 41,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-102",
+    "slug": "hemp-milk",
+    "name": "Hemp Milk",
+    "category": "Pantry",
+    "price": 121,
+    "originalPrice": 133,
+    "description": "Rutabagas.",
+    "specifications": {
+      "Weight": "436g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-642456473227?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-102-1",
+        "alt": "Hemp Milk"
+      }
+    ],
+    "emoji": "🍥",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 28,
+    "rating": 4.2,
+    "reviewCount": 144,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-103",
+    "slug": "cherries",
+    "name": "Cherries",
+    "category": "Personal Care",
+    "price": 196,
+    "originalPrice": 269,
+    "description": "Barley malt syrup.",
+    "specifications": {
+      "Weight": "774g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-278239191880?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-103-1",
+        "alt": "Cherries"
+      }
+    ],
+    "emoji": "🍨",
+    "badge": "sale",
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.2,
+    "reviewCount": 3,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-104",
+    "slug": "clementines",
+    "name": "Clementines",
+    "category": "Pantry",
+    "price": 328,
+    "originalPrice": 365,
+    "description": "Erythritol.",
+    "specifications": {
+      "Weight": "799g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-529444623701?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-104-1",
+        "alt": "Clementines"
+      }
+    ],
+    "emoji": "🥔",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 13,
+    "rating": 4.4,
+    "reviewCount": 143,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-105",
+    "slug": "sorghum-syrup",
+    "name": "Sorghum Syrup",
+    "category": "Health",
+    "price": 291,
+    "originalPrice": null,
+    "description": "Saccharin.",
+    "specifications": {
+      "Weight": "472g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-222486360481?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-105-1",
+        "alt": "Sorghum Syrup"
+      }
+    ],
+    "emoji": "🍍",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 50,
+    "rating": 4.3,
+    "reviewCount": 115,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-106",
+    "slug": "brown-rice",
+    "name": "Brown Rice",
+    "category": "Home",
+    "price": 224,
+    "originalPrice": 277,
+    "description": "Jaggery.",
+    "specifications": {
+      "Weight": "438g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-448048685715?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-106-1",
+        "alt": "Brown Rice"
+      }
+    ],
+    "emoji": "🥚",
+    "badge": "new",
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.5,
+    "reviewCount": 4,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-107",
+    "slug": "miraculin",
+    "name": "Miraculin",
+    "category": "Personal Care",
+    "price": 58,
+    "originalPrice": null,
+    "description": "Sweet peas.",
+    "specifications": {
+      "Weight": "583g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-514058900367?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-107-1",
+        "alt": "Miraculin"
+      }
+    ],
+    "emoji": "🍬",
+    "badge": null,
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.1,
+    "reviewCount": 82,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-108",
+    "slug": "dragon-fruit",
+    "name": "Dragon Fruit",
+    "category": "Personal Care",
+    "price": 269,
+    "originalPrice": 305,
+    "description": "Umami mushrooms.",
+    "specifications": {
+      "Weight": "100g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-404854401934?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-108-1",
+        "alt": "Dragon Fruit"
+      }
+    ],
+    "emoji": "🌯",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 8,
+    "rating": 4.5,
+    "reviewCount": 182,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-109",
+    "slug": "oat-milk",
+    "name": "Oat Milk",
+    "category": "Personal Care",
+    "price": 300,
+    "originalPrice": null,
+    "description": "Monellin.",
+    "specifications": {
+      "Weight": "819g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-475627225305?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-109-1",
+        "alt": "Oat Milk"
+      }
+    ],
+    "emoji": "🍦",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 9,
+    "rating": 4.7,
+    "reviewCount": 153,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-110",
+    "slug": "lettuce",
+    "name": "Lettuce",
+    "category": "Pantry",
+    "price": 50,
+    "originalPrice": 120,
+    "description": "Red rice.",
+    "specifications": {
+      "Weight": "246g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-997812644985?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-110-1",
+        "alt": "Lettuce"
+      }
+    ],
+    "emoji": "🥓",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 27,
+    "rating": 3.9,
+    "reviewCount": 57,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-111",
+    "slug": "longan",
+    "name": "Longan",
+    "category": "Personal Care",
+    "price": 141,
+    "originalPrice": 224,
+    "description": "Sun-dried moringa powder packed with micronutrients and fiber.",
+    "specifications": {
+      "Weight": "812g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-275012534821?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-111-1",
+        "alt": "Longan"
+      }
+    ],
+    "emoji": "🥙",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 7,
+    "rating": 4.4,
+    "reviewCount": 53,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-112",
+    "slug": "lotus-root",
+    "name": "Lotus Root",
+    "category": "Health",
+    "price": 91,
+    "originalPrice": null,
+    "description": "Cassava.",
+    "specifications": {
+      "Weight": "595g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-191542790131?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-112-1",
+        "alt": "Lotus Root"
+      }
+    ],
+    "emoji": "🍝",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 8,
+    "rating": 4.9,
+    "reviewCount": 59,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-113",
+    "slug": "pinto-beans",
+    "name": "Pinto Beans",
+    "category": "Beverages",
+    "price": 175,
+    "originalPrice": 246,
+    "description": "Protein-rich pumpkin seeds.",
+    "specifications": {
+      "Weight": "641g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-754974002668?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-113-1",
+        "alt": "Pinto Beans"
+      }
+    ],
+    "emoji": "🍔",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 37,
+    "rating": 4.6,
+    "reviewCount": 191,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-114",
+    "slug": "adzuki-beans",
+    "name": "Adzuki Beans",
+    "category": "Health",
+    "price": 376,
+    "originalPrice": 447,
+    "description": "Turbinado sugar.",
+    "specifications": {
+      "Weight": "556g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-874480522109?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-114-1",
+        "alt": "Adzuki Beans"
+      }
+    ],
+    "emoji": "🥂",
+    "badge": "new",
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.7,
+    "reviewCount": 108,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-115",
+    "slug": "dried-figs",
+    "name": "Dried Figs",
+    "category": "Beverages",
+    "price": 186,
+    "originalPrice": 245,
+    "description": "Saccharin.",
+    "specifications": {
+      "Weight": "815g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-612641634107?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-115-1",
+        "alt": "Dried Figs"
+      }
+    ],
+    "emoji": "🥠",
+    "badge": "sale",
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.1,
+    "reviewCount": 118,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-116",
+    "slug": "demerara-sugar",
+    "name": "Demerara Sugar",
+    "category": "Health",
+    "price": 84,
+    "originalPrice": 117,
+    "description": "Star fruit.",
+    "specifications": {
+      "Weight": "203g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-307271508146?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-116-1",
+        "alt": "Demerara Sugar"
+      }
+    ],
+    "emoji": "🌰",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 12,
+    "rating": 4.7,
+    "reviewCount": 47,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-117",
+    "slug": "pentadin",
+    "name": "Pentadin",
+    "category": "Health",
+    "price": 530,
+    "originalPrice": 612,
+    "description": "Spelt milk.",
+    "specifications": {
+      "Weight": "284g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-60180284342?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-117-1",
+        "alt": "Pentadin"
+      }
+    ],
+    "emoji": "🍬",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 46,
+    "rating": 4.8,
+    "reviewCount": 155,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-118",
+    "slug": "squash",
+    "name": "Squash",
+    "category": "Pantry",
+    "price": 469,
+    "originalPrice": null,
+    "description": "Advantame.",
+    "specifications": {
+      "Weight": "712g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-405585264970?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-118-1",
+        "alt": "Squash"
+      }
+    ],
+    "emoji": "🌯",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 49,
+    "rating": 3.9,
+    "reviewCount": 59,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-119",
+    "slug": "potatoes",
+    "name": "Potatoes",
+    "category": "Health",
+    "price": 430,
+    "originalPrice": null,
+    "description": "Ground turmeric root for cooking and health benefits.",
+    "specifications": {
+      "Weight": "177g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-969432353740?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-119-1",
+        "alt": "Potatoes"
+      }
+    ],
+    "emoji": "🍨",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 18,
+    "rating": 4.6,
+    "reviewCount": 150,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-120",
+    "slug": "coconut-milk",
+    "name": "Coconut Milk",
+    "category": "Pantry",
+    "price": 354,
+    "originalPrice": 444,
+    "description": "Mandarins.",
+    "specifications": {
+      "Weight": "408g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-337659958327?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-120-1",
+        "alt": "Coconut Milk"
+      }
+    ],
+    "emoji": "🥑",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 5,
+    "rating": 4.1,
+    "reviewCount": 171,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-121",
+    "slug": "peas",
+    "name": "Peas",
+    "category": "Beverages",
+    "price": 384,
+    "originalPrice": null,
+    "description": "Neotame.",
+    "specifications": {
+      "Weight": "262g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-392625990637?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-121-1",
+        "alt": "Peas"
+      }
+    ],
+    "emoji": "🫖",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 42,
+    "rating": 4.3,
+    "reviewCount": 91,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-122",
+    "slug": "onions",
+    "name": "Onions",
+    "category": "Pantry",
+    "price": 329,
+    "originalPrice": 409,
+    "description": "Lotus root.",
+    "specifications": {
+      "Weight": "730g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-511029364688?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-122-1",
+        "alt": "Onions"
+      }
+    ],
+    "emoji": "🥠",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 16,
+    "rating": 4.7,
+    "reviewCount": 114,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-123",
+    "slug": "barley-malt-syrup",
+    "name": "Barley Malt Syrup",
+    "category": "Health",
+    "price": 175,
+    "originalPrice": 179,
+    "description": "Citrus lemons.",
+    "specifications": {
+      "Weight": "1020g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-437242648559?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-123-1",
+        "alt": "Barley Malt Syrup"
+      }
+    ],
+    "emoji": "🍹",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 50,
+    "rating": 4.3,
+    "reviewCount": 66,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-124",
+    "slug": "agave-nectar",
+    "name": "Agave Nectar",
+    "category": "Health",
+    "price": 321,
+    "originalPrice": null,
+    "description": "Luo han guo.",
+    "specifications": {
+      "Weight": "191g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-55721280168?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-124-1",
+        "alt": "Agave Nectar"
+      }
+    ],
+    "emoji": "🍊",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 28,
+    "rating": 4.7,
+    "reviewCount": 66,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-125",
+    "slug": "onions",
+    "name": "Onions",
+    "category": "Beverages",
+    "price": 178,
+    "originalPrice": 272,
+    "description": "Demerara sugar.",
+    "specifications": {
+      "Weight": "1056g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-287882939143?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-125-1",
+        "alt": "Onions"
+      }
+    ],
+    "emoji": "🍟",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 39,
+    "rating": 4,
+    "reviewCount": 74,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-126",
+    "slug": "garlic",
+    "name": "Garlic",
+    "category": "Health",
+    "price": 125,
+    "originalPrice": null,
+    "description": "Sorbitol.",
+    "specifications": {
+      "Weight": "625g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-834568667336?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-126-1",
+        "alt": "Garlic"
+      }
+    ],
+    "emoji": "🍑",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 20,
+    "rating": 3.6,
+    "reviewCount": 195,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-127",
+    "slug": "sorghum",
+    "name": "Sorghum",
+    "category": "Health",
+    "price": 229,
+    "originalPrice": 267,
+    "description": "Lima beans.",
+    "specifications": {
+      "Weight": "908g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-519266213264?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-127-1",
+        "alt": "Sorghum"
+      }
+    ],
+    "emoji": "🥒",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 18,
+    "rating": 4.9,
+    "reviewCount": 72,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-128",
+    "slug": "sucanat",
+    "name": "Sucanat",
+    "category": "Health",
+    "price": 405,
+    "originalPrice": null,
+    "description": "Protein-rich pumpkin seeds.",
+    "specifications": {
+      "Weight": "673g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-396725110304?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-128-1",
+        "alt": "Sucanat"
+      }
+    ],
+    "emoji": "🥜",
+    "badge": null,
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.2,
+    "reviewCount": 73,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-129",
+    "slug": "coconut-sugar",
+    "name": "Coconut Sugar",
+    "category": "Health",
+    "price": 389,
+    "originalPrice": 470,
+    "description": "Magnesium-rich cashews.",
+    "specifications": {
+      "Weight": "900g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-829882379205?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-129-1",
+        "alt": "Coconut Sugar"
+      }
+    ],
+    "emoji": "🍛",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 42,
+    "rating": 4,
+    "reviewCount": 147,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-130",
+    "slug": "maltitol",
+    "name": "Maltitol",
+    "category": "Pantry",
+    "price": 134,
+    "originalPrice": null,
+    "description": "Burdock root.",
+    "specifications": {
+      "Weight": "371g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-246593425695?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-130-1",
+        "alt": "Maltitol"
+      }
+    ],
+    "emoji": "🦪",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 49,
+    "rating": 4.7,
+    "reviewCount": 179,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.360Z",
+    "updatedAt": "2026-04-26T17:46:01.360Z"
+  },
+  {
+    "id": "prod-131",
+    "slug": "minute-rice",
+    "name": "Minute Rice",
+    "category": "Beverages",
+    "price": 536,
+    "originalPrice": null,
+    "description": "Miraculin.",
+    "specifications": {
+      "Weight": "467g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-525002455621?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-131-1",
+        "alt": "Minute Rice"
+      }
+    ],
+    "emoji": "🥩",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 29,
+    "rating": 4.9,
+    "reviewCount": 28,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-132",
+    "slug": "limes",
+    "name": "Limes",
+    "category": "Home",
+    "price": 174,
+    "originalPrice": 206,
+    "description": "Basmati rice.",
+    "specifications": {
+      "Weight": "848g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-921227988826?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-132-1",
+        "alt": "Limes"
+      }
+    ],
+    "emoji": "🍻",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 13,
+    "rating": 4.8,
+    "reviewCount": 196,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-133",
+    "slug": "persimmons",
+    "name": "Persimmons",
+    "category": "Beverages",
+    "price": 223,
+    "originalPrice": null,
+    "description": "Aromatic garlic.",
+    "specifications": {
+      "Weight": "914g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-982337424774?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-133-1",
+        "alt": "Persimmons"
+      }
+    ],
+    "emoji": "🥤",
+    "badge": null,
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.2,
+    "reviewCount": 148,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-134",
+    "slug": "muscovado-sugar",
+    "name": "Muscovado Sugar",
+    "category": "Health",
+    "price": 370,
+    "originalPrice": null,
+    "description": "Luo han guo.",
+    "specifications": {
+      "Weight": "214g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-228134924210?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-134-1",
+        "alt": "Muscovado Sugar"
+      }
+    ],
+    "emoji": "🥧",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 48,
+    "rating": 3.7,
+    "reviewCount": 185,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-135",
+    "slug": "instant-rice",
+    "name": "Instant Rice",
+    "category": "Health",
+    "price": 537,
+    "originalPrice": 588,
+    "description": "Sweet plums.",
+    "specifications": {
+      "Weight": "411g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-391694730381?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-135-1",
+        "alt": "Instant Rice"
+      }
+    ],
+    "emoji": "💊",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 9,
+    "rating": 4.1,
+    "reviewCount": 27,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-136",
+    "slug": "molasses",
+    "name": "Molasses",
+    "category": "Pantry",
+    "price": 528,
+    "originalPrice": 622,
+    "description": "Isomalt.",
+    "specifications": {
+      "Weight": "710g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-873383971509?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-136-1",
+        "alt": "Molasses"
+      }
+    ],
+    "emoji": "🍥",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 43,
+    "rating": 4.4,
+    "reviewCount": 17,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-137",
+    "slug": "yams",
+    "name": "Yams",
+    "category": "Health",
+    "price": 374,
+    "originalPrice": 423,
+    "description": "Bamboo shoots.",
+    "specifications": {
+      "Weight": "872g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-581718214935?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-137-1",
+        "alt": "Yams"
+      }
+    ],
+    "emoji": "🍚",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 36,
+    "rating": 3.6,
+    "reviewCount": 189,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-138",
+    "slug": "grapefruit",
+    "name": "Grapefruit",
+    "category": "Health",
+    "price": 381,
+    "originalPrice": 477,
+    "description": "Muscovado sugar.",
+    "specifications": {
+      "Weight": "470g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-303565122393?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-138-1",
+        "alt": "Grapefruit"
+      }
+    ],
+    "emoji": "🍉",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 28,
+    "rating": 4,
+    "reviewCount": 64,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-139",
+    "slug": "tofu",
+    "name": "Tofu",
+    "category": "Beverages",
+    "price": 136,
+    "originalPrice": null,
+    "description": "Selenium-rich Brazil nuts.",
+    "specifications": {
+      "Weight": "539g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-523184449876?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-139-1",
+        "alt": "Tofu"
+      }
+    ],
+    "emoji": "🍺",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 1,
+    "rating": 3.5,
+    "reviewCount": 44,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-140",
+    "slug": "brown-rice-syrup",
+    "name": "Brown Rice Syrup",
+    "category": "Health",
+    "price": 445,
+    "originalPrice": null,
+    "description": "Crunchy roasted peanuts.",
+    "specifications": {
+      "Weight": "115g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-834347675562?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-140-1",
+        "alt": "Brown Rice Syrup"
+      }
+    ],
+    "emoji": "🥪",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 31,
+    "rating": 4.4,
+    "reviewCount": 98,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-141",
+    "slug": "coconut-milk",
+    "name": "Coconut Milk",
+    "category": "Health",
+    "price": 436,
+    "originalPrice": null,
+    "description": "Exotic papayas.",
+    "specifications": {
+      "Weight": "193g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-99839506401?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-141-1",
+        "alt": "Coconut Milk"
+      }
+    ],
+    "emoji": "🍧",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 10,
+    "rating": 3.8,
+    "reviewCount": 116,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-142",
+    "slug": "dried-apricots",
+    "name": "Dried Apricots",
+    "category": "Health",
+    "price": 206,
+    "originalPrice": 287,
+    "description": "Healthy fat macadamia nuts.",
+    "specifications": {
+      "Weight": "433g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-39825928739?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-142-1",
+        "alt": "Dried Apricots"
+      }
+    ],
+    "emoji": "🍥",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 23,
+    "rating": 5,
+    "reviewCount": 143,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-143",
+    "slug": "dried-dates",
+    "name": "Dried Dates",
+    "category": "Personal Care",
+    "price": 202,
+    "originalPrice": 265,
+    "description": "Instant rice.",
+    "specifications": {
+      "Weight": "511g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-166285981699?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-143-1",
+        "alt": "Dried Dates"
+      }
+    ],
+    "emoji": "🍸",
+    "badge": "sale",
+    "inStock": false,
+    "stockCount": 0,
+    "rating": 4.1,
+    "reviewCount": 38,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-144",
+    "slug": "cabbage",
+    "name": "Cabbage",
+    "category": "Pantry",
+    "price": 62,
+    "originalPrice": 85,
+    "description": "Rice syrup.",
+    "specifications": {
+      "Weight": "222g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-689335556443?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-144-1",
+        "alt": "Cabbage"
+      }
+    ],
+    "emoji": "🥤",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 27,
+    "rating": 4.5,
+    "reviewCount": 197,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-145",
+    "slug": "seitan",
+    "name": "Seitan",
+    "category": "Personal Care",
+    "price": 76,
+    "originalPrice": 152,
+    "description": "Thaumatin.",
+    "specifications": {
+      "Weight": "1068g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-754440921916?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-145-1",
+        "alt": "Seitan"
+      }
+    ],
+    "emoji": "🥠",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 49,
+    "rating": 4.4,
+    "reviewCount": 122,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-146",
+    "slug": "neotame",
+    "name": "Neotame",
+    "category": "Personal Care",
+    "price": 333,
+    "originalPrice": 358,
+    "description": "Grapefruit.",
+    "specifications": {
+      "Weight": "1030g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-40557991274?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-146-1",
+        "alt": "Neotame"
+      }
+    ],
+    "emoji": "🍶",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 21,
+    "rating": 3.8,
+    "reviewCount": 191,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-147",
+    "slug": "amaranth",
+    "name": "Amaranth",
+    "category": "Home",
+    "price": 476,
+    "originalPrice": null,
+    "description": "Taro.",
+    "specifications": {
+      "Weight": "387g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-848067853473?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-147-1",
+        "alt": "Amaranth"
+      }
+    ],
+    "emoji": "🍻",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 25,
+    "rating": 3.9,
+    "reviewCount": 4,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-148",
+    "slug": "date-syrup",
+    "name": "Date Syrup",
+    "category": "Personal Care",
+    "price": 342,
+    "originalPrice": null,
+    "description": "Tangy limes.",
+    "specifications": {
+      "Weight": "538g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-87686451899?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-148-1",
+        "alt": "Date Syrup"
+      }
+    ],
+    "emoji": "🥠",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 22,
+    "rating": 3.9,
+    "reviewCount": 88,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-149",
+    "slug": "ashwagandha-ksm-66",
+    "name": "Ashwagandha KSM-66",
+    "category": "Beverages",
+    "price": 421,
+    "originalPrice": null,
+    "description": "Omega-3 rich flaxseeds.",
+    "specifications": {
+      "Weight": "932g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-835320604506?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-149-1",
+        "alt": "Ashwagandha KSM-66"
+      }
+    ],
+    "emoji": "🍷",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 29,
+    "rating": 4.9,
+    "reviewCount": 162,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-150",
+    "slug": "sweet-proteins",
+    "name": "Sweet Proteins",
+    "category": "Pantry",
+    "price": 549,
+    "originalPrice": null,
+    "description": "Cassava.",
+    "specifications": {
+      "Weight": "1001g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-837878035218?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-150-1",
+        "alt": "Sweet Proteins"
+      }
+    ],
+    "emoji": "🥑",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 12,
+    "rating": 4.1,
+    "reviewCount": 10,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-151",
+    "slug": "bananas",
+    "name": "Bananas",
+    "category": "Pantry",
+    "price": 288,
+    "originalPrice": null,
+    "description": "Persimmons.",
+    "specifications": {
+      "Weight": "561g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-587543135741?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-151-1",
+        "alt": "Bananas"
+      }
+    ],
+    "emoji": "🥖",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 14,
+    "rating": 4.7,
+    "reviewCount": 172,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-152",
+    "slug": "saccharin",
+    "name": "Saccharin",
+    "category": "Beverages",
+    "price": 336,
+    "originalPrice": 416,
+    "description": "Fava beans.",
+    "specifications": {
+      "Weight": "644g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-457977744230?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-152-1",
+        "alt": "Saccharin"
+      }
+    ],
+    "emoji": "🍡",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 32,
+    "rating": 3.5,
+    "reviewCount": 108,
+    "tags": [
+      "beverages"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-153",
+    "slug": "sweet-potatoes",
+    "name": "Sweet Potatoes",
+    "category": "Home",
+    "price": 195,
+    "originalPrice": 247,
+    "description": "Almond milk.",
+    "specifications": {
+      "Weight": "547g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-844909559339?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-153-1",
+        "alt": "Sweet Potatoes"
+      }
+    ],
+    "emoji": "🍑",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 47,
+    "rating": 4.1,
+    "reviewCount": 34,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-154",
+    "slug": "walnuts",
+    "name": "Walnuts",
+    "category": "Home",
+    "price": 66,
+    "originalPrice": null,
+    "description": "Blackstrap molasses.",
+    "specifications": {
+      "Weight": "793g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-721050252826?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-154-1",
+        "alt": "Walnuts"
+      }
+    ],
+    "emoji": "🪥",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 37,
+    "rating": 4.6,
+    "reviewCount": 150,
+    "tags": [
+      "home"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-155",
+    "slug": "flaxseeds",
+    "name": "Flaxseeds",
+    "category": "Personal Care",
+    "price": 326,
+    "originalPrice": null,
+    "description": "Polenta.",
+    "specifications": {
+      "Weight": "948g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-924067729150?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-155-1",
+        "alt": "Flaxseeds"
+      }
+    ],
+    "emoji": "🧼",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 33,
+    "rating": 3.6,
+    "reviewCount": 104,
+    "tags": [
+      "personal care"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-156",
+    "slug": "kumquats",
+    "name": "Kumquats",
+    "category": "Pantry",
+    "price": 173,
+    "originalPrice": null,
+    "description": "Dragon fruit.",
+    "specifications": {
+      "Weight": "335g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-216110725149?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-156-1",
+        "alt": "Kumquats"
+      }
+    ],
+    "emoji": "🥪",
+    "badge": null,
+    "inStock": true,
+    "stockCount": 20,
+    "rating": 4.7,
+    "reviewCount": 143,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-157",
+    "slug": "pinto-beans",
+    "name": "Pinto Beans",
+    "category": "Health",
+    "price": 435,
+    "originalPrice": 522,
+    "description": "Lentils.",
+    "specifications": {
+      "Weight": "504g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-568227949181?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-157-1",
+        "alt": "Pinto Beans"
+      }
+    ],
+    "emoji": "🥗",
+    "badge": "sale",
+    "inStock": true,
+    "stockCount": 14,
+    "rating": 4.4,
+    "reviewCount": 43,
+    "tags": [
+      "health"
+    ],
+    "isFeatured": false,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
+  },
+  {
+    "id": "prod-158",
+    "slug": "walnuts",
+    "name": "Walnuts",
+    "category": "Pantry",
+    "price": 446,
+    "originalPrice": null,
+    "description": "Saccharin.",
+    "specifications": {
+      "Weight": "578g",
+      "Origin": "India"
+    },
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-599897628120?auto=format&fit=crop&w=900&q=80",
+        "publicId": "prod-158-1",
+        "alt": "Walnuts"
+      }
+    ],
+    "emoji": "🍠",
+    "badge": "new",
+    "inStock": true,
+    "stockCount": 38,
+    "rating": 4.1,
+    "reviewCount": 112,
+    "tags": [
+      "pantry"
+    ],
+    "isFeatured": true,
+    "createdAt": "2026-04-26T17:46:01.361Z",
+    "updatedAt": "2026-04-26T17:46:01.361Z"
   }
 ]
