@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppContext } from "../../hooks/useAppContext";
 import { calculateDiscount } from "../../utils/calculateDiscount";
@@ -7,15 +8,23 @@ import { StarRating } from "../ui/StarRating";
 import { ProductBadge } from "./ProductBadge";
 
 export function ProductCard({ product }) {
+  const [imageError, setImageError] = useState(false);
   const { cart, wishlistIds, toggleWishlist, notify } = useAppContext();
   const discount = calculateDiscount(product.price, product.originalPrice);
   const isWishlisted = wishlistIds.includes(product.id);
+  const imageUrl = product.images?.[0]?.url;
+  const showImage = imageUrl && !imageError;
 
   return (
     <article className="pcard">
       <div className="pcard-img" style={{ background: product.bg || "#f5f0e8" }}>
-        {product.images?.[0]?.url ? (
-          <img className="pcard-photo" src={product.images[0].url} alt={product.name} />
+        {showImage ? (
+          <img
+            className="pcard-photo"
+            src={imageUrl}
+            alt={product.name}
+            onError={() => setImageError(true)}
+          />
         ) : (
           <span>{product.emoji || "📦"}</span>
         )}
