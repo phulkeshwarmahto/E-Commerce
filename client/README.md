@@ -1157,47 +1157,6 @@ VITE_API_BASE_URL      = https://api.grambazaar.in/api
 VITE_RAZORPAY_KEY_ID   = rzp_live_xxxx
 ```
 
-### Backend → Railway
-```bash
-# Connect GitHub repo on railway.app
-# Set root directory to: server
-# Add environment variables from server/.env
-# Railway auto-detects Node.js and runs: npm start
-
-# Custom domain: api.grambazaar.in → Railway deployment URL
-```
-
-### Alternative: Docker Compose
-```yaml
-# docker-compose.yml
-version: "3.9"
-services:
-  server:
-    build: ./server
-    ports: ["5000:5000"]
-    env_file: ./server/.env
-    depends_on: [mongo]
-
-  client:
-    build: ./client
-    ports: ["80:80"]
-    depends_on: [server]
-
-  mongo:
-    image: mongo:6
-    volumes: [mongo_data:/data/db]
-    ports: ["27017:27017"]
-
-volumes:
-  mongo_data:
-```
-
-```bash
-docker-compose up --build
-```
-
----
-
 ## 🤝 Contributing
 
 1. Fork the repository
