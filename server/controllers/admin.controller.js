@@ -1,5 +1,5 @@
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { db } from "../utils/mockDb.js";
+import { db, saveProducts } from "../utils/mockDb.js";
 
 export const getDashboard = (_req, res) => {
   const revenue = db.orders.reduce((sum, order) => sum + order.total, 0);
@@ -61,6 +61,7 @@ export const createProduct = (req, res) => {
   };
 
   db.products.unshift(product);
+  saveProducts();
   res.status(201).json(new ApiResponse(true, "Product created.", { product }));
 };
 
@@ -81,5 +82,6 @@ export const updateProduct = (req, res) => {
     updatedAt: new Date().toISOString(),
   });
 
+  saveProducts();
   res.json(new ApiResponse(true, "Product updated.", { product }));
 };

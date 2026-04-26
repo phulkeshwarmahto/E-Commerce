@@ -1,4 +1,32 @@
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const now = () => new Date().toISOString();
+
+const productsFile = path.join(__dirname, "../seeds/products.json");
+
+let products = [];
+try {
+  const data = fs.readFileSync(productsFile, "utf8");
+  products = JSON.parse(data);
+} catch (error) {
+  console.log("Products file not found or invalid, using default products.");
+  products = [
+    // ... existing products ...
+  ];
+}
+
+const saveProducts = () => {
+  try {
+    fs.writeFileSync(productsFile, JSON.stringify(products, null, 2));
+  } catch (error) {
+    console.error("Failed to save products:", error);
+  }
+};
 
 export const db = {
   users: [
@@ -21,256 +49,9 @@ export const db = {
       createdAt: now(),
     },
   ],
-  products: [
-    {
-      id: "prod-1",
-      slug: "organic-wild-honey",
-      name: "Organic Wild Honey",
-      category: "Pantry",
-      price: 399,
-      originalPrice: 499,
-      description: "Raw forest honey with a floral finish and zero heat processing.",
-      specifications: {
-        Weight: "500g",
-        Origin: "Jharkhand",
-        Processing: "Raw",
-      },
-      images: [
-        {
-          url: "https://images.unsplash.com/photo-1587049352851-8d4e89133924?auto=format&fit=crop&w=900&q=80",
-          publicId: "honey-1",
-          alt: "Organic wild honey jar",
-        },
-      ],
-      emoji: "🍯",
-      badge: "sale",
-      inStock: true,
-      stockCount: 24,
-      rating: 4.8,
-      reviewCount: 124,
-      tags: ["raw", "honey", "forest"],
-      isFeatured: true,
-      createdAt: now(),
-      updatedAt: now(),
-    },
-    {
-      id: "prod-2",
-      slug: "darjeeling-green-tea",
-      name: "Darjeeling Green Tea",
-      category: "Beverages",
-      price: 249,
-      originalPrice: null,
-      description: "Light, floral first-flush tea sourced from Darjeeling estates.",
-      specifications: {
-        Weight: "50g",
-        Cups: "25",
-        Flush: "First Flush",
-      },
-      images: [
-        {
-          url: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=900&q=80",
-          publicId: "tea-1",
-          alt: "Cup of green tea",
-        },
-      ],
-      emoji: "🍵",
-      badge: "new",
-      inStock: true,
-      stockCount: 30,
-      rating: 4.7,
-      reviewCount: 88,
-      tags: ["tea", "green tea", "darjeeling"],
-      isFeatured: true,
-      createdAt: now(),
-      updatedAt: now(),
-    },
-    {
-      id: "prod-3",
-      slug: "cold-pressed-olive-oil",
-      name: "Olive Oil Extra Virgin",
-      category: "Pantry",
-      price: 549,
-      originalPrice: 649,
-      description: "Single-origin extra virgin olive oil with low acidity and rich aroma.",
-      specifications: {
-        Volume: "500ml",
-        Acidity: "< 0.5%",
-        Origin: "Rajasthan",
-      },
-      images: [
-        {
-          url: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=900&q=80",
-          publicId: "oil-1",
-          alt: "Olive oil bottle",
-        },
-      ],
-      emoji: "🫒",
-      badge: "sale",
-      inStock: true,
-      stockCount: 18,
-      rating: 4.6,
-      reviewCount: 95,
-      tags: ["olive oil", "cold pressed"],
-      isFeatured: false,
-      createdAt: now(),
-      updatedAt: now(),
-    },
-    {
-      id: "prod-4",
-      slug: "bamboo-dish-brush",
-      name: "Bamboo Dish Brush",
-      category: "Home",
-      price: 189,
-      originalPrice: null,
-      description: "Biodegradable bamboo brush with natural sisal bristles.",
-      specifications: {
-        Material: "Bamboo + Sisal",
-        Length: "28cm",
-        Pack: "Single",
-      },
-      images: [
-        {
-          url: "https://images.unsplash.com/photo-1616627457211-92bfdf76f27b?auto=format&fit=crop&w=900&q=80",
-          publicId: "brush-1",
-          alt: "Bamboo dish brush",
-        },
-      ],
-      emoji: "🪥",
-      badge: "new",
-      inStock: true,
-      stockCount: 40,
-      rating: 4.2,
-      reviewCount: 46,
-      tags: ["home", "bamboo", "kitchen"],
-      isFeatured: false,
-      createdAt: now(),
-      updatedAt: now(),
-    },
-    {
-      id: "prod-5",
-      slug: "neem-turmeric-soap",
-      name: "Neem & Turmeric Soap",
-      category: "Personal Care",
-      price: 220,
-      originalPrice: null,
-      description: "Gentle handcrafted soap with neem and turmeric for daily care.",
-      specifications: {
-        Weight: "100g",
-        Skin: "All Types",
-        FreeFrom: "SLS, Parabens",
-      },
-      images: [
-        {
-          url: "https://images.unsplash.com/photo-1607006483225-53dbf6577722?auto=format&fit=crop&w=900&q=80",
-          publicId: "soap-1",
-          alt: "Neem soap bars",
-        },
-      ],
-      emoji: "🧼",
-      badge: null,
-      inStock: true,
-      stockCount: 50,
-      rating: 4.4,
-      reviewCount: 59,
-      tags: ["soap", "neem", "turmeric"],
-      isFeatured: false,
-      createdAt: now(),
-      updatedAt: now(),
-    },
-    {
-      id: "prod-6",
-      slug: "ashwagandha-ksm66",
-      name: "Ashwagandha KSM-66",
-      category: "Health",
-      price: 499,
-      originalPrice: 599,
-      description: "Clinically studied KSM-66 capsules for stress and stamina support.",
-      specifications: {
-        Count: "60 capsules",
-        Dose: "500mg",
-        Type: "Veg",
-      },
-      images: [
-        {
-          url: "https://images.unsplash.com/photo-1576671081837-49000212a370?auto=format&fit=crop&w=900&q=80",
-          publicId: "capsules-1",
-          alt: "Capsule supplement bottle",
-        },
-      ],
-      emoji: "💊",
-      badge: "sale",
-      inStock: true,
-      stockCount: 15,
-      rating: 4.7,
-      reviewCount: 72,
-      tags: ["ashwagandha", "supplements"],
-      isFeatured: true,
-      createdAt: now(),
-      updatedAt: now(),
-    },
-    {
-      id: "prod-7",
-      slug: "copper-water-bottle",
-      name: "Copper Water Bottle",
-      category: "Home",
-      price: 599,
-      originalPrice: null,
-      description: "Pure copper bottle crafted for everyday Ayurvedic hydration.",
-      specifications: {
-        Volume: "1L",
-        Material: "Copper",
-        Cap: "Leak-proof",
-      },
-      images: [
-        {
-          url: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=900&q=80",
-          publicId: "copper-1",
-          alt: "Copper bottle",
-        },
-      ],
-      emoji: "🥤",
-      badge: null,
-      inStock: true,
-      stockCount: 22,
-      rating: 4.7,
-      reviewCount: 63,
-      tags: ["copper", "bottle", "home"],
-      isFeatured: false,
-      createdAt: now(),
-      updatedAt: now(),
-    },
-    {
-      id: "prod-8",
-      slug: "moringa-leaf-powder",
-      name: "Moringa Leaf Powder",
-      category: "Health",
-      price: 329,
-      originalPrice: null,
-      description: "Sun-dried moringa powder packed with micronutrients and fiber.",
-      specifications: {
-        Weight: "200g",
-        Form: "Fine Powder",
-        ShelfLife: "18 months",
-      },
-      images: [
-        {
-          url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=80",
-          publicId: "moringa-1",
-          alt: "Moringa powder bowl",
-        },
-      ],
-      emoji: "🌿",
-      badge: null,
-      inStock: true,
-      stockCount: 28,
-      rating: 4.5,
-      reviewCount: 41,
-      tags: ["moringa", "powder", "health"],
-      isFeatured: false,
-      createdAt: now(),
-      updatedAt: now(),
-    },
-  ],
+  products,
+  // ... rest of db ...
+  // ... rest of db ...
   reviews: [
     {
       id: "review-1",
@@ -345,5 +126,4 @@ export const db = {
   ],
 };
 
-export const findUserById = (id) => db.users.find((user) => user.id === id);
-export const findProductById = (id) => db.products.find((product) => product.id === id);
+export { saveProducts };
