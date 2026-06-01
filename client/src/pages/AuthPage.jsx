@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../hooks/useAppContext";
 
@@ -35,13 +35,71 @@ const roles = [
 
 export function AuthPage() {
   const navigate = useNavigate();
-  const { login, register, notify } = useAppContext();
+  const { login, register, googleLogin, notify } = useAppContext();
   const [mode, setMode] = useState("signin");
   const [selectedRole, setSelectedRole] = useState("user");
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (selectedRole === "admin") return;
+
+    /* global google */
+    if (typeof window !== "undefined" && window.google) {
+      try {
+        window.google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "335278705051-pmlk2h2a5gkl5ld0p4ch2q4chgr79o8v.apps.googleusercontent.com",
+          callback: async (response) => {
+            setError("");
+            setLoading(true);
+            try {
+              const loggedInUser = await googleLogin({ idToken: response.credential, role: selectedRole });
+              notify(`Welcome ${loggedInUser.name}! 👋`);
+              if (loggedInUser.role === "admin") {
+                navigate("/admin");
+              } else if (loggedInUser.role === "seller") {
+                navigate("/seller");
+              } else {
+                navigate("/account");
+              }
+            } catch (err) {
+              setError(err?.message || "Google authentication failed.");
+            } finally {
+              setLoading(false);
+            }
+          },
+        });
+
+        const btnElement = document.getElementById("google-signin-btn");
+        if (btnElement) {
+          window.google.accounts.id.renderButton(btnElement, {
+            theme: "outline",
+            size: "large",
+            width: "100%",
+            text: mode === "signin" ? "signin_with" : "signup_with",
+          });
+        }
+      } catch (err) {
+        console.error("Google GIS initialization error:", err);
+      }
+    }
+  }, [selectedRole, mode, googleLogin, navigate, notify]);
+
+  const handleAdminQuickLogin = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      await login({ email: "admin@grambazaar.in", password: "Admin@1234" });
+      notify("Welcome back, Administrator! 🛠️");
+      navigate("/admin");
+    } catch (err) {
+      setError(err?.message || "Admin login failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const activeRole = roles.find((r) => r.id === selectedRole);
 
@@ -158,6 +216,31 @@ export function AuthPage() {
                 )}
               </p>
             </div>
+            
+            {selectedRole === "admin" && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-2 mb-5">
+                <div className="flex gap-2.5 items-start text-left">
+                  <span className="text-xl">💡</span>
+                  <div>
+                    <p className="text-xs font-bold text-amber-900 leading-normal">
+                      Admin Testing Mode Enabled
+                    </p>
+                    <p className="text-[0.72rem] text-amber-700 leading-normal mt-0.5">
+                      You can log in with: <br />
+                      <strong>Email:</strong> admin@grambazaar.in <br />
+                      <strong>Password:</strong> Admin@1234
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleAdminQuickLogin}
+                      className="mt-3 bg-amber-600 hover:bg-amber-700 text-white text-[0.7rem] font-bold py-1.5 px-3 rounded-lg transition-colors shadow-sm"
+                    >
+                      🚀 Quick Login as Admin
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -239,6 +322,19 @@ export function AuthPage() {
                     : `Create ${activeRole?.label} Account →`}
               </button>
             </form>
+
+            {selectedRole !== "admin" && (
+              <>
+                <div className="relative my-4 flex py-1 items-center justify-center">
+                  <div className="flex-grow border-t border-gray-200"></div>
+                  <span className="flex-shrink mx-3 text-gray-400 text-xs font-semibold uppercase tracking-wider">
+                    or continue with
+                  </span>
+                  <div className="flex-grow border-t border-gray-200"></div>
+                </div>
+                <div id="google-signin-btn" className="w-full flex justify-center min-h-[44px]"></div>
+              </>
+            )}
 
             {/* Switch mode */}
             <div className="text-center mt-5 pt-4 border-t border-gray-100">

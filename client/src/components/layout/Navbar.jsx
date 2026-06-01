@@ -192,11 +192,20 @@ export function Navbar() {
                 label="Account"
                 onClick={() => navigate("/account")}
               />
-              <NavIconBtn
-                icon={<AdminIcon />}
-                label="Admin"
-                onClick={() => navigate("/admin")}
-              />
+              {user.role === "admin" && (
+                <NavIconBtn
+                  icon={<AdminIcon />}
+                  label="Admin"
+                  onClick={() => navigate("/admin")}
+                />
+              )}
+              {user.role === "seller" && (
+                <NavIconBtn
+                  icon={<AdminIcon />}
+                  label="Seller"
+                  onClick={() => navigate("/seller")}
+                />
+              )}
             </>
           ) : (
             <NavIconBtn
@@ -334,7 +343,8 @@ export function Navbar() {
               { label: "My Orders", to: "/orders" },
               { label: "Wishlist", to: "/wishlist" },
               { label: user ? "Account" : "Sign In", to: user ? "/account" : "/auth" },
-              ...(user ? [{ label: "Admin Panel", to: "/admin" }] : []),
+              ...(user && user.role === "admin" ? [{ label: "Admin Panel", to: "/admin" }] : []),
+              ...(user && user.role === "seller" ? [{ label: "Seller Panel", to: "/seller" }] : []),
             ].map(({ label, to }) => (
               <NavLink
                 key={to}

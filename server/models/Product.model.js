@@ -28,6 +28,7 @@ const productSchema = new mongoose.Schema(
     reviewCount: { type: Number, default: 0, min: 0 },
     tags: { type: [String], default: [] },
     isFeatured: { type: Boolean, default: false },
+    seller: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },
   },
   { timestamps: true },
 );

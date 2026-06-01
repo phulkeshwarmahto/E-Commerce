@@ -15,6 +15,7 @@ import { useOrders } from "./hooks/useOrders";
 import { getStoredWishlist, setStoredWishlist } from "./store/wishlistStore";
 import { AccountPage } from "./pages/AccountPage";
 import { AdminPage } from "./pages/AdminPage";
+import { SellerPage } from "./pages/SellerPage";
 import { AuthPage } from "./pages/AuthPage";
 import { CartPage } from "./pages/CartPage";
 import { CheckoutPage } from "./pages/CheckoutPage";
@@ -71,6 +72,7 @@ export default function App() {
                 <Route path="/wishlist" element={<WishlistPage />} />
                 <Route path="/account" element={<AccountPage />} />
                 <Route path="/admin" element={<AdminPage />} />
+                <Route path="/seller" element={<SellerPage />} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

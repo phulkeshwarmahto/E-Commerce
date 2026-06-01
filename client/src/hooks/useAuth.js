@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { loginRequest, meRequest, registerRequest } from "../api/auth.api";
+import { loginRequest, meRequest, registerRequest, googleLoginRequest } from "../api/auth.api";
 import {
   clearStoredSession,
   getStoredSession,
@@ -55,6 +55,19 @@ export function useAuth() {
     }
   };
 
+  const googleLogin = async (payload) => {
+    setLoading(true);
+    try {
+      const data = await googleLoginRequest(payload);
+      const nextSession = { user: data.user, token: data.token };
+      setSession(nextSession);
+      setStoredSession(nextSession);
+      return data.user;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = () => {
     setSession(null);
     clearStoredSession();
@@ -67,6 +80,7 @@ export function useAuth() {
     loading,
     login,
     register,
+    googleLogin,
     logout,
   };
 }

@@ -11,12 +11,24 @@ const products = JSON.parse(fs.readFileSync(path.join(__dirname, "products.json"
 
 await connectDB();
 
-const docs = products.map((product) => ({
-  ...product,
-  legacyId: product.id,
-  slug: product.slug || slugify(product.name),
-  emoji: product.emoji || "📦",
-}));
+const seenSlugs = new Set();
+const docs = products.map((product) => {
+  let baseSlug = product.slug || slugify(product.name);
+  let finalSlug = baseSlug;
+  let counter = 1;
+  while (seenSlugs.has(finalSlug)) {
+    finalSlug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+  seenSlugs.add(finalSlug);
+  return {
+    ...product,
+    legacyId: product.id,
+    slug: finalSlug,
+    emoji: product.emoji || "📦",
+  };
+});
+
 
 try {
   await Product.deleteMany({});

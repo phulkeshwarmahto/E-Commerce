@@ -13,6 +13,8 @@ import uploadRoutes from "./routes/upload.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import couponRoutes from "./routes/coupon.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import sellerRoutes from "./routes/seller.routes.js";
+import faqRoutes from "./routes/faq.routes.js";
 import { apiRateLimiter } from "./middleware/rateLimit.middleware.js";
 import { errorHandler } from "./middleware/errorHandler.middleware.js";
 
@@ -61,6 +63,8 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/seller", sellerRoutes);
+app.use("/api/faqs", faqRoutes);
 
 app.use(errorHandler);
 
