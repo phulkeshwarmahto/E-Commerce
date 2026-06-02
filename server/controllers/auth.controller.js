@@ -99,6 +99,10 @@ export const googleLogin = async (req, res) => {
         user.name = name;
         updated = true;
       }
+      if (role === "seller" && user.role === "user") {
+        user.role = "seller";
+        updated = true;
+      }
       if (!user.googleId) {
         user.googleId = googleId;
         updated = true;

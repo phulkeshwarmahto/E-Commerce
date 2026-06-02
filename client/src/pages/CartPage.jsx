@@ -7,8 +7,28 @@ import { useAppContext } from "../hooks/useAppContext";
 
 export function CartPage() {
   const navigate = useNavigate();
-  const { cart, notify } = useAppContext();
+  const { cart, notify, user } = useAppContext();
   const [promo, setPromo] = useState({ code: "", discount: 0 });
+
+  if (user?.role === "seller") {
+    return (
+      <section className="page-content text-center py-20 bg-gray-50 min-h-screen">
+        <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 border border-amber-100">
+          <span className="text-5xl">🏪</span>
+          <h2 className="text-2xl font-black text-gray-900 mt-4 mb-2">Merchant Viewing Mode</h2>
+          <p className="text-gray-500 text-sm mb-6">
+            Sellers are restricted from purchasing products. Only viewing is enabled.
+          </p>
+          <button
+            onClick={() => navigate("/seller")}
+            className="w-full bg-[#c4622d] text-white font-bold py-3.5 px-6 rounded-xl hover:shadow-md transition-all text-sm"
+          >
+            Go to Seller Dashboard
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="min-h-screen bg-gray-50 py-4 md:py-8">

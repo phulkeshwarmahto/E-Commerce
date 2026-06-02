@@ -40,7 +40,7 @@ export function ProductDetailPage() {
   const { id } = useParams();
   const { product, relatedProducts, loading } = useProductDetail(id);
   const { reviews, submitReview } = useReviews(product?.id);
-  const { cart, notify, isAuthenticated } = useAppContext();
+  const { cart, notify, isAuthenticated, user } = useAppContext();
   const [pincode, setPincode] = useState("");
   const [pinMessage, setPinMessage] = useState("");
   const [selectedThumb, setSelectedThumb] = useState(0);
@@ -335,28 +335,34 @@ export function ProductDetailPage() {
               </div>
 
               {/* CTA Buttons */}
-              <div className="space-y-2.5 pt-1">
-                <button
-                  disabled={!product.inStock}
-                  onClick={() => { cart.addToCart(product); notify(`${product.name} added to cart.`); }}
-                  className={`w-full py-3 rounded-xl font-bold text-sm border-2 transition-all
-                    ${product.inStock
-                      ? "border-[#c4622d] text-[#c4622d] hover:bg-[#c4622d] hover:text-white"
-                      : "border-gray-300 text-gray-400 cursor-not-allowed opacity-50"}`}
-                >
-                  🛒 Add to Cart
-                </button>
-                <button
-                  disabled={!product.inStock}
-                  onClick={() => { cart.addToCart(product); navigate("/cart"); }}
-                  className={`w-full py-3 rounded-xl font-bold text-sm transition-all
-                    ${product.inStock
-                      ? "bg-[#c4622d] hover:bg-[#e07a4a] text-white shadow-sm"
-                      : "bg-gray-300 text-gray-400 cursor-not-allowed opacity-50"}`}
-                >
-                  ⚡ Buy Now
-                </button>
-              </div>
+              {user?.role === "seller" ? (
+                <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-4 text-center text-xs font-semibold leading-relaxed shadow-sm">
+                  🏪 Merchant Viewing Mode: <br /> Sellers are restricted from purchasing products.
+                </div>
+              ) : (
+                <div className="space-y-2.5 pt-1">
+                  <button
+                    disabled={!product.inStock}
+                    onClick={() => { cart.addToCart(product); notify(`${product.name} added to cart.`); }}
+                    className={`w-full py-3 rounded-xl font-bold text-sm border-2 transition-all
+                      ${product.inStock
+                        ? "border-[#c4622d] text-[#c4622d] hover:bg-[#c4622d] hover:text-white"
+                        : "border-gray-300 text-gray-400 cursor-not-allowed opacity-50"}`}
+                  >
+                    🛒 Add to Cart
+                  </button>
+                  <button
+                    disabled={!product.inStock}
+                    onClick={() => { cart.addToCart(product); navigate("/cart"); }}
+                    className={`w-full py-3 rounded-xl font-bold text-sm transition-all
+                      ${product.inStock
+                        ? "bg-[#c4622d] hover:bg-[#e07a4a] text-white shadow-sm"
+                        : "bg-gray-300 text-gray-400 cursor-not-allowed opacity-50"}`}
+                  >
+                    ⚡ Buy Now
+                  </button>
+                </div>
+              )}
 
               {/* Trust mini-row */}
               <div className="flex justify-around pt-1 border-t border-gray-100">
@@ -413,7 +419,11 @@ export function ProductDetailPage() {
           </div>
 
           {/* Review Form */}
-          {isAuthenticated ? (
+          {user?.role === "seller" ? (
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-4 mb-6 text-xs font-semibold leading-relaxed shadow-sm">
+              🏪 Merchant Viewing Mode: Sellers cannot submit ratings or reviews.
+            </div>
+          ) : isAuthenticated ? (
             <div className="mb-8">
               <h3 className="font-bold text-gray-800 mb-3 text-sm">Write a Review</h3>
               <ReviewForm
@@ -449,7 +459,11 @@ export function ProductDetailPage() {
           </div>
 
           {/* Ask a question form */}
-          {isAuthenticated ? (
+          {user?.role === "seller" ? (
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-4 mb-6 text-xs font-semibold leading-relaxed shadow-sm">
+              🏪 Merchant Viewing Mode: Sellers cannot submit product questions.
+            </div>
+          ) : isAuthenticated ? (
             <form onSubmit={handleQuestionSubmit} className="mb-8 bg-gray-50 p-4 rounded-xl border border-gray-100">
               <label className="text-xs font-bold text-gray-600 block mb-1.5">Ask a question about this product</label>
               <div className="flex gap-2">

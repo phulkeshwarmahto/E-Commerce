@@ -122,13 +122,25 @@ export function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signin") {
-        await login({ email: form.email, password: form.password });
+        const loggedInUser = await login({ email: form.email, password: form.password });
         notify("Welcome back! 👋");
-        navigate("/account");
+        if (loggedInUser.role === "admin") {
+          navigate("/admin");
+        } else if (loggedInUser.role === "seller") {
+          navigate("/seller");
+        } else {
+          navigate("/account");
+        }
       } else {
-        await register({ name: form.name, email: form.email, password: form.password, role: selectedRole });
+        const loggedInUser = await register({ name: form.name, email: form.email, password: form.password, role: selectedRole });
         notify("Account created successfully! 🎉");
-        navigate("/account");
+        if (loggedInUser.role === "admin") {
+          navigate("/admin");
+        } else if (loggedInUser.role === "seller") {
+          navigate("/seller");
+        } else {
+          navigate("/account");
+        }
       }
     } catch (err) {
       setError(err?.message || "Something went wrong. Please try again.");

@@ -30,7 +30,7 @@ const loadRazorpayScript = () =>
 export function CheckoutPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { cart, orders, isAuthenticated, notify } = useAppContext();
+  const { cart, orders, isAuthenticated, notify, user } = useAppContext();
   const promo = location.state || { code: "", discount: 0 };
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("cod");
@@ -49,6 +49,26 @@ export function CheckoutPage() {
       <section className="page-content">
         <p>Please sign in before checkout.</p>
         <Button onClick={() => navigate("/auth")}>Go to sign in</Button>
+      </section>
+    );
+  }
+
+  if (user?.role === "seller") {
+    return (
+      <section className="page-content text-center py-20 min-h-screen">
+        <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 border border-amber-100">
+          <span className="text-5xl">🏪</span>
+          <h2 className="text-2xl font-black text-gray-900 mt-4 mb-2">Merchant Checkout Restricted</h2>
+          <p className="text-gray-500 text-sm mb-6">
+            Sellers are restricted from placing orders on the store. Only viewing is enabled.
+          </p>
+          <button
+            onClick={() => navigate("/seller")}
+            className="w-full bg-[#c4622d] text-white font-bold py-3.5 px-6 rounded-xl hover:shadow-md transition-all text-sm"
+          >
+            Go to Seller Dashboard
+          </button>
+        </div>
       </section>
     );
   }
