@@ -119,11 +119,15 @@ export const createOrder = async (req, res) => {
 
   await Cart.findOneAndUpdate({ userId: req.user._id }, { $set: { items: [] } }, { upsert: true });
 
-  await sendEmail({
-    to: req.user.email,
-    subject: `Order ${order.orderNumber} confirmed`,
-    text: `Your GramBazaar order ${order.orderNumber} has been placed.`,
-  });
+  try {
+    await sendEmail({
+      to: req.user.email,
+      subject: `Order ${order.orderNumber} confirmed`,
+      text: `Your GramBazaar order ${order.orderNumber} has been placed.`,
+    });
+  } catch (emailError) {
+    console.error("Gracefully caught mail sending failure:", emailError.message);
+  }
 
   res.status(201).json(new ApiResponse(true, "Order placed.", { order: order.toClient() }));
 };
