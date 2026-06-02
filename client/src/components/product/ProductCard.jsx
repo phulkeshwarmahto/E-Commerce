@@ -32,7 +32,7 @@ function HeartIcon({ filled }) {
 
 export function ProductCard({ product }) {
   const [imageError, setImageError] = useState(false);
-  const { cart, wishlistIds, toggleWishlist, notify } = useAppContext();
+  const { cart, wishlistIds, toggleWishlist, notify, user } = useAppContext();
   const discount = calculateDiscount(product.price, product.originalPrice);
   const isWishlisted = wishlistIds.includes(product.id);
   const imageUrl = product.images?.[0]?.url;
@@ -145,20 +145,30 @@ export function ProductCard({ product }) {
 
         {/* Add to Cart — slides in on hover */}
         <div className="mt-auto">
-          <button
-            disabled={!product.inStock}
-            onClick={() => {
-              cart.addToCart(product);
-              notify(`${product.name} added to cart.`);
-            }}
-            className={`w-full py-2 rounded text-sm font-semibold transition-all duration-150
-                        border-2 border-[#c4622d]
-                        ${product.inStock
-                          ? "text-[#c4622d] hover:bg-[#c4622d] hover:text-white active:scale-[0.98]"
-                          : "opacity-40 cursor-not-allowed text-gray-400 border-gray-300"}`}
-          >
-            {product.inStock ? "Add to Cart" : "Out of Stock"}
-          </button>
+          {user?.role === "seller" ? (
+            <Link
+              to={`/products/${product.slug}`}
+              className="w-full block py-2 rounded text-sm font-semibold text-center transition-all duration-150
+                          border-2 border-gray-400 text-gray-500 hover:bg-gray-100 hover:text-gray-700 active:scale-[0.98]"
+            >
+              View Details
+            </Link>
+          ) : (
+            <button
+              disabled={!product.inStock}
+              onClick={() => {
+                cart.addToCart(product);
+                notify(`${product.name} added to cart.`);
+              }}
+              className={`w-full py-2 rounded text-sm font-semibold transition-all duration-150
+                          border-2 border-[#c4622d]
+                          ${product.inStock
+                            ? "text-[#c4622d] hover:bg-[#c4622d] hover:text-white active:scale-[0.98]"
+                            : "opacity-40 cursor-not-allowed text-gray-400 border-gray-300"}`}
+            >
+              {product.inStock ? "Add to Cart" : "Out of Stock"}
+            </button>
+          )}
         </div>
       </div>
     </article>
