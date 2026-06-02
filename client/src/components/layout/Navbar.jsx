@@ -322,17 +322,19 @@ export function Navbar() {
             </NavLink>
           ))}
           <div className="ml-auto flex items-center gap-1">
-            <NavLink
-              to="/orders"
-              className={({ isActive }) =>
-                `px-3 py-1.5 text-[0.82rem] whitespace-nowrap rounded
-                 transition-colors ${isActive
-                  ? "text-amber-400 bg-white/10"
-                  : "text-white/70 hover:text-white hover:bg-white/10"}`
-              }
-            >
-              My Orders
-            </NavLink>
+            {user?.role !== "seller" && (
+              <NavLink
+                to="/orders"
+                className={({ isActive }) =>
+                  `px-3 py-1.5 text-[0.82rem] whitespace-nowrap rounded
+                   transition-colors ${isActive
+                    ? "text-amber-400 bg-white/10"
+                    : "text-white/70 hover:text-white hover:bg-white/10"}`
+                }
+              >
+                My Orders
+              </NavLink>
+            )}
           </div>
         </div>
 
@@ -342,7 +344,7 @@ export function Navbar() {
             {[
               { label: "Home", to: "/" },
               { label: "Shop All", to: "/shop" },
-              { label: "My Orders", to: "/orders" },
+              ...(user?.role !== "seller" ? [{ label: "My Orders", to: "/orders" }] : []),
               { label: "Wishlist", to: "/wishlist" },
               { label: user ? "Account" : "Sign In", to: user ? "/account" : "/auth" },
               ...(user && user.role === "admin" ? [{ label: "Admin Panel", to: "/admin" }] : []),

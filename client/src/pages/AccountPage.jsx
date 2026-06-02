@@ -49,10 +49,12 @@ export function AccountPage() {
               <div className="profile-email">{user.email}</div>
               <div className="profile-badge">⭐ {user.membership}</div>
               <div className="account-stat-grid">
-                <div className="account-stat">
-                  <strong>{orders.orders.length}</strong>
-                  <span>Orders</span>
-                </div>
+                {user?.role !== "seller" && (
+                  <div className="account-stat">
+                    <strong>{orders.orders.length}</strong>
+                    <span>Orders</span>
+                  </div>
+                )}
                 <div className="account-stat">
                   <strong>{user.role}</strong>
                   <span>Access</span>
@@ -71,9 +73,11 @@ export function AccountPage() {
               <span>{settingsOpen ? "Hide" : "Show"}</span>
             </button>
             <div className="account-links mobile-collapsible-content">
-              <Link className="acct-link" to="/orders">
-                <span className="al-icon">📦</span>My Orders<span className="al-arrow">›</span>
-              </Link>
+              {user?.role !== "seller" && (
+                <Link className="acct-link" to="/orders">
+                  <span className="al-icon">📦</span>My Orders<span className="al-arrow">›</span>
+                </Link>
+              )}
               <Link className="acct-link" to="/wishlist">
                 <span className="al-icon">❤️</span>My Wishlist<span className="al-arrow">›</span>
               </Link>
