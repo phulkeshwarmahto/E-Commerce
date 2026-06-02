@@ -224,12 +224,14 @@ export function Navbar() {
           />
 
           {/* Cart */}
-          <NavIconBtn
-            icon={<CartIcon />}
-            label="Cart"
-            badge={cart.summary.itemCount}
-            onClick={() => navigate("/cart")}
-          />
+          {user?.role !== "seller" && (
+            <NavIconBtn
+              icon={<CartIcon />}
+              label="Cart"
+              badge={cart.summary.itemCount}
+              onClick={() => navigate("/cart")}
+            />
+          )}
 
           {/* Mobile hamburger */}
           <button
