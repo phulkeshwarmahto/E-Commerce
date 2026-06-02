@@ -58,15 +58,22 @@ Login → Dashboard → Manage Products → Update Orders → Monitor Reviews
 ## ✨ Features
 
 ### 👤 User Features
-- **Authentication** — Sign up, sign in, sign out with JWT
+- **Authentication** — Sign up, sign in, sign out with JWT or passwordless **Google Authentication** (decoupling existing records dynamically).
 - **Product Browsing** — Category filters, search, sort, price range
-- **Product Detail** — Image gallery, specs, delivery check by pincode
+- **Product Detail** — Image gallery, specs, delivery check by pincode, and an interactive **Product Q&A (FAQ)** section where buyers can ask product questions.
 - **Shopping Cart** — Qty controls, promo codes, order summary
-- **Checkout** — Multi-step: Address → Payment → Review → Confirm
+- **Checkout** — Multi-step: Address (with Developer Quick-Fill Address autofill) → Payment → Review → Confirm
 - **Order Tracking** — Real-time status, step-by-step timeline
 - **Wishlist** — Save favourites, persistent across sessions
 - **Reviews** — Star rating, text, photo/video uploads, edit own review
 - **Account Dashboard** — Orders, wishlist, notifications, preferences
+
+### 🏪 Seller Features
+- **Merchant Overview** — Dedicated Seller Panel displaying merchant-specific sales revenue, listed product counts, and incoming orders containing their items.
+- **Product Management** — Full searchable product list with creation (auto-assigns merchant owner), updates, and soft deletions.
+- **Customer Reviews** — Dropdown menu allowing sellers to review buyer ratings and testimonials left on their catalog.
+- **Buyer FAQs** — View unanswered questions asked on their items and submit answers that update the product page live.
+- **Feature Restrictions** — Hidden checkout options, hidden cart navigation buttons, blocked order portals, and viewing-only locks on item reviews or purchase details to protect role logic integrity.
 
 ### 🛠️ Admin Features
 - **Dashboard** — Revenue, order, customer, and product stats
@@ -74,6 +81,7 @@ Login → Dashboard → Manage Products → Update Orders → Monitor Reviews
 - **Product Catalog** — Edit name, price, description, stock, badge
 - **Add Product** — Full form with multi-image upload via Cloudinary
 - **Review Moderation** — Approve or remove customer reviews
+- **Quick Test Tool** — Admin quick-login assistant pre-filling credentials for easy developers testing.
 
 ### 🎨 UI/UX
 - Smooth page transition animations (fade, slide)
@@ -82,6 +90,8 @@ Login → Dashboard → Manage Products → Update Orders → Monitor Reviews
 - Responsive sticky navigation
 - Deal of the Day countdown timer
 - Mobile-friendly layout
+- Scanline overlay animation for UPI gateway modals
+- Adaptive layout hiding buyer features for sellers and admins dynamically.
 
 ---
 
