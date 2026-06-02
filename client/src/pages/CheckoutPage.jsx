@@ -44,45 +44,6 @@ export function CheckoutPage() {
     pincode: "",
   });
 
-  const [showUpiModal, setShowUpiModal] = useState(false);
-  const [upiOrderId, setUpiOrderId] = useState("");
-  const [upiTotal, setUpiTotal] = useState(0);
-  const [timerSeconds, setTimerSeconds] = useState(300); // 5 minutes
-
-  useEffect(() => {
-    if (!showUpiModal) return;
-    if (timerSeconds <= 0) {
-      setShowUpiModal(false);
-      notify("Payment session expired. Please try placing your order again.");
-      return;
-    }
-    const interval = setInterval(() => {
-      setTimerSeconds((prev) => prev - 1);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [showUpiModal, timerSeconds]);
-
-  const formatTimer = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const handleUpiSuccess = async (orderId) => {
-    try {
-      setPlacingOrder(true);
-      await verifyUpiPaymentRequest(orderId);
-      cart.clearCart();
-      setShowUpiModal(false);
-      notify(`UPI Payment successful for order ${orderId}.`);
-      navigate(`/order-success/${orderId}`);
-    } catch (error) {
-      notify(error.message || "Failed to confirm UPI payment.");
-    } finally {
-      setPlacingOrder(false);
-    }
-  };
-
   if (!isAuthenticated) {
     return (
       <section className="page-content">
@@ -134,14 +95,6 @@ export function CheckoutPage() {
         return;
       }
 
-      if (paymentMethod === "upi") {
-        setUpiOrderId(order.id);
-        setUpiTotal(Math.max(cart.summary.subtotal - promo.discount, 0));
-        setTimerSeconds(300);
-        setShowUpiModal(true);
-        return;
-      }
-
       await loadRazorpayScript();
       const paymentOrder = await createPaymentOrderRequest(order.id);
       const checkout = new window.Razorpay({
@@ -154,6 +107,7 @@ export function CheckoutPage() {
         prefill: {
           name: form.name,
           contact: form.phone,
+          method: paymentMethod === "upi" ? "upi" : undefined,
         },
         handler: async (response) => {
           await verifyPaymentRequest({
@@ -309,111 +263,6 @@ export function CheckoutPage() {
           </div>
         </aside>
       </div>
-
-      {showUpiModal && (
-        <div className="fixed inset-0 z-[300] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <style>{`
-            @keyframes scan {
-              0% { top: 0%; }
-              50% { top: 100%; }
-              100% { top: 0%; }
-            }
-            .scan-line {
-              height: 2px;
-              background: #f59e0b;
-              box-shadow: 0 0 8px #f59e0b;
-              animation: scan 4s linear infinite;
-            }
-          `}</style>
-          <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full border border-amber-100 overflow-hidden transform scale-100 transition-all duration-300">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-amber-500 to-[#c4622d] text-white py-5 px-6 text-center">
-              <span className="text-4xl">📲</span>
-              <h3 className="text-lg font-black mt-2 mb-1 text-white">UPI QR Code Payment</h3>
-              <p className="text-white/80 text-[0.65rem] font-semibold uppercase tracking-wider">GramBazaar Payment Gateway</p>
-            </div>
-
-            {/* Content */}
-            <div className="p-6 flex flex-col items-center">
-              {/* Timer & Amount */}
-              <div className="flex justify-between items-center w-full bg-amber-50 rounded-xl px-4 py-3 border border-amber-100 mb-5">
-                <div className="text-left">
-                  <div className="text-[0.65rem] text-gray-500 font-bold uppercase tracking-wider">Amount to Pay</div>
-                  <div className="text-base font-black text-gray-800">{formatCurrency(upiTotal)}</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-[0.65rem] text-gray-500 font-bold uppercase tracking-wider">Time Remaining</div>
-                  <div className={`text-sm font-bold ${timerSeconds < 60 ? "text-red-500" : "text-amber-600"}`}>
-                    ⏱️ {formatTimer(timerSeconds)}
-                  </div>
-                </div>
-              </div>
-
-              {/* Dynamic QR Code Wrapper */}
-              <div className="relative w-48 h-48 border-4 border-amber-400/30 rounded-2xl p-2 bg-white flex items-center justify-center shadow-inner overflow-hidden mb-5 group">
-                <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
-                    `upi://pay?pa=grambazaar@ybl&pn=GramBazaar&am=${upiTotal}&cu=INR&tn=Order_${upiOrderId}`
-                  )}`}
-                  alt="Scan to Pay via UPI"
-                  className="w-full h-full object-contain rounded-lg"
-                />
-                {/* Animate Scan Line */}
-                <div className="absolute left-0 right-0 scan-line" style={{ position: "absolute" }} />
-              </div>
-
-              <p className="text-center text-[0.72rem] text-gray-500 leading-relaxed mb-5">
-                Scan the QR code above using GPay, PhonePe, Paytm, or any BHIM UPI app to pay.
-              </p>
-
-              {/* UPI ID Info with Copy */}
-              <div className="w-full border border-gray-200 rounded-xl p-3 flex items-center justify-between bg-gray-50 text-xs mb-5">
-                <div className="text-left">
-                  <span className="text-[0.6rem] text-gray-400 font-bold uppercase block">Merchant UPI ID</span>
-                  <strong className="text-gray-700 font-semibold">grambazaar@ybl</strong>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText("grambazaar@ybl");
-                    notify("UPI ID copied to clipboard!");
-                  }}
-                  className="text-[0.7rem] bg-amber-400 hover:bg-amber-500 font-bold px-2.5 py-1 rounded-md text-gray-900 transition-colors shadow-sm border-0 cursor-pointer"
-                >
-                  📋 Copy
-                </button>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="w-full space-y-2">
-                <button
-                  type="button"
-                  onClick={() => handleUpiSuccess(upiOrderId)}
-                  disabled={placingOrder}
-                  className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3 px-5 rounded-xl hover:shadow-md transition-all text-xs flex items-center justify-center gap-2 cursor-pointer border-0 shadow-sm"
-                >
-                  {placingOrder ? (
-                    "Processing..."
-                  ) : (
-                    <>
-                      <span>✅</span>
-                      <span>Simulate Successful Payment Scan</span>
-                    </>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowUpiModal(false)}
-                  disabled={placingOrder}
-                  className="w-full border border-gray-300 hover:bg-gray-50 text-gray-600 font-bold py-2.5 px-5 rounded-xl transition-all text-xs cursor-pointer bg-transparent"
-                >
-                  ❌ Cancel Payment
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 }
