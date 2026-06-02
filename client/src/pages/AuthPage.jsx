@@ -50,7 +50,7 @@ export function AuthPage() {
     if (typeof window !== "undefined" && window.google) {
       try {
         window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "335278705051-pmlk2h2a5gkl5ld0p4ch2q4chgr79o8v.apps.googleusercontent.com",
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "581782915864-i3rmi8e6r5f5qfrfef9jfcbqf2sd7ivs.apps.googleusercontent.com",
           callback: async (response) => {
             setError("");
             setLoading(true);

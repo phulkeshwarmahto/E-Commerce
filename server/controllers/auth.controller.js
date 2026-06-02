@@ -74,15 +74,31 @@ export const googleLogin = async (req, res) => {
       return res.status(400).json(new ApiResponse(false, "Token audience mismatch."));
     }
 
-    const email = payload.email.trim().toLowerCase();
-    const name = payload.name || payload.email.split("@")[0];
+    console.log("Google Auth Payload received:", payload);
+
+    const email = (payload.email || "").trim().toLowerCase();
+    if (!email) {
+      return res.status(400).json(new ApiResponse(false, "Email not provided in Google account."));
+    }
+
+    let name = (payload.name || payload.given_name || "").trim();
+    if (!name) {
+      name = email.split("@")[0] || "Google User";
+    }
+
     const googleId = payload.sub;
     const avatarUrl = payload.picture;
+
+    console.log("Extracted Auth Details -> Name:", name, "Email:", email, "Google ID:", googleId);
 
     let user = await User.findOne({ email });
 
     if (user) {
       let updated = false;
+      if (!user.name) {
+        user.name = name;
+        updated = true;
+      }
       if (!user.googleId) {
         user.googleId = googleId;
         updated = true;
@@ -116,6 +132,7 @@ export const googleLogin = async (req, res) => {
       }),
     );
   } catch (error) {
+    console.error("CRITICAL GOOGLE AUTH ERROR:", error);
     return res.status(500).json(new ApiResponse(false, `Google authentication error: ${error.message}`));
   }
 };
