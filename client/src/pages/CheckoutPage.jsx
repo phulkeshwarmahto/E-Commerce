@@ -97,7 +97,7 @@ export function CheckoutPage() {
 
       await loadRazorpayScript();
       const paymentOrder = await createPaymentOrderRequest(order.id);
-      const checkout = new window.Razorpay({
+      const razorpayOptions = {
         key: paymentOrder.keyId,
         amount: paymentOrder.amount,
         currency: paymentOrder.currency || "INR",
@@ -120,7 +120,30 @@ export function CheckoutPage() {
           notify(`Payment received for ${order.id}.`);
           navigate(`/order-success/${order.id}`);
         },
-      });
+      };
+
+      if (paymentMethod === "upi") {
+        razorpayOptions.config = {
+          display: {
+            blocks: {
+              upiBlock: {
+                name: "Pay via UPI",
+                instruments: [
+                  {
+                    method: "upi",
+                  },
+                ],
+              },
+            },
+            sequence: ["block.upiBlock"],
+            preferences: {
+              show_default_blocks: false,
+            },
+          },
+        };
+      }
+
+      const checkout = new window.Razorpay(razorpayOptions);
       checkout.open();
     } catch (error) {
       notify(error.message || "Could not place order.");
