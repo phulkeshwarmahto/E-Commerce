@@ -62,7 +62,7 @@ export function AuthPage() {
               } else if (loggedInUser.role === "seller") {
                 navigate("/seller");
               } else {
-                navigate("/account");
+                navigate("/");
               }
             } catch (err) {
               setError(err?.message || "Google authentication failed.");
@@ -129,7 +129,7 @@ export function AuthPage() {
         } else if (loggedInUser.role === "seller") {
           navigate("/seller");
         } else {
-          navigate("/account");
+          navigate("/");
         }
       } else {
         const loggedInUser = await register({ name: form.name, email: form.email, password: form.password, role: selectedRole });
@@ -139,7 +139,7 @@ export function AuthPage() {
         } else if (loggedInUser.role === "seller") {
           navigate("/seller");
         } else {
-          navigate("/account");
+          navigate("/");
         }
       }
     } catch (err) {
