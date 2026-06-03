@@ -4,6 +4,8 @@ import { ORDER_STATUSES, Order } from "../models/Order.model.js";
 import { Product } from "../models/Product.model.js";
 import { Review } from "../models/Review.model.js";
 import { User } from "../models/User.model.js";
+import { Notification } from "../models/Notification.model.js";
+import { sendEmail } from "../utils/sendEmail.js";
 import { slugify } from "../utils/slugify.js";
 
 export const getDashboard = async (_req, res) => {
@@ -161,4 +163,96 @@ export const updateUserRole = async (req, res) => {
   await user.save();
 
   res.json(new ApiResponse(true, "User role updated.", { user: user.toClient() }));
+};
+
+export const sendNotification = async (req, res) => {
+  const { userId, title, message, sendEmailCheckbox } = req.body;
+
+  if (!userId || !title || !message) {
+    return res.status(400).json(new ApiResponse(false, "userId, title, and message are required."));
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json(new ApiResponse(false, "User not found."));
+  }
+
+  const notification = await Notification.create({
+    userId,
+    title,
+    message,
+  });
+
+  let emailSent = false;
+  if (sendEmailCheckbox) {
+    try {
+      emailSent = await sendEmail({
+        to: user.email,
+        subject: title,
+        text: message,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
+            <h2 style="color: #ea580c; border-bottom: 2px solid #f97316; padding-bottom: 10px;">Message from GramBazaar Admin</h2>
+            <p style="font-size: 16px; line-height: 1.5; color: #333;">Hello ${user.name || "User"},</p>
+            <div style="background-color: #fcf8f2; border-left: 4px solid #ea580c; padding: 15px; margin: 20px 0; font-style: italic; color: #555;">
+              ${message.replace(/\n/g, "<br/>")}
+            </div>
+            <p style="font-size: 12px; color: #777; margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px;">
+              This is a personalized notification sent from the GramBazaar Administrator Panel. Please do not reply directly to this automated email.
+            </p>
+          </div>
+        `,
+      });
+    } catch (err) {
+      if (req.log) {
+        req.log.error(err, "Failed to send admin email notification");
+      } else {
+        console.error("Email send failed:", err);
+      }
+    }
+  }
+
+  res.json(
+    new ApiResponse(true, "Notification sent successfully.", {
+      notification: notification.toClient(),
+      emailSent,
+    })
+  );
+};
+
+export const getCouponsAdmin = async (_req, res) => {
+  const coupons = await Coupon.find().sort({ createdAt: -1 });
+  res.json(new ApiResponse(true, "All coupons fetched.", { coupons }));
+};
+
+export const createCouponAdmin = async (req, res) => {
+  const { code, discountType, discountValue, minOrderAmount, expiresAt, active } = req.body;
+
+  if (!code || !discountType || discountValue === undefined) {
+    return res.status(400).json(new ApiResponse(false, "Code, discount type, and value are required."));
+  }
+
+  const exists = await Coupon.findOne({ code: code.toUpperCase().trim() });
+  if (exists) {
+    return res.status(400).json(new ApiResponse(false, "Coupon code already exists."));
+  }
+
+  const coupon = await Coupon.create({
+    code: code.toUpperCase().trim(),
+    discountType,
+    discountValue: Number(discountValue),
+    minOrderAmount: Number(minOrderAmount || 0),
+    expiresAt: expiresAt ? new Date(expiresAt) : null,
+    active: active ?? true,
+  });
+
+  res.status(201).json(new ApiResponse(true, "Coupon created successfully.", { coupon }));
+};
+
+export const deleteCouponAdmin = async (req, res) => {
+  const coupon = await Coupon.findByIdAndDelete(req.params.id);
+  if (!coupon) {
+    return res.status(404).json(new ApiResponse(false, "Coupon not found."));
+  }
+  res.json(new ApiResponse(true, "Coupon deleted successfully."));
 };

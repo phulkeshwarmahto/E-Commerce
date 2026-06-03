@@ -1,7 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { categories } from "../../constants/categories";
 import { useAppContext } from "../../hooks/useAppContext";
+import { Modal } from "../ui/Modal";
+import {
+  getNotificationsRequest,
+  markNotificationReadRequest,
+  markAllNotificationsReadRequest,
+} from "../../api/notification.api";
 
 // ── SVG Icons ────────────────────────────────────────────────────────────────
 const SearchIcon = () => (
@@ -64,6 +70,15 @@ const CloseIcon = () => (
   </svg>
 );
 
+const BellIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+    className="w-6 h-6">
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+  </svg>
+);
+
 // ── NavIconButton ─────────────────────────────────────────────────────────────
 function NavIconBtn({ icon, label, badge, onClick }) {
   return (
@@ -97,6 +112,56 @@ export function Navbar() {
   const { cart, wishlistIds, user } = useAppContext();
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+  // Notifications State
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifModal, setShowNotifModal] = useState(false);
+
+  const loadNotifications = useCallback(async () => {
+    if (!user) return;
+    try {
+      const res = await getNotificationsRequest();
+      if (res.success) {
+        setNotifications(res.data?.notifications || res.notifications || []);
+      }
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) {
+      setNotifications([]);
+      return;
+    }
+    loadNotifications().catch(() => {});
+    const interval = setInterval(() => {
+      loadNotifications().catch(() => {});
+    }, 20000);
+    return () => clearInterval(interval);
+  }, [user, loadNotifications]);
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  const handleMarkRead = async (id) => {
+    try {
+      await markNotificationReadRequest(id);
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+      );
+    } catch (err) {
+      console.error("Error marking notification read:", err);
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await markAllNotificationsReadRequest();
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    } catch (err) {
+      console.error("Error marking all notifications read:", err);
+    }
+  };
 
   const params = new URLSearchParams(location.search);
   const searchValue = params.get("search") || "";
@@ -212,6 +277,15 @@ export function Navbar() {
               icon={<UserIcon />}
               label="Sign In"
               onClick={() => navigate("/auth")}
+            />
+          )}
+
+          {user && (
+            <NavIconBtn
+              icon={<BellIcon />}
+              label="Notifications"
+              badge={unreadCount}
+              onClick={() => setShowNotifModal(true)}
             />
           )}
 
@@ -367,6 +441,61 @@ export function Navbar() {
           </div>
         )}
       </nav>
+
+      {showNotifModal && (
+        <Modal title="🔔 Notifications Center" onClose={() => setShowNotifModal(false)}>
+          <div className="flex flex-col max-h-[400px] overflow-y-auto pr-1 text-sm">
+            {notifications.length > 0 && unreadCount > 0 && (
+              <div className="flex justify-end mb-3">
+                <button
+                  onClick={handleMarkAllRead}
+                  className="text-xs text-[#c4622d] font-bold hover:underline"
+                >
+                  ✓ Mark all as read
+                </button>
+              </div>
+            )}
+            <div className="space-y-3">
+              {notifications.length > 0 ? (
+                notifications.map((notif) => (
+                  <div
+                    key={notif.id}
+                    className={`p-3.5 rounded-xl border transition-all duration-200 ${
+                      notif.isRead
+                        ? "bg-gray-50 border-gray-150 text-gray-600"
+                        : "bg-amber-50/40 border-amber-200 text-gray-900 shadow-sm"
+                    }`}
+                  >
+                    <div className="flex justify-between items-start gap-2 mb-1">
+                      <h4 className="font-bold text-sm">{notif.title}</h4>
+                      {!notif.isRead && (
+                        <button
+                          onClick={() => handleMarkRead(notif.id)}
+                          className="text-[10px] text-amber-700 bg-amber-100 hover:bg-amber-200 px-2 py-0.5 rounded font-bold transition-colors"
+                        >
+                          Mark read
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-xs leading-relaxed break-words whitespace-pre-line">{notif.message}</p>
+                    <span className="text-[10px] text-gray-400 block mt-2 font-medium">
+                      {new Date(notif.createdAt).toLocaleString(undefined, {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-400">
+                  <span className="text-4xl block mb-2">🔔</span>
+                  <p className="text-xs">No notifications yet.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </Modal>
+      )}
     </header>
   );
 }

@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useAppContext } from "../../hooks/useAppContext";
 
 const footerLinks = {
   Shop: [
@@ -34,35 +36,56 @@ const socialLinks = [
 ];
 
 export function Footer() {
+  const { notify } = useAppContext();
+  const [email, setEmail] = useState("");
+  const [isSubscribed, setIsSubscribed] = useState(
+    localStorage.getItem("newsletter_subscribed") === "true"
+  );
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (!email.trim()) {
+      notify("Please enter a valid email address.");
+      return;
+    }
+    localStorage.setItem("newsletter_subscribed", "true");
+    setIsSubscribed(true);
+    notify("Subscribed successfully! Thank you for staying in the loop.");
+  };
+
   return (
     <>
       {/* ── Newsletter Strip ──────────────────────────────────────── */}
-      <div className="bg-[#c4622d] py-8 px-4 md:px-8">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-4 md:gap-8">
-          <div className="text-center md:text-left flex-1">
-            <p className="text-white/80 text-sm font-medium uppercase tracking-widest mb-1">Stay in the loop</p>
-            <h3 className="text-white text-xl md:text-2xl font-bold">Get exclusive deals & new arrivals</h3>
-          </div>
-          <form
-            className="flex w-full md:w-auto min-w-0 md:min-w-[380px] rounded-lg overflow-hidden
-                       shadow-lg border border-white/20"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <input
-              type="email"
-              placeholder="Enter your email address"
-              className="flex-1 px-4 py-3 text-sm text-gray-800 bg-white outline-none min-w-0"
-            />
-            <button
-              type="submit"
-              className="bg-[#2c1a0e] hover:bg-black text-amber-400 font-bold
-                         text-sm px-5 py-3 whitespace-nowrap transition-colors"
+      {!isSubscribed && (
+        <div className="bg-[#c4622d] py-8 px-4 md:px-8">
+          <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-4 md:gap-8">
+            <div className="text-center md:text-left flex-1">
+              <p className="text-white/80 text-sm font-medium uppercase tracking-widest mb-1">Stay in the loop</p>
+              <h3 className="text-white text-xl md:text-2xl font-bold">Get exclusive deals & new arrivals</h3>
+            </div>
+            <form
+              className="flex w-full md:w-auto min-w-0 md:min-w-[380px] rounded-lg overflow-hidden
+                         shadow-lg border border-white/20"
+              onSubmit={handleSubscribe}
             >
-              Subscribe
-            </button>
-          </form>
+              <input
+                type="email"
+                placeholder="Enter your email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-1 px-4 py-3 text-sm text-gray-800 bg-white outline-none min-w-0"
+              />
+              <button
+                type="submit"
+                className="bg-[#2c1a0e] hover:bg-black text-amber-400 font-bold
+                           text-sm px-5 py-3 whitespace-nowrap transition-colors"
+              >
+                Subscribe
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ── Main Footer ──────────────────────────────────────────── */}
       <footer className="bg-[#131921] text-gray-300">

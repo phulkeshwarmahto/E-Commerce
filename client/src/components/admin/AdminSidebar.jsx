@@ -1,5 +1,5 @@
 export function AdminSidebar({ section, onChange }) {
-  const sections = ["overview", "products", "orders", "reviews", "users"];
+  const sections = ["overview", "products", "orders", "reviews", "users", "coupons"];
 
   return (
     <aside className="admin-sidebar">

@@ -8,6 +8,10 @@ import {
   updateUserCreditScore,
   updateUserCertification,
   updateUserRole,
+  sendNotification,
+  getCouponsAdmin,
+  createCouponAdmin,
+  deleteCouponAdmin,
 } from "../controllers/admin.controller.js";
 import { requireAuth } from "../middleware/auth.middleware.js";
 import { isAdmin } from "../middleware/admin.middleware.js";
@@ -26,5 +30,9 @@ router.get("/users", asyncHandler(getUsers));
 router.patch("/users/:id/credit-score", asyncHandler(updateUserCreditScore));
 router.patch("/users/:id/certification", asyncHandler(updateUserCertification));
 router.patch("/users/:id/role", asyncHandler(updateUserRole));
+router.post("/send-notification", asyncHandler(sendNotification));
+router.get("/coupons", asyncHandler(getCouponsAdmin));
+router.post("/coupons", asyncHandler(createCouponAdmin));
+router.delete("/coupons/:id", asyncHandler(deleteCouponAdmin));
 
 export default router;

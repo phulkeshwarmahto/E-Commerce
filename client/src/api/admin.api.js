@@ -15,3 +15,12 @@ export const updateUserCertificationRequest = (id, certificationStatus) =>
   apiRequest(`/admin/users/${id}/certification`, { method: "PATCH", body: { certificationStatus } });
 export const updateUserRoleRequest = (id, role) =>
   apiRequest(`/admin/users/${id}/role`, { method: "PATCH", body: { role } });
+
+export const sendAdminNotificationRequest = (payload) =>
+  apiRequest("/admin/send-notification", { method: "POST", body: payload });
+export const getAdminCouponsRequest = () =>
+  apiRequest("/admin/coupons");
+export const createAdminCouponRequest = (payload) =>
+  apiRequest("/admin/coupons", { method: "POST", body: payload });
+export const deleteAdminCouponRequest = (id) =>
+  apiRequest(`/admin/coupons/${id}`, { method: "DELETE" });

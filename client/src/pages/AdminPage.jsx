@@ -8,6 +8,10 @@ import {
   updateUserCreditScoreRequest,
   updateUserCertificationRequest,
   updateUserRoleRequest,
+  sendAdminNotificationRequest,
+  getAdminCouponsRequest,
+  createAdminCouponRequest,
+  deleteAdminCouponRequest,
 } from "../api/admin.api";
 import { AdminSidebar } from "../components/admin/AdminSidebar";
 import { OrderTable } from "../components/admin/OrderTable";
@@ -26,6 +30,24 @@ export function AdminPage() {
   const [usersList, setUsersList] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
 
+  // Message modal state
+  const [selectedUserForMsg, setSelectedUserForMsg] = useState(null);
+  const [msgTitle, setMsgTitle] = useState("");
+  const [msgBody, setMsgBody] = useState("");
+  const [sendEmailCheckbox, setSendEmailCheckbox] = useState(true);
+  const [sendingMsg, setSendingMsg] = useState(false);
+
+  // Coupons state
+  const [couponsList, setCouponsList] = useState([]);
+  const [loadingCoupons, setLoadingCoupons] = useState(false);
+  const [newCoupon, setNewCoupon] = useState({
+    code: "",
+    discountType: "percent",
+    discountValue: "",
+    minOrderAmount: "",
+    expiresAt: "",
+  });
+
   const loadDashboard = useCallback(async () => {
     const data = await getDashboardRequest();
     setDashboard(data);
@@ -43,6 +65,77 @@ export function AdminPage() {
     }
   }, [notify]);
 
+  const loadCoupons = useCallback(async () => {
+    setLoadingCoupons(true);
+    try {
+      const res = await getAdminCouponsRequest();
+      setCouponsList(res.coupons || []);
+    } catch (err) {
+      notify(err.message || "Failed to load coupons.");
+    } finally {
+      setLoadingCoupons(false);
+    }
+  }, [notify]);
+
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!selectedUserForMsg || !msgTitle || !msgBody) return;
+    setSendingMsg(true);
+    try {
+      await sendAdminNotificationRequest({
+        userId: selectedUserForMsg.id,
+        title: msgTitle,
+        message: msgBody,
+        sendEmailCheckbox,
+      });
+      notify(`Message sent successfully to ${selectedUserForMsg.name}.`);
+      setSelectedUserForMsg(null);
+      setMsgTitle("");
+      setMsgBody("");
+    } catch (err) {
+      notify(err.message || "Failed to send message.");
+    } finally {
+      setSendingMsg(false);
+    }
+  };
+
+  const handleCreateCoupon = async (e) => {
+    e.preventDefault();
+    if (!newCoupon.code || !newCoupon.discountValue) {
+      notify("Code and value are required.");
+      return;
+    }
+    try {
+      await createAdminCouponRequest({
+        ...newCoupon,
+        discountValue: Number(newCoupon.discountValue),
+        minOrderAmount: Number(newCoupon.minOrderAmount || 0),
+      });
+      notify("Coupon created successfully.");
+      setNewCoupon({
+        code: "",
+        discountType: "percent",
+        discountValue: "",
+        minOrderAmount: "",
+        expiresAt: "",
+      });
+      loadCoupons().catch(() => {});
+    } catch (err) {
+      notify(err.message || "Failed to create coupon.");
+    }
+  };
+
+  const handleDeleteCoupon = async (id) => {
+    if (!confirm("Are you sure you want to delete this coupon?")) return;
+    try {
+      await deleteAdminCouponRequest(id);
+      notify("Coupon deleted successfully.");
+      loadCoupons().catch(() => {});
+    } catch (err) {
+      notify(err.message || "Failed to delete coupon.");
+    }
+  };
+
   useEffect(() => {
     if (user?.role === "admin") {
       loadDashboard().catch(() => {});
@@ -54,6 +147,12 @@ export function AdminPage() {
       loadUsers().catch(() => {});
     }
   }, [section, loadUsers, user]);
+
+  useEffect(() => {
+    if (user?.role === "admin" && section === "coupons") {
+      loadCoupons().catch(() => {});
+    }
+  }, [section, loadCoupons, user]);
 
   if (!user || user.role !== "admin") {
     return (
@@ -138,6 +237,7 @@ export function AdminPage() {
                         <th>Role</th>
                         <th>Certification</th>
                         <th>Credit Score</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -212,6 +312,15 @@ export function AdminPage() {
                               <span className="text-[10px] text-gray-400 font-semibold">/1000</span>
                             </div>
                           </td>
+                          <td>
+                            <button
+                              type="button"
+                              className="button button-secondary text-[11px] px-2 py-1 flex items-center gap-1 font-semibold"
+                              onClick={() => setSelectedUserForMsg(usr)}
+                            >
+                              ✉️ Message
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -220,6 +329,115 @@ export function AdminPage() {
               ) : (
                 <p className="text-sm text-gray-500 py-10 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
                   No users found.
+                </p>
+              )}
+            </div>
+          ) : null}
+
+          {section === "coupons" ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 stack">
+              <div className="section-head mb-4">
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900">🎟️ Coupon Code Generator</h2>
+                  <p className="text-xs text-gray-500">Create and delete store discount coupons. Users can apply these codes during checkout.</p>
+                </div>
+              </div>
+
+              {/* Create Coupon Form */}
+              <form onSubmit={handleCreateCoupon} className="bg-gray-50 rounded-xl border border-gray-150 p-5 grid grid-cols-1 md:grid-cols-5 gap-4 items-end mb-6 text-sm">
+                <div className="field">
+                  <label className="label text-xs font-semibold text-gray-700">Code (uppercase)</label>
+                  <input
+                    type="text"
+                    className="input py-2"
+                    required
+                    placeholder="e.g. SAVE25"
+                    value={newCoupon.code}
+                    onChange={(e) => setNewCoupon({ ...newCoupon, code: e.target.value.toUpperCase().trim() })}
+                  />
+                </div>
+                <div className="field">
+                  <label className="label text-xs font-semibold text-gray-700">Discount Type</label>
+                  <select
+                    className="input py-2"
+                    value={newCoupon.discountType}
+                    onChange={(e) => setNewCoupon({ ...newCoupon, discountType: e.target.value })}
+                  >
+                    <option value="percent">Percentage (%)</option>
+                    <option value="flat">Flat Amount (₹)</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label className="label text-xs font-semibold text-gray-700">Value ({newCoupon.discountType === "percent" ? "%" : "₹"})</label>
+                  <input
+                    type="number"
+                    min="1"
+                    className="input py-2"
+                    required
+                    placeholder="e.g. 20"
+                    value={newCoupon.discountValue}
+                    onChange={(e) => setNewCoupon({ ...newCoupon, discountValue: e.target.value })}
+                  />
+                </div>
+                <div className="field">
+                  <label className="label text-xs font-semibold text-gray-700">Min Order (₹)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="input py-2"
+                    placeholder="e.g. 500"
+                    value={newCoupon.minOrderAmount}
+                    onChange={(e) => setNewCoupon({ ...newCoupon, minOrderAmount: e.target.value })}
+                  />
+                </div>
+                <div className="field flex justify-end">
+                  <button type="submit" className="button button-primary w-full py-2 font-semibold">
+                    Generate
+                  </button>
+                </div>
+              </form>
+
+              {/* Coupons List */}
+              {loadingCoupons ? (
+                <p className="text-sm text-gray-500 py-6 text-center animate-pulse">Loading coupons...</p>
+              ) : couponsList.length > 0 ? (
+                <div className="table-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Code</th>
+                        <th>Type</th>
+                        <th>Value</th>
+                        <th>Min Order</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {couponsList.map((cpn) => (
+                        <tr key={cpn.id}>
+                          <td className="font-bold text-[#c4622d] tracking-wider">{cpn.code}</td>
+                          <td className="text-xs capitalize font-medium text-gray-600">{cpn.discountType}</td>
+                          <td className="font-semibold text-gray-900">
+                            {cpn.discountType === "percent" ? `${cpn.discountValue}%` : `₹${cpn.discountValue}`}
+                          </td>
+                          <td className="text-gray-600">₹{cpn.minOrderAmount || 0}</td>
+                          <td>
+                            <button
+                              type="button"
+                              className="text-red-500 hover:text-red-700 font-semibold text-xs transition-colors"
+                              onClick={() => handleDeleteCoupon(cpn.id)}
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 py-10 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                  No coupons generated yet. Fill in the form above to generate one.
                 </p>
               )}
             </div>
@@ -253,6 +471,58 @@ export function AdminPage() {
               loadDashboard().catch(() => {});
             }}
           />
+        </Modal>
+      ) : null}
+
+      {selectedUserForMsg ? (
+        <Modal title={`Send Message to ${selectedUserForMsg.name}`} onClose={() => setSelectedUserForMsg(null)}>
+          <form onSubmit={handleSendMessage} className="stack text-sm">
+            <div className="field">
+              <label className="label">Subject / Title</label>
+              <input
+                type="text"
+                className="input"
+                required
+                placeholder="e.g. Special Offer or Account Update"
+                value={msgTitle}
+                onChange={(e) => setMsgTitle(e.target.value)}
+              />
+            </div>
+            <div className="field">
+              <label className="label">Message Body</label>
+              <textarea
+                className="input min-h-[120px]"
+                required
+                placeholder="Write your message here..."
+                value={msgBody}
+                onChange={(e) => setMsgBody(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center gap-2 py-2">
+              <input
+                type="checkbox"
+                id="sendEmailCheckbox"
+                checked={sendEmailCheckbox}
+                onChange={(e) => setSendEmailCheckbox(e.target.checked)}
+                className="cursor-pointer"
+              />
+              <label htmlFor="sendEmailCheckbox" className="font-semibold text-gray-700 cursor-pointer select-none">
+                📧 Send direct Email to user
+              </label>
+            </div>
+            <div className="flex justify-end gap-2 pt-4">
+              <button
+                type="button"
+                className="button button-secondary"
+                onClick={() => setSelectedUserForMsg(null)}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="button button-primary" disabled={sendingMsg}>
+                {sendingMsg ? "Sending..." : "Send Message"}
+              </button>
+            </div>
+          </form>
         </Modal>
       ) : null}
     </section>
