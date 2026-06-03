@@ -12,3 +12,6 @@ export const updateSellerProductRequest = (id, payload) =>
 
 export const deleteSellerProductRequest = (id) =>
   apiRequest(`/seller/products/${id}`, { method: "DELETE" });
+
+export const updateSellerOrderStatusRequest = (id, status) =>
+  apiRequest(`/seller/orders/${id}/status`, { method: "PATCH", body: { status } });

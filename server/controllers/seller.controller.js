@@ -1,6 +1,6 @@
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Product } from "../models/Product.model.js";
-import { Order } from "../models/Order.model.js";
+import { ORDER_STATUSES, Order } from "../models/Order.model.js";
 import { ProductFAQ } from "../models/ProductFAQ.model.js";
 import { slugify } from "../utils/slugify.js";
 
@@ -119,4 +119,42 @@ export const deleteSellerProduct = async (req, res) => {
 
   await Product.findByIdAndDelete(req.params.id);
   return res.json(new ApiResponse(true, "Product deleted."));
+};
+
+export const updateSellerOrderStatus = async (req, res) => {
+  const sellerId = req.user._id;
+  const { status } = req.body;
+
+  if (!ORDER_STATUSES.includes(status)) {
+    return res.status(400).json(new ApiResponse(false, "Invalid order status."));
+  }
+
+  const order = await Order.findOne({ orderNumber: req.params.id });
+  if (!order) {
+    return res.status(404).json(new ApiResponse(false, "Order not found."));
+  }
+
+  // Find all products owned by this seller
+  const sellerProducts = await Product.find({ seller: sellerId });
+  const sellerProductIds = sellerProducts.map((p) => p._id.toString());
+
+  // Check if at least one item in the order is owned by this seller
+  const hasMerchantProduct = order.items.some((item) =>
+    sellerProductIds.includes(item.productId.toString())
+  );
+
+  // If not owned by this seller, check if the user is an admin
+  if (!hasMerchantProduct && req.user.role !== "admin") {
+    return res.status(403).json(new ApiResponse(false, "Not authorized to update this order."));
+  }
+
+  order.status = status;
+  order.statusHistory.push({
+    status,
+    updatedAt: new Date(),
+    note: `Status updated to ${status} by Merchant: ${req.user.name}`,
+  });
+  await order.save();
+
+  return res.json(new ApiResponse(true, "Order status updated.", { order: order.toClient() }));
 };

@@ -5,6 +5,7 @@ import {
   createSellerProduct,
   updateSellerProduct,
   deleteSellerProduct,
+  updateSellerOrderStatus,
 } from "../controllers/seller.controller.js";
 import { requireAuth } from "../middleware/auth.middleware.js";
 import { isSeller } from "../middleware/seller.middleware.js";
@@ -21,5 +22,6 @@ router.get("/faqs", asyncHandler(getSellerFAQs));
 router.post("/products", validate(productValidator), asyncHandler(createSellerProduct));
 router.put("/products/:id", validate(productValidator), asyncHandler(updateSellerProduct));
 router.delete("/products/:id", asyncHandler(deleteSellerProduct));
+router.patch("/orders/:id/status", asyncHandler(updateSellerOrderStatus));
 
 export default router;

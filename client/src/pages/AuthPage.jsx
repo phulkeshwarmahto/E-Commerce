@@ -87,20 +87,6 @@ export function AuthPage() {
     }
   }, [selectedRole, mode, googleLogin, navigate, notify]);
 
-  const handleAdminQuickLogin = async () => {
-    setError("");
-    setLoading(true);
-    try {
-      await login({ email: "admin@grambazaar.in", password: "Admin@1234" });
-      notify("Welcome back, Administrator! 🛠️");
-      navigate("/admin");
-    } catch (err) {
-      setError(err?.message || "Admin login failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const activeRole = roles.find((r) => r.id === selectedRole);
 
   // Admin can't sign up
@@ -229,30 +215,7 @@ export function AuthPage() {
               </p>
             </div>
             
-            {selectedRole === "admin" && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-2 mb-5">
-                <div className="flex gap-2.5 items-start text-left">
-                  <span className="text-xl">💡</span>
-                  <div>
-                    <p className="text-xs font-bold text-amber-900 leading-normal">
-                      Admin Testing Mode Enabled
-                    </p>
-                    <p className="text-[0.72rem] text-amber-700 leading-normal mt-0.5">
-                      You can log in with: <br />
-                      <strong>Email:</strong> admin@grambazaar.in <br />
-                      <strong>Password:</strong> Admin@1234
-                    </p>
-                    <button
-                      type="button"
-                      onClick={handleAdminQuickLogin}
-                      className="mt-3 bg-amber-600 hover:bg-amber-700 text-white text-[0.7rem] font-bold py-1.5 px-3 rounded-lg transition-colors shadow-sm"
-                    >
-                      🚀 Quick Login as Admin
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">

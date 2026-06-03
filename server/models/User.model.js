@@ -9,6 +9,8 @@ const userSchema = new mongoose.Schema(
     avatarUrl: { type: String },
     role: { type: String, enum: ["user", "admin", "seller"], default: "user" },
     membership: { type: String, default: "Silver" },
+    certificationStatus: { type: String, enum: ["new", "certified"], default: "new" },
+    creditScore: { type: Number, default: 750 },
   },
   { timestamps: true },
 );
@@ -21,6 +23,8 @@ userSchema.methods.toClient = function toClient() {
     role: this.role,
     membership: this.membership,
     avatarUrl: this.avatarUrl,
+    certificationStatus: this.certificationStatus || "new",
+    creditScore: this.creditScore ?? 750,
   };
 };
 

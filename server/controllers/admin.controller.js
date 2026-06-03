@@ -102,3 +102,63 @@ export const updateProduct = async (req, res) => {
   await product.save();
   res.json(new ApiResponse(true, "Product updated.", { product: product.toClient() }));
 };
+
+export const getUsers = async (_req, res) => {
+  const users = await User.find().sort({ name: 1 });
+  res.json(new ApiResponse(true, "Users fetched.", { users: users.map((u) => u.toClient()) }));
+};
+
+export const updateUserCreditScore = async (req, res) => {
+  const { score } = req.body;
+  const scoreNum = Number(score);
+
+  if (isNaN(scoreNum) || scoreNum < 0 || scoreNum > 1000) {
+    return res.status(400).json(new ApiResponse(false, "Invalid credit score. Must be between 0 and 1000."));
+  }
+
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return res.status(404).json(new ApiResponse(false, "User not found."));
+  }
+
+  user.creditScore = scoreNum;
+  await user.save();
+
+  res.json(new ApiResponse(true, "Credit score updated.", { user: user.toClient() }));
+};
+
+export const updateUserCertification = async (req, res) => {
+  const { certificationStatus } = req.body;
+
+  if (!["new", "certified"].includes(certificationStatus)) {
+    return res.status(400).json(new ApiResponse(false, "Invalid certification status."));
+  }
+
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return res.status(404).json(new ApiResponse(false, "User not found."));
+  }
+
+  user.certificationStatus = certificationStatus;
+  await user.save();
+
+  res.json(new ApiResponse(true, "Certification status updated.", { user: user.toClient() }));
+};
+
+export const updateUserRole = async (req, res) => {
+  const { role } = req.body;
+
+  if (!["user", "seller", "admin"].includes(role)) {
+    return res.status(400).json(new ApiResponse(false, "Invalid user role."));
+  }
+
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return res.status(404).json(new ApiResponse(false, "User not found."));
+  }
+
+  user.role = role;
+  await user.save();
+
+  res.json(new ApiResponse(true, "User role updated.", { user: user.toClient() }));
+};

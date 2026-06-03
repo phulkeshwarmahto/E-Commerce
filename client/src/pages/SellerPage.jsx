@@ -6,6 +6,7 @@ import {
   updateSellerProductRequest,
   deleteSellerProductRequest,
   getSellerFAQsRequest,
+  updateSellerOrderStatusRequest,
 } from "../api/seller.api";
 import { getReviewsRequest } from "../api/reviews.api";
 import { answerQuestionRequest } from "../api/faq.api";
@@ -185,8 +186,14 @@ export function SellerPage() {
               {dashboard.recentOrders?.length > 0 ? (
                 <OrderTable
                   orders={dashboard.recentOrders}
-                  onUpdateStatus={async () => {
-                    notify("Orders status is managed by administrators.");
+                  onUpdateStatus={async (id, status) => {
+                    try {
+                      await updateSellerOrderStatusRequest(id, status);
+                      notify("Order status updated successfully.");
+                      loadSellerData().catch(() => {});
+                    } catch (err) {
+                      notify(err.message || "Failed to update order status.");
+                    }
                   }}
                 />
               ) : (
