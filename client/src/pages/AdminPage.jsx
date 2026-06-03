@@ -245,11 +245,11 @@ export function AdminPage() {
                         <tr key={usr.id}>
                           <td className="font-semibold text-gray-900 flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xs">
-                              {usr.name[0]?.toUpperCase() || "U"}
+                              {usr.name?.[0]?.toUpperCase() || "U"}
                             </div>
-                            {usr.name}
+                            {usr.name || "Unknown User"}
                           </td>
-                          <td className="text-gray-600 text-xs">{usr.email}</td>
+                          <td className="text-gray-600 text-xs">{usr.email || "No Email"}</td>
                           <td>
                             <select
                               className="border border-gray-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-[#c4622d] bg-white cursor-pointer"
