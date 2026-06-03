@@ -1,13 +1,9 @@
 import { formatCurrency } from "../../utils/formatCurrency";
 
-const FREE_DELIVERY_THRESHOLD = 500;
-
-export function CartSummary({ summary, discount = 0, onCheckout, code = "" }) {
-  const shipping = summary.subtotal >= FREE_DELIVERY_THRESHOLD || summary.subtotal === 0 ? 0 : 49;
+export function CartSummary({ items = [], summary, discount = 0, onCheckout, code = "" }) {
+  const shipping = items.reduce((sum, item) => sum + (item.deliveryFee || 0) * item.quantity, 0);
   const total = Math.max(summary.subtotal + shipping - discount, 0);
-  const toFreeDelivery = Math.max(FREE_DELIVERY_THRESHOLD - summary.subtotal, 0);
-  const deliveryProgress = Math.min((summary.subtotal / FREE_DELIVERY_THRESHOLD) * 100, 100);
-  const totalSavings = discount + (summary.subtotal > 0 && shipping === 0 ? 49 : 0);
+  const totalSavings = discount;
 
   return (
     <aside className="sticky top-24 bg-white rounded-xl border border-gray-200
@@ -22,27 +18,6 @@ export function CartSummary({ summary, discount = 0, onCheckout, code = "" }) {
       </div>
 
       <div className="px-5 py-4 space-y-3">
-        {/* Free Delivery Progress */}
-        {summary.subtotal > 0 && summary.subtotal < FREE_DELIVERY_THRESHOLD && (
-          <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-4">
-            <p className="text-[0.75rem] text-blue-700 font-semibold mb-2">
-              🚚 Add <span className="font-bold">{formatCurrency(toFreeDelivery)}</span> more for FREE delivery!
-            </p>
-            <div className="h-2 bg-blue-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-blue-500 rounded-full transition-all duration-500"
-                style={{ width: `${deliveryProgress}%` }}
-              />
-            </div>
-          </div>
-        )}
-        {summary.subtotal >= FREE_DELIVERY_THRESHOLD && summary.subtotal > 0 && (
-          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 mb-1">
-            <p className="text-[0.78rem] text-emerald-700 font-semibold">
-              🎉 You've unlocked FREE delivery!
-            </p>
-          </div>
-        )}
 
         {/* Line Items */}
         <div className="flex justify-between text-sm text-gray-600">

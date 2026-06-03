@@ -238,43 +238,58 @@ export function SellerPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredProducts.map((product) => (
-                        <tr key={product.id}>
-                          <td className="font-semibold text-gray-900 flex items-center gap-2">
-                            <span className="text-xl">{product.emoji || "📦"}</span>
-                            {product.name}
-                          </td>
-                          <td>
-                            <span className="bg-gray-100 text-gray-700 text-xs px-2.5 py-1 rounded-full font-medium">
-                              {product.category}
-                            </span>
-                          </td>
-                          <td className="font-bold text-gray-800">{formatCurrency(product.price)}</td>
-                          <td className="text-gray-600">
-                            {product.stockCount > 0 ? (
-                              <span className="text-green-600 font-bold">{product.stockCount} in stock</span>
-                            ) : (
-                              <span className="text-red-500 font-bold">Out of stock</span>
-                            )}
-                          </td>
-                          <td className="text-right">
-                            <div className="inline-flex gap-2">
-                              <button
-                                className="bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold py-1.5 px-3 rounded-lg text-xs transition-colors"
-                                onClick={() => setEditingProduct(product)}
-                              >
-                                Edit
-                              </button>
-                              <button
-                                className="bg-red-50 hover:bg-red-100 text-red-600 font-bold py-1.5 px-3 rounded-lg text-xs transition-colors"
-                                onClick={() => handleDeleteProduct(product.id)}
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                      {filteredProducts.map((product) => {
+                        const hasImage = product.images?.[0]?.url;
+                        return (
+                          <tr key={product.id}>
+                            <td className="font-semibold text-gray-900">
+                              <div className="flex items-center gap-3">
+                                {hasImage ? (
+                                  <img
+                                    src={product.images[0].url}
+                                    alt={product.name}
+                                    className="w-10 h-10 object-cover rounded-lg border border-gray-200 shadow-sm shrink-0"
+                                  />
+                                ) : (
+                                  <div className="w-10 h-10 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center text-xl shadow-sm shrink-0 select-none">
+                                    {product.emoji || "📦"}
+                                  </div>
+                                )}
+                                <span className="truncate max-w-[200px]">{product.name}</span>
+                              </div>
+                            </td>
+                            <td>
+                              <span className="bg-gray-100 text-gray-700 text-xs px-2.5 py-1 rounded-full font-medium">
+                                {product.category}
+                              </span>
+                            </td>
+                            <td className="font-bold text-gray-800">{formatCurrency(product.price)}</td>
+                            <td className="text-gray-600">
+                              {product.stockCount > 0 ? (
+                                <span className="text-green-600 font-bold">{product.stockCount} in stock</span>
+                              ) : (
+                                <span className="text-red-500 font-bold">Out of stock</span>
+                              )}
+                            </td>
+                            <td className="text-right">
+                              <div className="inline-flex gap-2">
+                                <button
+                                  className="bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold py-1.5 px-3 rounded-lg text-xs transition-colors"
+                                  onClick={() => setEditingProduct(product)}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  className="bg-red-50 hover:bg-red-100 text-red-600 font-bold py-1.5 px-3 rounded-lg text-xs transition-colors"
+                                  onClick={() => handleDeleteProduct(product.id)}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

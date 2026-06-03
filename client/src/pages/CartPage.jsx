@@ -119,6 +119,7 @@ export function CartPage() {
 
             {/* Right — Order Summary (sticky) */}
             <CartSummary
+              items={cart.items}
               summary={cart.summary}
               discount={promo.discount}
               code={promo.code}

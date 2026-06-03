@@ -78,6 +78,7 @@ export const createProduct = async (req, res) => {
     reviewCount: 0,
     tags: req.body.tags || [],
     isFeatured: Boolean(req.body.isFeatured),
+    deliveryFee: req.body.deliveryFee !== undefined ? Number(req.body.deliveryFee) : 0,
   });
 
   res.status(201).json(new ApiResponse(true, "Product created.", { product: product.toClient() }));
@@ -90,16 +91,27 @@ export const updateProduct = async (req, res) => {
     return res.status(404).json(new ApiResponse(false, "Product not found."));
   }
 
-  Object.assign(product, {
-    ...req.body,
-    slug: req.body.slug || product.slug,
-    price: Number(req.body.price ?? product.price),
-    originalPrice:
-      req.body.originalPrice === null || req.body.originalPrice === ""
-        ? null
-        : Number(req.body.originalPrice ?? product.originalPrice),
-    stockCount: Number(req.body.stockCount ?? product.stockCount),
-  });
+  // Only pick mutable fields — never assign _id, __v, seller (populated), etc.
+  const { name, category, description, badge, emoji, images, tags, isFeatured, inStock } = req.body;
+
+  if (name !== undefined) product.name = name;
+  if (category !== undefined) product.category = category;
+  if (description !== undefined) product.description = description;
+  if (badge !== undefined) product.badge = badge || null;
+  if (emoji !== undefined) product.emoji = emoji;
+  if (images !== undefined) product.images = images;
+  if (tags !== undefined) product.tags = tags;
+  if (isFeatured !== undefined) product.isFeatured = Boolean(isFeatured);
+  if (inStock !== undefined) product.inStock = Boolean(inStock);
+
+  if (req.body.slug) product.slug = req.body.slug;
+  product.price = Number(req.body.price ?? product.price);
+  product.originalPrice =
+    req.body.originalPrice === null || req.body.originalPrice === ""
+      ? null
+      : Number(req.body.originalPrice ?? product.originalPrice);
+  product.stockCount = Number(req.body.stockCount ?? product.stockCount);
+  product.deliveryFee = req.body.deliveryFee !== undefined ? Number(req.body.deliveryFee) : product.deliveryFee;
 
   await product.save();
   res.json(new ApiResponse(true, "Product updated.", { product: product.toClient() }));

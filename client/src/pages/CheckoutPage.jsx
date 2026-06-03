@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
+import { Modal } from "../components/ui/Modal";
 import { createPaymentOrderRequest, verifyPaymentRequest, verifyUpiPaymentRequest } from "../api/payment.api";
 import { useAppContext } from "../hooks/useAppContext";
 import { formatCurrency } from "../utils/formatCurrency";
@@ -35,6 +36,7 @@ export function CheckoutPage() {
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [placingOrder, setPlacingOrder] = useState(false);
+  const [simulatingOrder, setSimulatingOrder] = useState(null);
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -43,6 +45,9 @@ export function CheckoutPage() {
     state: "",
     pincode: "",
   });
+
+  const shippingFee = cart.items.reduce((sum, item) => sum + (item.deliveryFee || 0) * item.quantity, 0);
+  const orderTotal = Math.max(cart.summary.subtotal + shippingFee - promo.discount, 0);
 
   if (!isAuthenticated) {
     return (
@@ -95,56 +100,62 @@ export function CheckoutPage() {
         return;
       }
 
-      await loadRazorpayScript();
-      const paymentOrder = await createPaymentOrderRequest(order.id);
-      const razorpayOptions = {
-        key: paymentOrder.keyId,
-        amount: paymentOrder.amount,
-        currency: paymentOrder.currency || "INR",
-        name: "GramBazaar",
-        description: `Order ${order.id}`,
-        order_id: paymentOrder.razorpayOrderId,
-        prefill: {
-          name: form.name,
-          contact: form.phone,
-          method: paymentMethod === "upi" ? "upi" : undefined,
-        },
-        handler: async (response) => {
-          await verifyPaymentRequest({
-            orderId: order.id,
-            razorpayOrderId: response.razorpay_order_id,
-            razorpayPaymentId: response.razorpay_payment_id,
-            signature: response.razorpay_signature,
-          });
-          cart.clearCart();
-          notify(`Payment received for ${order.id}.`);
-          navigate(`/order-success/${order.id}`);
-        },
-      };
-
-      if (paymentMethod === "upi") {
-        razorpayOptions.config = {
-          display: {
-            blocks: {
-              upiBlock: {
-                name: "Pay via UPI",
-                instruments: [
-                  {
-                    method: "upi",
-                  },
-                ],
-              },
-            },
-            sequence: ["block.upiBlock"],
-            preferences: {
-              show_default_blocks: false,
-            },
+      try {
+        await loadRazorpayScript();
+        const paymentOrder = await createPaymentOrderRequest(order.id);
+        const razorpayOptions = {
+          key: paymentOrder.keyId,
+          amount: paymentOrder.amount,
+          currency: paymentOrder.currency || "INR",
+          name: "GramBazaar",
+          description: `Order ${order.id}`,
+          order_id: paymentOrder.razorpayOrderId,
+          prefill: {
+            name: form.name,
+            contact: form.phone,
+            method: paymentMethod === "upi" ? "upi" : undefined,
+          },
+          handler: async (response) => {
+            await verifyPaymentRequest({
+              orderId: order.id,
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              signature: response.razorpay_signature,
+            });
+            cart.clearCart();
+            notify(`Payment received for ${order.id}.`);
+            navigate(`/order-success/${order.id}`);
           },
         };
-      }
 
-      const checkout = new window.Razorpay(razorpayOptions);
-      checkout.open();
+        if (paymentMethod === "upi") {
+          razorpayOptions.config = {
+            display: {
+              blocks: {
+                upiBlock: {
+                  name: "Pay via UPI",
+                  instruments: [
+                    {
+                      method: "upi",
+                    },
+                  ],
+                },
+              },
+              sequence: ["block.upiBlock"],
+              preferences: {
+                show_default_blocks: false,
+              },
+            },
+          };
+        }
+
+        const checkout = new window.Razorpay(razorpayOptions);
+        checkout.open();
+      } catch (payError) {
+        console.warn("Razorpay initialisation failed, falling back to simulator:", payError);
+        notify("Razorpay Gateway unavailable. Launching interactive Payment Simulator...");
+        setSimulatingOrder(order);
+      }
     } catch (error) {
       notify(error.message || "Could not place order.");
     } finally {
@@ -253,9 +264,29 @@ export function CheckoutPage() {
                 <strong>Payment:</strong>
                 <p>{paymentOptions.find((option) => option.id === paymentMethod)?.name}</p>
               </div>
-              <div className="review-total">
+
+              <div className="space-y-1.5 border-b border-gray-100 pb-3 mb-3 text-xs text-gray-600">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span>{formatCurrency(cart.summary.subtotal)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Delivery Charges</span>
+                  <span className={shippingFee === 0 ? "text-emerald-600 font-semibold" : ""}>
+                    {shippingFee === 0 ? "FREE 🎉" : formatCurrency(shippingFee)}
+                  </span>
+                </div>
+                {promo.discount > 0 && (
+                  <div className="flex justify-between text-emerald-600 font-semibold">
+                    <span>Discount ({promo.code})</span>
+                    <span>−{formatCurrency(promo.discount)}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="review-total flex justify-between items-baseline pt-2">
                 <span>Order Total</span>
-                <strong>{formatCurrency(Math.max(cart.summary.subtotal - promo.discount, 0))}</strong>
+                <strong className="text-[#c4622d] text-lg font-black">{formatCurrency(orderTotal)}</strong>
               </div>
               <div className="checkout-actions">
                 <Button className="next-btn next-btn-secondary" type="button" onClick={() => setStep(2)}>
@@ -282,10 +313,145 @@ export function CheckoutPage() {
           ))}
           <div className="mini-total">
             <span>Total</span>
-            <span>{formatCurrency(Math.max(cart.summary.subtotal - promo.discount, 0))}</span>
+            <span className="font-bold">{formatCurrency(orderTotal)}</span>
           </div>
         </aside>
       </div>
+
+      {simulatingOrder && (
+        <Modal title="Interactive Payment Simulator (Sandbox Mode)" onClose={() => setSimulatingOrder(null)}>
+          <div className="flex flex-col gap-5 text-center py-2 max-w-sm mx-auto">
+            <div className="flex items-center justify-between bg-amber-50 border border-amber-100 rounded-xl p-3 text-left">
+              <div>
+                <p className="text-[10px] text-amber-700 font-bold uppercase tracking-wider">Gateway Sandbox Mode</p>
+                <p className="text-xs text-amber-800 font-semibold mt-0.5 leading-relaxed">
+                  Razorpay is currently unconfigured. Use this simulator to safely test and complete payment.
+                </p>
+              </div>
+              <span className="text-2xl">⚡</span>
+            </div>
+
+            <div className="bg-gray-50 border border-gray-150 rounded-2xl p-4 flex flex-col items-center gap-3">
+              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Amount Due</span>
+              <span className="text-2xl font-black text-gray-900">{formatCurrency(orderTotal)}</span>
+              <span className="text-[11px] font-semibold text-gray-500 bg-gray-200/50 px-2.5 py-1 rounded">
+                Order Reference: {simulatingOrder.orderNumber}
+              </span>
+            </div>
+
+            {paymentMethod === "upi" && (
+              <div className="flex flex-col items-center gap-4 py-2">
+                <div className="relative w-36 h-36 bg-white border-2 border-[#c4622d] rounded-2xl flex items-center justify-center shadow-md p-2 overflow-hidden">
+                  {/* Mock QR Representation */}
+                  <div className="w-full h-full bg-slate-100 rounded-lg flex flex-col items-center justify-center gap-1 border border-dashed border-gray-300">
+                    <span className="text-3xl">📲</span>
+                    <span className="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Scan & Pay</span>
+                  </div>
+                  {/* Laser Scan line animation */}
+                  <div className="absolute left-0 right-0 h-[2px] bg-red-500 shadow-[0_0_8px_red] top-0 animate-[bounce_2s_infinite]" />
+                </div>
+
+                <div className="flex justify-between items-center w-full max-w-xs border border-gray-100 bg-gray-50/50 rounded-xl p-2.5 text-xs text-left">
+                  <div>
+                    <span className="text-[10px] text-gray-400 block uppercase font-bold">UPI VPA</span>
+                    <span className="font-semibold text-gray-800 font-mono">pay@grambazaar</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText("pay@grambazaar");
+                      notify("UPI Address copied to clipboard!");
+                    }}
+                    className="text-[#c4622d] font-bold hover:underline"
+                  >
+                    Copy
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">Session expires in:</span>
+                  <SimulatorTimer onTimeout={() => setSimulatingOrder(null)} />
+                </div>
+              </div>
+            )}
+
+            {paymentMethod === "card" && (
+              <div className="flex flex-col gap-3 py-2 text-left">
+                <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Simulated Card Details</p>
+                <div className="bg-gradient-to-r from-gray-800 to-gray-700 text-white rounded-2xl p-4 shadow-md font-mono flex flex-col justify-between h-36">
+                  <div className="flex justify-between items-start">
+                    <span className="text-sm font-bold tracking-widest">GramBazaar Card</span>
+                    <span className="text-xl">💳</span>
+                  </div>
+                  <div className="text-base tracking-widest my-2">4111 •••• •••• 1111</div>
+                  <div className="flex justify-between text-[10px]">
+                    <div>
+                      <span className="block text-gray-400 text-[8px] uppercase">Cardholder</span>
+                      <span>{form.name || "Pkm Tester"}</span>
+                    </div>
+                    <div>
+                      <span className="block text-gray-400 text-[8px] uppercase">Expires</span>
+                      <span>12/30</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {paymentMethod === "netbanking" && (
+              <div className="flex flex-col gap-3 py-2 text-left">
+                <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Simulated Net Banking Banks</p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {["State Bank of India", "HDFC Bank", "ICICI Bank", "Axis Bank"].map((bank) => (
+                    <div key={bank} className="border border-gray-200 rounded-xl p-2.5 text-center font-semibold bg-gray-50 hover:bg-gray-100 transition-colors">
+                      🏦 {bank}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-2 pt-2">
+              <Button type="button" className="w-full py-2.5 font-bold" onClick={handleSimulatePayment}>
+                🚀 Simulate Successful Payment
+              </Button>
+              <button
+                type="button"
+                className="text-xs text-gray-500 hover:text-gray-700 font-bold py-1 hover:underline transition-colors"
+                onClick={() => setSimulatingOrder(null)}
+              >
+                Cancel and Return
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </section>
+  );
+}
+
+function SimulatorTimer({ onTimeout }) {
+  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      onTimeout();
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, onTimeout]);
+
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+
+  return (
+    <span className="font-mono bg-red-50 text-red-600 px-2.5 py-1 rounded text-xs font-bold border border-red-200">
+      ⏱️ {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
+    </span>
   );
 }

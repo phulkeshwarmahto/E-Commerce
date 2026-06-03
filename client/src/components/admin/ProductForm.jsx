@@ -12,6 +12,7 @@ const baseState = {
   stockCount: 12,
   badge: "",
   imageUrl: "",
+  deliveryFee: "",
 };
 
 export function ProductForm({ product, onSubmit, onClose }) {
@@ -32,6 +33,7 @@ export function ProductForm({ product, onSubmit, onClose }) {
       stockCount: product.stockCount,
       badge: product.badge || "",
       imageUrl: product.images?.[0]?.url || "",
+      deliveryFee: product.deliveryFee !== undefined ? product.deliveryFee : "",
     });
   }, [product]);
 
@@ -40,6 +42,7 @@ export function ProductForm({ product, onSubmit, onClose }) {
     await onSubmit({
       ...product,
       ...form,
+      deliveryFee: Number(form.deliveryFee || 0),
       images: form.imageUrl ? [{ url: form.imageUrl, alt: form.name, publicId: "manual" }] : [],
     });
     setForm(baseState);
@@ -129,6 +132,19 @@ export function ProductForm({ product, onSubmit, onClose }) {
             <option value="sale">sale</option>
             <option value="new">new</option>
           </select>
+        </label>
+        <label className="field">
+          <span className="field-label">Delivery Fee (₹)</span>
+          <input
+            className="input"
+            type="number"
+            min="0"
+            placeholder="0 for free delivery"
+            value={form.deliveryFee}
+            onChange={(event) =>
+              setForm((current) => ({ ...current, deliveryFee: event.target.value }))
+            }
+          />
         </label>
       </div>
       <ImageUploadZone value={form.imageUrl} onChange={(imageUrl) => setForm((current) => ({ ...current, imageUrl }))} />

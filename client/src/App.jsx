@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BrowserRouter,
   Route,
   Routes,
+  useLocation,
 } from "react-router-dom";
 import { Footer } from "./components/layout/Footer";
 import { Navbar } from "./components/layout/Navbar";
@@ -26,6 +27,16 @@ import { OrderSuccessPage } from "./pages/OrderSuccessPage";
 import { ProductDetailPage } from "./pages/ProductDetailPage";
 import { ShopPage } from "./pages/ShopPage";
 import { WishlistPage } from "./pages/WishlistPage";
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
 
 export default function App() {
   const auth = useAuth();
@@ -57,6 +68,7 @@ export default function App() {
   return (
     <AppContext.Provider value={contextValue}>
       <BrowserRouter>
+        <ScrollToTop />
         <div className="app-shell">
           <Navbar />
           <main className="main-shell">

@@ -29,6 +29,7 @@ const productSchema = new mongoose.Schema(
     tags: { type: [String], default: [] },
     isFeatured: { type: Boolean, default: false },
     seller: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },
+    deliveryFee: { type: Number, default: 0, min: 0 },
   },
   { timestamps: true },
 );

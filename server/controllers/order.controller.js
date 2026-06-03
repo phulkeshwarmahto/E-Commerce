@@ -76,7 +76,7 @@ export const getOrders = async (req, res) => {
 export const createOrder = async (req, res) => {
   const orderItems = await buildOrderItems(req.body.items);
   const subtotal = orderItems.reduce((sum, item) => sum + item.subtotal, 0);
-  const shippingFee = subtotal >= SHIPPING_FREE_THRESHOLD ? 0 : SHIPPING_FEE;
+  const shippingFee = orderItems.reduce((sum, item) => sum + (item.product.deliveryFee || 0) * item.quantity, 0);
   const { discount, couponCode } = await calculateDiscount(req.body.couponCode, subtotal);
   const total = Math.max(subtotal + shippingFee - discount, 0);
   const paymentMethod = req.body.paymentMethod || "cod";

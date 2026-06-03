@@ -1,10 +1,18 @@
 import crypto from "crypto";
+import mongoose from "mongoose";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { getRazorpay } from "../config/razorpay.js";
 import { Order } from "../models/Order.model.js";
 
+const findOrderByIdOrNumber = async (id, userId) => {
+  const query = mongoose.Types.ObjectId.isValid(id)
+    ? { _id: id, userId }
+    : { orderNumber: id, userId };
+  return Order.findOne(query);
+};
+
 export const createPaymentOrder = async (req, res) => {
-  const order = await Order.findOne({ orderNumber: req.body.orderId, userId: req.user._id });
+  const order = await findOrderByIdOrNumber(req.body.orderId, req.user._id);
 
   if (!order) {
     return res.status(404).json(new ApiResponse(false, "Order not found."));
@@ -40,7 +48,7 @@ export const createPaymentOrder = async (req, res) => {
 
 export const verifyPayment = async (req, res) => {
   const { orderId, razorpayOrderId, razorpayPaymentId, signature } = req.body;
-  const order = await Order.findOne({ orderNumber: orderId, userId: req.user._id });
+  const order = await findOrderByIdOrNumber(orderId, req.user._id);
 
   if (!order) {
     return res.status(404).json(new ApiResponse(false, "Order not found."));
@@ -69,7 +77,7 @@ export const verifyPayment = async (req, res) => {
 
 export const verifyUpiPayment = async (req, res) => {
   const { orderId } = req.body;
-  const order = await Order.findOne({ orderNumber: orderId, userId: req.user._id });
+  const order = await findOrderByIdOrNumber(orderId, req.user._id);
 
   if (!order) {
     return res.status(404).json(new ApiResponse(false, "Order not found."));
