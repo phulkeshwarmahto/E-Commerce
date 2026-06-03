@@ -330,9 +330,9 @@ export function AdminPage() {
           ) : null}
 
           {section === "users" ? (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 stack">
-              <h2 className="text-lg font-bold text-gray-900 mb-2">👤 Buyers & Sellers Management</h2>
-              <p className="text-xs text-gray-500 mb-6">Administrate user access permissions, modify credit ratings, and approve certification statuses.</p>
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 stack">
+              <h2 className="text-lg font-bold text-gray-900 mb-1">👤 Buyers & Sellers Management</h2>
+              <p className="text-xs text-gray-500 mb-4">Administrate user access permissions, modify credit ratings, and approve certification statuses.</p>
 
               {/* Search, Filter, and Sort Bar */}
               <div className="flex flex-col md:flex-row gap-4 mb-6 text-sm">
@@ -372,31 +372,33 @@ export function AdminPage() {
               {loadingUsers ? (
                 <p className="text-sm text-gray-500 py-6 text-center animate-pulse">Loading users list...</p>
               ) : filteredUsers.length > 0 ? (
-                <div className="table-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-4">
-                  <table>
+                <div className="table-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto mt-4">
+                  <table className="w-full">
                     <thead>
-                      <tr>
-                        <th>User</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Certification</th>
-                        <th>Credit Score</th>
-                        <th>Action</th>
+                      <tr className="bg-gray-50 border-b-2 border-gray-200">
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">User</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Email</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Role</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Certification</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Credit Score</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredUsers.map((usr) => (
-                        <tr key={usr.id}>
-                          <td className="font-semibold text-gray-900 flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xs">
-                              {usr.name?.[0]?.toUpperCase() || "U"}
+                        <tr key={usr.id} className="hover:bg-amber-50/40 transition-colors">
+                          <td className="!py-3 !px-4 whitespace-nowrap">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xs shrink-0">
+                                {usr.name?.[0]?.toUpperCase() || "U"}
+                              </div>
+                              <span className="font-semibold text-gray-900 text-sm">{usr.name || "Unknown User"}</span>
                             </div>
-                            {usr.name || "Unknown User"}
                           </td>
-                          <td className="text-gray-600 text-xs">{usr.email || "No Email"}</td>
-                          <td>
+                          <td className="!py-3 !px-4 text-gray-600 text-xs whitespace-nowrap">{usr.email || "No Email"}</td>
+                          <td className="!py-3 !px-4">
                             <select
-                              className="border border-gray-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-[#c4622d] bg-white cursor-pointer"
+                              className="border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-[#c4622d] bg-white cursor-pointer"
                               value={usr.role}
                               onChange={async (e) => {
                                 try {
@@ -413,9 +415,9 @@ export function AdminPage() {
                               <option value="admin">Admin</option>
                             </select>
                           </td>
-                          <td>
+                          <td className="!py-3 !px-4">
                             <select
-                              className="border border-gray-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-[#c4622d] bg-white cursor-pointer"
+                              className="border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-[#c4622d] bg-white cursor-pointer"
                               value={usr.certificationStatus}
                               onChange={async (e) => {
                                 try {
@@ -431,13 +433,13 @@ export function AdminPage() {
                               <option value="certified">Certified</option>
                             </select>
                           </td>
-                          <td>
-                            <div className="flex items-center gap-2">
+                          <td className="!py-3 !px-4">
+                            <div className="flex items-center gap-1.5">
                               <input
                                 type="number"
                                 min="0"
                                 max="1000"
-                                className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-xs text-center focus:outline-none focus:border-[#c4622d]"
+                                className="w-16 border border-gray-300 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-[#c4622d]"
                                 defaultValue={usr.creditScore ?? 750}
                                 onBlur={async (e) => {
                                   const val = Number(e.target.value);
@@ -456,10 +458,10 @@ export function AdminPage() {
                               <span className="text-[10px] text-gray-400 font-semibold">/1000</span>
                             </div>
                           </td>
-                          <td>
+                          <td className="!py-3 !px-4">
                             <button
                               type="button"
-                              className="button button-secondary text-[11px] px-2 py-1 flex items-center gap-1 font-semibold"
+                              className="button button-secondary text-[11px] px-3 py-1.5 inline-flex items-center gap-1 font-semibold whitespace-nowrap"
                               onClick={() => setSelectedUserForMsg(usr)}
                             >
                               ✉️ Message

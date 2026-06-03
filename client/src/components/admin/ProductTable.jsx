@@ -2,24 +2,24 @@ import { formatCurrency } from "../../utils/formatCurrency";
 
 export function ProductTable({ products, onEdit }) {
   return (
-    <div className="table-card">
-      <table>
+    <div className="table-card overflow-x-auto">
+      <table className="w-full">
         <thead>
-          <tr>
-            <th>Product</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Stock</th>
-            <th>Seller</th>
-            <th />
+          <tr className="bg-gray-50 border-b-2 border-gray-200">
+            <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Product</th>
+            <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Category</th>
+            <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Price</th>
+            <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Stock</th>
+            <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Seller</th>
+            <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Action</th>
           </tr>
         </thead>
         <tbody>
           {products.map((product) => {
             const hasImage = product.images?.[0]?.url;
             return (
-              <tr key={product.id}>
-                <td className="font-semibold text-gray-900">
+              <tr key={product.id} className="hover:bg-amber-50/40 transition-colors">
+                <td className="!py-3 !px-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
                     {hasImage ? (
                       <img
@@ -32,21 +32,21 @@ export function ProductTable({ products, onEdit }) {
                         {product.emoji || "📦"}
                       </div>
                     )}
-                    <span className="truncate max-w-[200px]">{product.name}</span>
+                    <span className="truncate max-w-[200px] font-semibold text-gray-900">{product.name}</span>
                   </div>
                 </td>
-                <td>{product.category}</td>
-                <td className="font-bold text-gray-800">{formatCurrency(product.price)}</td>
-                <td className="text-gray-600">
+                <td className="!py-3 !px-4 text-gray-600 whitespace-nowrap">{product.category}</td>
+                <td className="!py-3 !px-4 font-bold text-gray-800 whitespace-nowrap">{formatCurrency(product.price)}</td>
+                <td className="!py-3 !px-4 whitespace-nowrap">
                   {product.stockCount > 0 ? (
                     <span className="text-green-600 font-bold">{product.stockCount}</span>
                   ) : (
                     <span className="text-red-500 font-bold">0</span>
                   )}
                 </td>
-                <td className="text-xs text-gray-600 font-semibold">{product.seller?.name || "Admin"}</td>
-                <td>
-                  <button className="link-button font-bold text-amber-700 hover:text-amber-900" onClick={() => onEdit(product)}>
+                <td className="!py-3 !px-4 text-xs text-gray-600 font-semibold whitespace-nowrap">{product.seller?.name || "Admin"}</td>
+                <td className="!py-3 !px-4">
+                  <button className="link-button font-bold text-amber-700 hover:text-amber-900 whitespace-nowrap" onClick={() => onEdit(product)}>
                     Edit
                   </button>
                 </td>
@@ -58,4 +58,3 @@ export function ProductTable({ products, onEdit }) {
     </div>
   );
 }
-
