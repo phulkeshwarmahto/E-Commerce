@@ -1640,13 +1640,14 @@
 
   .modal-backdrop {
     background: rgba(44, 26, 14, 0.45);
-    @apply fixed inset-0 grid place-items-center p-4;
+    z-index: 500;
+    @apply fixed inset-0 flex items-center justify-center p-4;
   }
 
   .modal-card {
     width: min(720px, 100%);
     max-height: calc(100vh - 2rem);
-    @apply overflow-auto p-6;
+    @apply overflow-auto p-6 bg-white rounded-2xl border border-bd shadow-2xl;
   }
 
   .modal-header {

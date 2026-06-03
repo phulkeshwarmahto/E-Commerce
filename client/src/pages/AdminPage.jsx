@@ -48,6 +48,16 @@ export function AdminPage() {
     expiresAt: "",
   });
 
+  // Users Search, Sort, Filter State
+  const [userSearch, setUserSearch] = useState("");
+  const [userRoleFilter, setUserRoleFilter] = useState("all");
+  const [userSort, setUserSort] = useState("name-asc");
+
+  // Products Search, Sort, Filter State
+  const [productSearch, setProductSearch] = useState("");
+  const [productCategoryFilter, setProductCategoryFilter] = useState("all");
+  const [productSort, setProductSort] = useState("name-asc");
+
   const loadDashboard = useCallback(async () => {
     const data = await getDashboardRequest();
     setDashboard(data);
@@ -162,6 +172,61 @@ export function AdminPage() {
     );
   }
 
+  // Filtered and Sorted Users
+  const filteredUsers = usersList
+    .filter((usr) => {
+      const searchLower = userSearch.toLowerCase();
+      const matchesSearch =
+        (usr.name || "").toLowerCase().includes(searchLower) ||
+        (usr.email || "").toLowerCase().includes(searchLower);
+
+      if (userRoleFilter === "all") return matchesSearch;
+      return matchesSearch && usr.role === userRoleFilter;
+    })
+    .sort((a, b) => {
+      if (userSort === "name-asc") {
+        return (a.name || "").localeCompare(b.name || "");
+      }
+      if (userSort === "name-desc") {
+        return (b.name || "").localeCompare(a.name || "");
+      }
+      if (userSort === "credit-desc") {
+        return (b.creditScore ?? 0) - (a.creditScore ?? 0);
+      }
+      if (userSort === "credit-asc") {
+        return (a.creditScore ?? 0) - (b.creditScore ?? 0);
+      }
+      return 0;
+    });
+
+  // Filtered and Sorted Products
+  const filteredProducts = (dashboard?.products || [])
+    .filter((prod) => {
+      const searchLower = productSearch.toLowerCase();
+      const matchesSearch =
+        (prod.name || "").toLowerCase().includes(searchLower) ||
+        (prod.category || "").toLowerCase().includes(searchLower) ||
+        (prod.seller?.name || "admin").toLowerCase().includes(searchLower);
+
+      if (productCategoryFilter === "all") return matchesSearch;
+      return matchesSearch && prod.category === productCategoryFilter;
+    })
+    .sort((a, b) => {
+      if (productSort === "name-asc") {
+        return (a.name || "").localeCompare(b.name || "");
+      }
+      if (productSort === "name-desc") {
+        return (b.name || "").localeCompare(a.name || "");
+      }
+      if (productSort === "price-desc") {
+        return (b.price ?? 0) - (a.price ?? 0);
+      }
+      if (productSort === "price-asc") {
+        return (a.price ?? 0) - (b.price ?? 0);
+      }
+      return 0;
+    });
+
   return (
     <section className="page-content admin-page">
       <div className="admin-page-head">
@@ -190,13 +255,57 @@ export function AdminPage() {
 
           {section === "products" && dashboard ? (
             <>
-              <div className="section-head">
+              <div className="section-head mb-4">
                 <h1 className="page-title">Products</h1>
                 <button className="button button-primary" onClick={() => setShowCreateModal(true)}>
                   Add product
                 </button>
               </div>
-              <ProductTable products={dashboard.products} onEdit={setEditingProduct} />
+
+              {/* Search, Filter, and Sort Bar */}
+              <div className="flex flex-col md:flex-row gap-4 mb-6 text-sm">
+                <div className="flex-grow">
+                  <input
+                    type="text"
+                    placeholder="Search by product name, category, or seller..."
+                    value={productSearch}
+                    onChange={(e) => setProductSearch(e.target.value)}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#c4622d]"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <select
+                    value={productCategoryFilter}
+                    onChange={(e) => setProductCategoryFilter(e.target.value)}
+                    className="border border-gray-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#c4622d] bg-white cursor-pointer"
+                  >
+                    <option value="all">All Categories</option>
+                    <option value="Pantry">Pantry</option>
+                    <option value="Beverages">Beverages</option>
+                    <option value="Home">Home</option>
+                    <option value="Personal Care">Personal Care</option>
+                    <option value="Health">Health</option>
+                  </select>
+                  <select
+                    value={productSort}
+                    onChange={(e) => setProductSort(e.target.value)}
+                    className="border border-gray-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#c4622d] bg-white cursor-pointer"
+                  >
+                    <option value="name-asc">Name (A-Z)</option>
+                    <option value="name-desc">Name (Z-A)</option>
+                    <option value="price-desc">Price (High-Low)</option>
+                    <option value="price-asc">Price (Low-High)</option>
+                  </select>
+                </div>
+              </div>
+
+              <ProductTable products={filteredProducts} onEdit={setEditingProduct} />
+              
+              {filteredProducts.length === 0 && (
+                <p className="text-sm text-gray-500 py-10 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                  No products match your search/filters.
+                </p>
+              )}
             </>
           ) : null}
 
@@ -225,9 +334,44 @@ export function AdminPage() {
               <h2 className="text-lg font-bold text-gray-900 mb-2">👤 Buyers & Sellers Management</h2>
               <p className="text-xs text-gray-500 mb-6">Administrate user access permissions, modify credit ratings, and approve certification statuses.</p>
 
+              {/* Search, Filter, and Sort Bar */}
+              <div className="flex flex-col md:flex-row gap-4 mb-6 text-sm">
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    placeholder="Search by name or email..."
+                    value={userSearch}
+                    onChange={(e) => setUserSearch(e.target.value)}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#c4622d]"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <select
+                    value={userRoleFilter}
+                    onChange={(e) => setUserRoleFilter(e.target.value)}
+                    className="border border-gray-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#c4622d] bg-white cursor-pointer"
+                  >
+                    <option value="all">All Roles</option>
+                    <option value="user">Customer (Buyer)</option>
+                    <option value="seller">Seller</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <select
+                    value={userSort}
+                    onChange={(e) => setUserSort(e.target.value)}
+                    className="border border-gray-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#c4622d] bg-white cursor-pointer"
+                  >
+                    <option value="name-asc">Name (A-Z)</option>
+                    <option value="name-desc">Name (Z-A)</option>
+                    <option value="credit-desc">Credit Score (High-Low)</option>
+                    <option value="credit-asc">Credit Score (Low-High)</option>
+                  </select>
+                </div>
+              </div>
+
               {loadingUsers ? (
                 <p className="text-sm text-gray-500 py-6 text-center animate-pulse">Loading users list...</p>
-              ) : usersList.length > 0 ? (
+              ) : filteredUsers.length > 0 ? (
                 <div className="table-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-4">
                   <table>
                     <thead>
@@ -241,7 +385,7 @@ export function AdminPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {usersList.map((usr) => (
+                      {filteredUsers.map((usr) => (
                         <tr key={usr.id}>
                           <td className="font-semibold text-gray-900 flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xs">
@@ -328,7 +472,7 @@ export function AdminPage() {
                 </div>
               ) : (
                 <p className="text-sm text-gray-500 py-10 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                  No users found.
+                  No users match your filters.
                 </p>
               )}
             </div>
@@ -475,7 +619,7 @@ export function AdminPage() {
       ) : null}
 
       {selectedUserForMsg ? (
-        <Modal title={`Send Message to ${selectedUserForMsg.name}`} onClose={() => setSelectedUserForMsg(null)}>
+        <Modal title={`Send Message to ${selectedUserForMsg.name || "Unknown User"}`} onClose={() => setSelectedUserForMsg(null)}>
           <form onSubmit={handleSendMessage} className="stack text-sm">
             <div className="field">
               <label className="label">Subject / Title</label>

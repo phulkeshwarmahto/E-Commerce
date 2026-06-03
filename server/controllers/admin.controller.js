@@ -15,9 +15,9 @@ export const getDashboard = async (_req, res) => {
       Order.countDocuments(),
       Product.countDocuments(),
       User.countDocuments(),
-      Product.find().sort({ createdAt: -1 }).limit(100),
+      Product.find().populate("seller", "name email").sort({ createdAt: -1 }).limit(100),
       Order.find().sort({ createdAt: -1 }).limit(10),
-      Product.find().sort({ rating: -1 }).limit(5),
+      Product.find().populate("seller", "name email").sort({ rating: -1 }).limit(5),
       Review.find().sort({ createdAt: -1 }).limit(5),
       Coupon.countDocuments(),
     ]);
