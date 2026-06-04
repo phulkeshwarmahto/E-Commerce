@@ -1,5 +1,7 @@
+import { createPortal } from "react-dom";
+
 export function Modal({ title, children, onClose }) {
-  return (
+  const modalContent = (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-card" onClick={(event) => event.stopPropagation()}>
         <div className="modal-header">
@@ -12,4 +14,6 @@ export function Modal({ title, children, onClose }) {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
