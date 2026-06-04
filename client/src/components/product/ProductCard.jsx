@@ -30,6 +30,8 @@ function HeartIcon({ filled }) {
   );
 }
 
+import { optimizeCloudinaryUrl } from "../../utils/optimizeImage";
+
 export function ProductCard({ product }) {
   const [imageError, setImageError] = useState(false);
   const { cart, wishlistIds, toggleWishlist, notify, user } = useAppContext();
@@ -50,7 +52,7 @@ export function ProductCard({ product }) {
           {showImage ? (
             <img
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              src={imageUrl}
+              src={optimizeCloudinaryUrl(imageUrl, { width: 400 })}
               alt={product.name}
               onError={() => setImageError(true)}
             />

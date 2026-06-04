@@ -12,6 +12,7 @@ import { validatePincode } from "../utils/validatePincode";
 import { getProductFAQsRequest, createQuestionRequest } from "../api/faq.api";
 import { ReportModal } from "../components/ui/ReportModal";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
+import { optimizeCloudinaryUrl } from "../utils/optimizeImage";
 
 // Star SVGs
 function Star({ filled, half }) {
@@ -176,7 +177,7 @@ export function ProductDetailPage() {
               {product.images?.[0]?.url ? (
                 <img
                   className="w-full h-[320px] md:h-[380px] object-cover"
-                  src={product.images[selectedThumb]?.url || product.images[0].url}
+                  src={optimizeCloudinaryUrl(product.images[selectedThumb]?.url || product.images[0].url, { width: 800 })}
                   alt={product.name}
                 />
               ) : (
@@ -204,7 +205,7 @@ export function ProductDetailPage() {
                                  : "border-gray-200 hover:border-gray-400"}`}
                     style={{ background: product.bg || "#f5f0e8" }}
                   >
-                    <img src={img.url} alt={`${product.name} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
+                    <img src={optimizeCloudinaryUrl(img.url, { width: 150 })} alt={`${product.name} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
