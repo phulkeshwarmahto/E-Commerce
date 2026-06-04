@@ -38,6 +38,7 @@
 14. [Scripts](#-scripts)
 15. [Deployment](#-deployment)
 16. [Contributing](#-contributing)
+17. [Recent Feature Updates](#-recent-feature-updates)
 
 ---
 
@@ -1205,6 +1206,40 @@ volumes:
 ```bash
 docker-compose up --build
 ```
+
+---
+
+## 🚀 Recent Feature Updates
+
+Here is a list of the premium updates and features added to GramBazaar:
+
+### 1. 🔔 Multi-Route Notification Triggers
+* **Purchase Alerts**: Product sellers receive instant notifications when a customer purchases their listed item(s).
+* **Review & Q&A Alerts**: Ratings, buyer testimonials, and product questions are automatically routed to store admins and the respective seller's panel in real-time.
+* **Report System Routing**: Users can report catalog issues to `"admin"`, `"seller"`, or `"both"`. The backend dynamically routes notifications and records target details.
+
+### 2. 🚚 On the Way Milestone & Journey Timeline
+* **Status Overhaul**: Removed `"Paid"` status and replaced `"Shipped"` with `"On the Way"` to align with standard e-commerce fulfilment states (Processing → On the Way → Delivered).
+* **Journey Tracker**: Upgraded the buyer's order tracking dashboard with a dynamic progress bar and vertical journey timeline rendering actual dates, badges, icons, and custom status update messages.
+
+### 3. 💳 Cash on Delivery Payment Control
+* **Inline Selectors**: Upgraded the merchant and admin order tables with a **Payment Status** column.
+* **COD Status Updates**: If the payment method is Cash on Delivery, admins and sellers see a dropdown to manually transition payment status (**Pending**, **Paid on Delivery**, **Cancelled**, **Returned**), which syncs with backend validation logs and buyer notifications.
+
+### 4. 📄 Tax-Compliant Invoice Generator
+* **PDF Preview**: Renders detail-oriented invoice overlays containing transaction references, billing summaries, itemized counts, and signator blocks.
+* **Dedicated Print CSS**: Custom CSS print media rules hide parent layouts during printing, forcing clean **1-page** physical document outputs.
+
+### 5. 🏠 Saved Addresses & Autofill Drawer
+* **Checkout Card Tray**: Loads default profile details and previous checkout history as quick-fill cards, letting buyers autofill entire delivery forms with one click.
+
+### 6. 🖼️ Glassmorphism Modals & Viewport Portal
+* **createPortal Fix**: Rendered layout overlays using React `createPortal` to bypass parent container CSS bugs and center modals on the viewport.
+* **Aesthetic Backdrop**: Injected a modern `backdrop-filter: blur(6px)` blur effect.
+
+### 7. 🏷️ Premium SEO Architecture & Sitemap
+* **Dynamic Metadata**: Custom `useDocumentMetadata` hook dynamically configures title tags, description metas, and crawlers index settings.
+* **JSON-LD Schema Markup**: Automatic injection of Website/Store and rich Product JSON-LD structured schemas, allowing google search to index star reviews and pricing directly.
 
 ---
 
