@@ -233,6 +233,63 @@ export const sendNotification = async (req, res) => {
   );
 };
 
+export const broadcastNotification = async (req, res) => {
+  const { title, message, sendEmailCheckbox } = req.body;
+
+  if (!title || !message) {
+    return res.status(400).json(new ApiResponse(false, "Title and message are required."));
+  }
+
+  const users = await User.find({}, "_id name email");
+
+  if (users.length === 0) {
+    return res.status(404).json(new ApiResponse(false, "No users found to notify."));
+  }
+
+  // Create notifications for all users
+  const notificationDocs = users.map((u) => ({
+    userId: u._id,
+    title,
+    message,
+  }));
+  await Notification.insertMany(notificationDocs);
+
+  let emailsSent = 0;
+  if (sendEmailCheckbox) {
+    const emailPromises = users
+      .filter((u) => u.email)
+      .map((u) =>
+        sendEmail({
+          to: u.email,
+          subject: title,
+          text: message,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
+              <h2 style="color: #ea580c; border-bottom: 2px solid #f97316; padding-bottom: 10px;">📢 Announcement from GramBazaar</h2>
+              <p style="font-size: 16px; line-height: 1.5; color: #333;">Hello ${u.name || "User"},</p>
+              <div style="background-color: #fcf8f2; border-left: 4px solid #ea580c; padding: 15px; margin: 20px 0; font-style: italic; color: #555;">
+                ${message.replace(/\n/g, "<br/>")}
+              </div>
+              <p style="font-size: 12px; color: #777; margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px;">
+                This is a broadcast notification sent from the GramBazaar Administrator Panel. Please do not reply directly to this automated email.
+              </p>
+            </div>
+          `,
+        }).catch(() => null)
+      );
+
+    const results = await Promise.allSettled(emailPromises);
+    emailsSent = results.filter((r) => r.status === "fulfilled" && r.value).length;
+  }
+
+  res.json(
+    new ApiResponse(true, `Broadcast sent to ${users.length} user(s).`, {
+      notificationCount: users.length,
+      emailsSent,
+    })
+  );
+};
+
 export const getCouponsAdmin = async (_req, res) => {
   const coupons = await Coupon.find().sort({ createdAt: -1 });
   res.json(new ApiResponse(true, "All coupons fetched.", { coupons }));

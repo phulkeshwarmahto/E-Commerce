@@ -37,6 +37,7 @@ export function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [placingOrder, setPlacingOrder] = useState(false);
   const [simulatingOrder, setSimulatingOrder] = useState(null);
+  const [locatingUser, setLocatingUser] = useState(false);
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -45,6 +46,65 @@ export function CheckoutPage() {
     state: "",
     pincode: "",
   });
+
+  const handleUseMyLocation = async () => {
+    if (!navigator.geolocation) {
+      notify("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    setLocatingUser(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+            { headers: { "Accept-Language": "en" } }
+          );
+          const data = await response.json();
+
+          if (data?.address) {
+            const addr = data.address;
+            setForm((prev) => ({
+              ...prev,
+              line1:
+                [addr.road, addr.neighbourhood, addr.suburb]
+                  .filter(Boolean)
+                  .join(", ") || prev.line1,
+              city:
+                addr.city ||
+                addr.town ||
+                addr.village ||
+                addr.county ||
+                prev.city,
+              state: addr.state || prev.state,
+              pincode: addr.postcode || prev.pincode,
+            }));
+            notify("📍 Location detected! Please verify and fill remaining fields.");
+          } else {
+            notify("Could not determine address from your location.");
+          }
+        } catch {
+          notify("Failed to fetch address from your location.");
+        } finally {
+          setLocatingUser(false);
+        }
+      },
+      (error) => {
+        setLocatingUser(false);
+        if (error.code === error.PERMISSION_DENIED) {
+          notify("Location access denied. Please allow location in your browser settings.");
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          notify("Location unavailable. Please try again.");
+        } else {
+          notify("Location request timed out. Please try again.");
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
   const shippingFee = cart.items.reduce((sum, item) => sum + (item.deliveryFee || 0) * item.quantity, 0);
   const orderTotal = Math.max(cart.summary.subtotal + shippingFee - promo.discount, 0);
@@ -184,19 +244,18 @@ export function CheckoutPage() {
                 <h3 className="m-0 text-lg font-extrabold text-[#2c1a0e]">📍 Delivery Address</h3>
                 <button
                   type="button"
-                  onClick={() =>
-                    setForm({
-                      name: "Pkm Tester",
-                      phone: "9876543210",
-                      line1: "123 Bazaar Lane",
-                      city: "Mumbai",
-                      state: "Maharashtra",
-                      pincode: "400001",
-                    })
-                  }
-                  className="bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold px-3 py-1.5 rounded-lg text-xs transition-colors flex items-center gap-1 shadow-sm border-0 cursor-pointer"
+                  onClick={handleUseMyLocation}
+                  disabled={locatingUser}
+                  className="bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold px-3 py-1.5 rounded-lg text-xs transition-colors flex items-center gap-1 shadow-sm border-0 cursor-pointer disabled:opacity-60 disabled:cursor-wait"
                 >
-                  🚀 Quick Fill Test Address
+                  {locatingUser ? (
+                    <>
+                      <span className="inline-block w-3 h-3 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></span>
+                      Detecting...
+                    </>
+                  ) : (
+                    "📍 Use My Location"
+                  )}
                 </button>
               </div>
               <div className="form-row">

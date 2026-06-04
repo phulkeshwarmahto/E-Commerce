@@ -1,6 +1,5 @@
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
 import express from "express";
 import helmet from "helmet";
 import pinoHttp from "pino-http";
@@ -19,8 +18,6 @@ import faqRoutes from "./routes/faq.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import { apiRateLimiter } from "./middleware/rateLimit.middleware.js";
 import { errorHandler } from "./middleware/errorHandler.middleware.js";
-
-dotenv.config();
 
 const app = express();
 

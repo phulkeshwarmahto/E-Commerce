@@ -9,6 +9,7 @@ import {
   updateUserCertification,
   updateUserRole,
   sendNotification,
+  broadcastNotification,
   getCouponsAdmin,
   createCouponAdmin,
   deleteCouponAdmin,
@@ -34,6 +35,7 @@ router.patch("/users/:id/credit-score", asyncHandler(updateUserCreditScore));
 router.patch("/users/:id/certification", asyncHandler(updateUserCertification));
 router.patch("/users/:id/role", asyncHandler(updateUserRole));
 router.post("/send-notification", asyncHandler(sendNotification));
+router.post("/broadcast-notification", asyncHandler(broadcastNotification));
 router.get("/coupons", asyncHandler(getCouponsAdmin));
 router.post("/coupons", asyncHandler(createCouponAdmin));
 router.delete("/coupons/:id", asyncHandler(deleteCouponAdmin));

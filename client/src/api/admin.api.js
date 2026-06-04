@@ -18,6 +18,8 @@ export const updateUserRoleRequest = (id, role) =>
 
 export const sendAdminNotificationRequest = (payload) =>
   apiRequest("/admin/send-notification", { method: "POST", body: payload });
+export const broadcastNotificationRequest = (payload) =>
+  apiRequest("/admin/broadcast-notification", { method: "POST", body: payload });
 export const getAdminCouponsRequest = () =>
   apiRequest("/admin/coupons");
 export const createAdminCouponRequest = (payload) =>
