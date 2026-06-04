@@ -1999,7 +1999,8 @@
   flex-wrap: nowrap !important;
   overflow-x: auto !important;
   overflow-y: hidden !important;
-  scrollbar-width: auto;
+  scrollbar-width: none; /* Hide scrollbar in Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar in IE/Edge */
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
   gap: 1rem;
@@ -2007,16 +2008,7 @@
 }
 
 .product-hscroll::-webkit-scrollbar {
-  height: 6px;
-}
-
-.product-hscroll::-webkit-scrollbar-thumb {
-  background-color: rgba(196, 98, 45, 0.3);
-  border-radius: 4px;
-}
-
-.product-hscroll::-webkit-scrollbar-track {
-  background: transparent;
+  display: none; /* Hide scrollbar in Chrome, Safari, and Opera */
 }
 
 .product-hscroll .pcard {

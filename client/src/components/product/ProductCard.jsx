@@ -40,7 +40,7 @@ export function ProductCard({ product }) {
   const savings = product.originalPrice ? product.originalPrice - product.price : 0;
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white
+    <article className="pcard group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white
                         shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
 
       {/* ── Image Area ── */}
