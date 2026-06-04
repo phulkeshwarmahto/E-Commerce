@@ -115,8 +115,8 @@ export function HomePage() {
   useEffect(() => {
     getBrandsRequest()
       .then((res) => {
-        if (res.success && res.data?.brands?.length > 0) {
-          setBrands(res.data.brands);
+        if (res && res.brands && res.brands.length > 0) {
+          setBrands(res.brands);
         } else {
           setBrands(brandAds);
         }

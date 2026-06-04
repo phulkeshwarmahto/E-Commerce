@@ -121,8 +121,8 @@ export function Navbar() {
     if (!user) return;
     try {
       const res = await getNotificationsRequest();
-      if (res.success) {
-        setNotifications(res.data?.notifications || res.notifications || []);
+      if (res && res.notifications) {
+        setNotifications(res.notifications);
       }
     } catch (err) {
       console.error("Error fetching notifications:", err);

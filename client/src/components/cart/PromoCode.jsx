@@ -11,8 +11,8 @@ export function PromoCode({ subtotal, onApply }) {
   useEffect(() => {
     getCouponsRequest()
       .then((res) => {
-        if (res.success && res.data?.coupons) {
-          setDbCoupons(res.data.coupons);
+        if (res && res.coupons) {
+          setDbCoupons(res.coupons);
         }
       })
       .catch((err) => console.error("Error fetching coupons:", err));

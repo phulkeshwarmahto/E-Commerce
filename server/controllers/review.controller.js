@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Product } from "../models/Product.model.js";
 import { Review } from "../models/Review.model.js";
+import { User } from "../models/User.model.js";
+import { Notification } from "../models/Notification.model.js";
 
 const resolveProduct = async (id) => {
   if (mongoose.Types.ObjectId.isValid(id)) {
@@ -49,6 +51,32 @@ export const createReview = async (req, res) => {
   product.rating =
     productReviews.reduce((sum, entry) => sum + entry.rating, 0) / Math.max(productReviews.length, 1);
   await product.save();
+
+  // Create notifications for product's seller and all admins
+  try {
+    const admins = await User.find({ role: "admin" }, "_id");
+    const adminIds = admins.map((a) => a._id.toString());
+    
+    const recipientIds = new Set(adminIds);
+    if (product.seller) {
+      recipientIds.add(product.seller.toString());
+    }
+    
+    // Remove the buyer who left the review
+    recipientIds.delete(req.user._id.toString());
+    
+    const notifications = Array.from(recipientIds).map((uid) => ({
+      userId: uid,
+      title: `⭐ New Review on ${product.name}`,
+      message: `${req.user.name || req.user.email} rated it ${review.rating}⭐: "${review.title || "Customer review"}"`,
+    }));
+    
+    if (notifications.length > 0) {
+      await Notification.insertMany(notifications);
+    }
+  } catch (notifErr) {
+    console.error("Error generating review notifications:", notifErr);
+  }
 
   res.status(201).json(new ApiResponse(true, "Review submitted.", { review: review.toClient() }));
 };
