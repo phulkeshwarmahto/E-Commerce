@@ -68,8 +68,8 @@ export const verifyPayment = async (req, res) => {
   order.payment.status = "paid";
   order.payment.razorpayOrderId = razorpayOrderId;
   order.payment.razorpayPaymentId = razorpayPaymentId;
-  order.status = "Paid";
-  order.statusHistory.push({ status: "Paid", note: "Payment verified" });
+  order.status = "Processing";
+  order.statusHistory.push({ status: "Processing", note: "Payment verified" });
   await order.save();
 
   res.json(new ApiResponse(true, "Payment verified.", { verified: true, order: order.toClient() }));
@@ -85,8 +85,8 @@ export const verifyUpiPayment = async (req, res) => {
 
   order.payment.status = "paid";
   order.payment.razorpayPaymentId = `upi_${crypto.randomBytes(6).toString("hex")}`;
-  order.status = "Paid";
-  order.statusHistory.push({ status: "Paid", note: "Simulated UPI Payment Completed" });
+  order.status = "Processing";
+  order.statusHistory.push({ status: "Processing", note: "Simulated UPI Payment Completed" });
   await order.save();
 
   res.json(new ApiResponse(true, "UPI Payment verified successfully.", { verified: true, order: order.toClient() }));

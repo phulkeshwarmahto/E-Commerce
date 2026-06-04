@@ -212,9 +212,9 @@ export function SellerPage() {
               {dashboard.recentOrders?.length > 0 ? (
                 <OrderTable
                   orders={dashboard.recentOrders}
-                  onUpdateStatus={async (id, status) => {
+                  onUpdateStatus={async (id, status, paymentStatus) => {
                     try {
-                      await updateSellerOrderStatusRequest(id, status);
+                      await updateSellerOrderStatusRequest(id, status, paymentStatus);
                       notify("Order status updated successfully.");
                       loadSellerData().catch(() => {});
                     } catch (err) {

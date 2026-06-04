@@ -1,6 +1,6 @@
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Coupon } from "../models/Coupon.model.js";
-import { ORDER_STATUSES, Order } from "../models/Order.model.js";
+import { ORDER_STATUSES, PAYMENT_STATUSES, Order } from "../models/Order.model.js";
 import { Product } from "../models/Product.model.js";
 import { Review } from "../models/Review.model.js";
 import { User } from "../models/User.model.js";
@@ -40,10 +40,14 @@ export const getDashboard = async (_req, res) => {
 };
 
 export const updateOrderStatus = async (req, res) => {
-  const { status } = req.body;
+  const { status, paymentStatus } = req.body;
 
-  if (!ORDER_STATUSES.includes(status)) {
+  if (status && !ORDER_STATUSES.includes(status)) {
     return res.status(400).json(new ApiResponse(false, "Invalid order status."));
+  }
+
+  if (paymentStatus && !PAYMENT_STATUSES.includes(paymentStatus)) {
+    return res.status(400).json(new ApiResponse(false, "Invalid payment status."));
   }
 
   const order = await Order.findOne({ orderNumber: req.params.id });
@@ -52,23 +56,39 @@ export const updateOrderStatus = async (req, res) => {
     return res.status(404).json(new ApiResponse(false, "Order not found."));
   }
 
-  order.status = status;
+  if (status) {
+    order.status = status;
+  }
+  if (paymentStatus) {
+    order.payment.status = paymentStatus;
+  }
 
-  let buyerMessage = `📦 Your order #${order.orderNumber} status has been updated to "${status}".`;
-  if (status === "Paid") {
-    buyerMessage = `🎉 Payment Confirmed! We have successfully received your payment for order #${order.orderNumber}. Sourcing your fresh items now!`;
-  } else if (status === "Shipped") {
-    buyerMessage = `🚚 Hurray! Your order #${order.orderNumber} is on the way! It's on time and your product is shipped. Track details in your dashboard.`;
-  } else if (status === "Delivered") {
-    buyerMessage = `🥳 Order Delivered! Your organic everyday essentials for order #${order.orderNumber} have arrived safely. Thank you for shopping with us!`;
-  } else if (status === "Cancelled") {
-    buyerMessage = `⚠️ Order Cancelled. Your order #${order.orderNumber} has been cancelled. Please contact support if you need refund help.`;
-  } else if (status === "Returned") {
-    buyerMessage = `↩️ Return Processed. The return request for order #${order.orderNumber} has been processed successfully.`;
+  let buyerMessage = "";
+  if (status) {
+    if (status === "On the Way") {
+      buyerMessage = `🚚 Hurray! Your order #${order.orderNumber} is on the way! It's on time. Track details in your dashboard.`;
+    } else if (status === "Delivered") {
+      buyerMessage = `🥳 Order Delivered! Your organic everyday essentials for order #${order.orderNumber} have arrived safely. Thank you for shopping with us!`;
+    } else if (status === "Cancelled") {
+      buyerMessage = `⚠️ Order Cancelled. Your order #${order.orderNumber} has been cancelled. Please contact support if you need refund help.`;
+    } else if (status === "Returned") {
+      buyerMessage = `↩️ Return Processed. The return request for order #${order.orderNumber} has been processed successfully.`;
+    } else {
+      buyerMessage = `📦 Your order #${order.orderNumber} status has been updated to "${status}".`;
+    }
+  }
+
+  if (paymentStatus) {
+    let paymentFriendly = paymentStatus === "paid" ? "Paid on Delivery" : paymentStatus === "failed" ? "Cancelled" : paymentStatus === "refunded" ? "Returned" : "Pending";
+    if (buyerMessage) {
+      buyerMessage += ` | Payment Status: ${paymentFriendly}.`;
+    } else {
+      buyerMessage = `💳 Your order #${order.orderNumber} payment status has been updated to "${paymentFriendly}".`;
+    }
   }
 
   order.statusHistory.push({
-    status,
+    status: status || order.status,
     updatedAt: new Date(),
     note: buyerMessage,
   });
@@ -79,7 +99,7 @@ export const updateOrderStatus = async (req, res) => {
   try {
     await Notification.create({
       userId: order.userId,
-      title: `🔔 Order Status Update: ${status}`,
+      title: `🔔 Order Update: ${status || "Payment Update"}`,
       message: buyerMessage,
     });
   } catch (notifErr) {

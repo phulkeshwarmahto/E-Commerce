@@ -219,7 +219,7 @@ function getProgressPercentage(order) {
   
   const historyStatuses = order.statusHistory.map(h => h.status);
   let completedCount = 0;
-  const milestones = ["Processing", "Paid", "Shipped", "Delivered"];
+  const milestones = ["Processing", "On the Way", "Delivered"];
   milestones.forEach((m) => {
     if (historyStatuses.includes(m)) completedCount++;
   });
@@ -244,8 +244,7 @@ function getMilestonesForOrder(order) {
   }
   return [
     { status: "Processing", label: "Processing" },
-    { status: "Paid", label: "Paid" },
-    { status: "Shipped", label: "Shipped" },
+    { status: "On the Way", label: "On the Way" },
     { status: "Delivered", label: "Delivered" },
   ];
 }
@@ -258,13 +257,7 @@ function getStatusTimelineConfig(status) {
         borderColor: "border-blue-200 text-blue-600",
         badgeClass: "bg-blue-50 text-blue-700 border border-blue-150",
       };
-    case "Paid":
-      return {
-        icon: "💳",
-        borderColor: "border-emerald-200 text-emerald-600",
-        badgeClass: "bg-emerald-50 text-emerald-700 border border-emerald-150",
-      };
-    case "Shipped":
+    case "On the Way":
       return {
         icon: "🚚",
         borderColor: "border-amber-200 text-amber-600",

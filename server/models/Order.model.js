@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export const ORDER_STATUSES = ["Processing", "Paid", "Shipped", "Delivered", "Cancelled", "Returned"];
+export const ORDER_STATUSES = ["Processing", "On the Way", "Delivered", "Cancelled", "Returned"];
 export const PAYMENT_METHODS = ["cod", "upi", "card", "netbanking"];
 export const PAYMENT_STATUSES = ["pending", "paid", "failed", "refunded"];
 
