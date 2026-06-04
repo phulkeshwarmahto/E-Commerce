@@ -25,6 +25,7 @@ import { StatCard } from "../components/admin/StatCard";
 import { Modal } from "../components/ui/Modal";
 import { useAppContext } from "../hooks/useAppContext";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
+import { ImageUploadZone } from "../components/admin/ImageUploadZone";
 
 export function AdminPage() {
   const { user, notify } = useAppContext();
@@ -947,14 +948,10 @@ export function AdminPage() {
                   </div>
                 </div>
                 <div className="field col-span-2">
-                  <label className="label text-xs font-semibold text-gray-700">Campaign Image URL</label>
-                  <input
-                    type="text"
-                    className="input py-2"
-                    required
-                    placeholder="e.g. https://images.unsplash.com/..."
+                  <ImageUploadZone
+                    label="Campaign Image"
                     value={newBrand.image}
-                    onChange={(e) => setNewBrand({ ...newBrand, image: e.target.value })}
+                    onChange={(url) => setNewBrand({ ...newBrand, image: url })}
                   />
                 </div>
                 <div className="col-span-2 flex justify-end">

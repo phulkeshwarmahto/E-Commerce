@@ -2,7 +2,7 @@ import { useState } from "react";
 import { uploadImageRequest } from "../../api/upload.api";
 import { useAppContext } from "../../hooks/useAppContext";
 
-export function ImageUploadZone({ value, onChange }) {
+export function ImageUploadZone({ value, onChange, label = "Product Image" }) {
   const { notify } = useAppContext();
   const [uploading, setUploading] = useState(false);
 
@@ -47,7 +47,7 @@ export function ImageUploadZone({ value, onChange }) {
 
         {/* Upload Controls */}
         <div className="flex-grow flex flex-col gap-2">
-          <span className="font-bold text-gray-700 block">Product Image</span>
+          <span className="font-bold text-gray-700 block">{label}</span>
           <div className="flex items-center gap-2">
             <label className="button button-secondary cursor-pointer py-1.5 px-3 text-[11px] font-semibold text-center rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors">
               {uploading ? "Uploading..." : "📁 Upload Image File"}
