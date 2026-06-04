@@ -11,6 +11,13 @@ const userSchema = new mongoose.Schema(
     membership: { type: String, default: "Silver" },
     certificationStatus: { type: String, enum: ["new", "certified"], default: "new" },
     creditScore: { type: Number, default: 750 },
+    phone: { type: String, trim: true, default: "" },
+    address: {
+      line1: { type: String, default: "" },
+      city: { type: String, default: "" },
+      state: { type: String, default: "" },
+      pincode: { type: String, default: "" },
+    },
   },
   { timestamps: true },
 );
@@ -25,6 +32,8 @@ userSchema.methods.toClient = function toClient() {
     avatarUrl: this.avatarUrl,
     certificationStatus: this.certificationStatus || "new",
     creditScore: this.creditScore ?? 750,
+    phone: this.phone || "",
+    address: this.address || { line1: "", city: "", state: "", pincode: "" },
   };
 };
 

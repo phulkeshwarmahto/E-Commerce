@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { loginRequest, meRequest, registerRequest, googleLoginRequest } from "../api/auth.api";
+import { loginRequest, meRequest, registerRequest, googleLoginRequest, updateProfileRequest } from "../api/auth.api";
 import {
   clearStoredSession,
   getStoredSession,
@@ -73,6 +73,19 @@ export function useAuth() {
     clearStoredSession();
   };
 
+  const updateProfile = async (payload) => {
+    setLoading(true);
+    try {
+      const data = await updateProfileRequest(payload);
+      const nextSession = { ...session, user: data.user };
+      setSession(nextSession);
+      setStoredSession(nextSession);
+      return data.user;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     user: session?.user || null,
     token: session?.token || "",
@@ -82,5 +95,6 @@ export function useAuth() {
     register,
     googleLogin,
     logout,
+    updateProfile,
   };
 }

@@ -38,14 +38,93 @@ export function CheckoutPage() {
   const [placingOrder, setPlacingOrder] = useState(false);
   const [simulatingOrder, setSimulatingOrder] = useState(null);
   const [locatingUser, setLocatingUser] = useState(false);
+  const [saveAddressForFuture, setSaveAddressForFuture] = useState(false);
   const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    line1: "",
-    city: "",
-    state: "",
-    pincode: "",
+    name: user?.name || "",
+    phone: user?.phone || "",
+    line1: user?.address?.line1 || "",
+    city: user?.address?.city || "",
+    state: user?.address?.state || "",
+    pincode: user?.address?.pincode || "",
   });
+
+  const { updateProfile } = useAppContext();
+
+  useEffect(() => {
+    if (user) {
+      setForm((prev) => ({
+        name: prev.name || user.name || "",
+        phone: prev.phone || user.phone || "",
+        line1: prev.line1 || user.address?.line1 || "",
+        city: prev.city || user.address?.city || "",
+        state: prev.state || user.address?.state || "",
+        pincode: prev.pincode || user.address?.pincode || "",
+      }));
+    }
+  }, [user]);
+
+  const handleAutofillFromProfile = () => {
+    if (user) {
+      setForm({
+        name: user.name || "",
+        phone: user.phone || "",
+        line1: user.address?.line1 || "",
+        city: user.address?.city || "",
+        state: user.address?.state || "",
+        pincode: user.address?.pincode || "",
+      });
+      notify("📋 Autofilled delivery details from your profile!");
+    } else {
+      notify("No profile details found.");
+    }
+  };
+
+  const handleContinueToPayment = async () => {
+    if (!form.name?.trim()) {
+      notify("Full name is required.");
+      return;
+    }
+    if (!form.phone?.trim()) {
+      notify("Phone number is required.");
+      return;
+    }
+    if (!form.line1?.trim()) {
+      notify("Address line is required.");
+      return;
+    }
+    if (!form.city?.trim()) {
+      notify("City is required.");
+      return;
+    }
+    if (!form.state?.trim()) {
+      notify("State is required.");
+      return;
+    }
+    if (!form.pincode?.trim()) {
+      notify("Pincode is required.");
+      return;
+    }
+
+    if (saveAddressForFuture) {
+      try {
+        await updateProfile({
+          name: form.name.trim(),
+          phone: form.phone.trim(),
+          address: {
+            line1: form.line1.trim(),
+            city: form.city.trim(),
+            state: form.state.trim(),
+            pincode: form.pincode.trim(),
+          },
+        });
+        notify("📍 Delivery details saved to your profile!");
+      } catch (err) {
+        console.error("Failed to save address to profile:", err);
+      }
+    }
+
+    setStep(2);
+  };
 
   const handleUseMyLocation = async () => {
     if (!navigator.geolocation) {
@@ -242,21 +321,32 @@ export function CheckoutPage() {
             <>
               <div className="flex justify-between items-center mb-5 border-b border-gray-100 pb-3 flex-wrap gap-2">
                 <h3 className="m-0 text-lg font-extrabold text-[#2c1a0e]">📍 Delivery Address</h3>
-                <button
-                  type="button"
-                  onClick={handleUseMyLocation}
-                  disabled={locatingUser}
-                  className="bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold px-3 py-1.5 rounded-lg text-xs transition-colors flex items-center gap-1 shadow-sm border-0 cursor-pointer disabled:opacity-60 disabled:cursor-wait"
-                >
-                  {locatingUser ? (
-                    <>
-                      <span className="inline-block w-3 h-3 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></span>
-                      Detecting...
-                    </>
-                  ) : (
-                    "📍 Use My Location"
+                <div className="flex gap-2">
+                  {user && (
+                    <button
+                      type="button"
+                      onClick={handleAutofillFromProfile}
+                      className="bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-3 py-1.5 rounded-lg text-xs transition-colors flex items-center gap-1 shadow-sm border border-amber-200 cursor-pointer"
+                    >
+                      📋 Autofill Profile
+                    </button>
                   )}
-                </button>
+                  <button
+                    type="button"
+                    onClick={handleUseMyLocation}
+                    disabled={locatingUser}
+                    className="bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold px-3 py-1.5 rounded-lg text-xs transition-colors flex items-center gap-1 shadow-sm border-0 cursor-pointer disabled:opacity-60 disabled:cursor-wait"
+                  >
+                    {locatingUser ? (
+                      <>
+                        <span className="inline-block w-3 h-3 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></span>
+                        Detecting...
+                      </>
+                    ) : (
+                      "📍 Use My Location"
+                    )}
+                  </button>
+                </div>
               </div>
               <div className="form-row">
                 <Input label="Full name" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} required />
@@ -272,7 +362,19 @@ export function CheckoutPage() {
               <div className="form-row full">
                 <Input label="Pincode" value={form.pincode} onChange={(event) => setForm((current) => ({ ...current, pincode: event.target.value }))} required />
               </div>
-              <Button className="next-btn" type="button" onClick={() => setStep(2)}>
+              <div className="flex items-center gap-2 mb-5 mt-3 select-none">
+                <input
+                  type="checkbox"
+                  id="saveAddressCheck"
+                  checked={saveAddressForFuture}
+                  onChange={(e) => setSaveAddressForFuture(e.target.checked)}
+                  className="cursor-pointer h-4 w-4 rounded border-gray-300 text-[#c4622d] focus:ring-[#c4622d]"
+                />
+                <label htmlFor="saveAddressCheck" className="text-xs font-semibold text-gray-700 cursor-pointer">
+                  💾 Save this address and phone number for future use
+                </label>
+              </div>
+              <Button className="next-btn" type="button" onClick={handleContinueToPayment}>
                 Continue to Payment →
               </Button>
             </>

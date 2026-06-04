@@ -140,3 +140,32 @@ export const googleLogin = async (req, res) => {
     return res.status(500).json(new ApiResponse(false, `Google authentication error: ${error.message}`));
   }
 };
+
+export const updateProfile = async (req, res) => {
+  const { name, phone, address } = req.body;
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    return res.status(404).json(new ApiResponse(false, "User not found."));
+  }
+
+  if (name !== undefined) user.name = name.trim();
+  if (phone !== undefined) user.phone = phone.trim();
+
+  if (address !== undefined) {
+    user.address = {
+      line1: address.line1 !== undefined ? address.line1.trim() : user.address?.line1 || "",
+      city: address.city !== undefined ? address.city.trim() : user.address?.city || "",
+      state: address.state !== undefined ? address.state.trim() : user.address?.state || "",
+      pincode: address.pincode !== undefined ? address.pincode.trim() : user.address?.pincode || "",
+    };
+  }
+
+  await user.save();
+
+  return res.json(
+    new ApiResponse(true, "Profile updated successfully.", {
+      user: user.toClient(),
+    })
+  );
+};
