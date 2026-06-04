@@ -20,15 +20,23 @@ export const sendEmail = async ({ to, subject, html, text }) => {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
+    connectionTimeout: 5000, // 5 seconds connection timeout
+    greetingTimeout: 5000,   // 5 seconds greeting timeout
+    socketTimeout: 5000,     // 5 seconds socket inactivity timeout
   });
 
-  await transporter.sendMail({
-    from: process.env.MAIL_FROM || "GramBazaar <no-reply@grambazaar.local>",
-    to,
-    subject,
-    html,
-    text,
-  });
-
-  return true;
+  try {
+    await transporter.sendMail({
+      from: process.env.MAIL_FROM || "GramBazaar <no-reply@grambazaar.local>",
+      to,
+      subject,
+      html,
+      text,
+    });
+    console.log(`Email successfully sent to ${to} (Subject: "${subject}")`);
+    return true;
+  } catch (error) {
+    console.error(`Failed to send email to ${to} (Subject: "${subject}"):`, error.message);
+    throw error;
+  }
 };
