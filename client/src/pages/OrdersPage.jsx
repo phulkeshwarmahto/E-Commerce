@@ -6,6 +6,7 @@ import { formatCurrency } from "../utils/formatCurrency";
 import { formatDate } from "../utils/formatDate";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 import { ReportModal } from "../components/ui/ReportModal";
+import { InvoiceModal } from "../components/ui/InvoiceModal";
 
 export function OrdersPage() {
   const navigate = useNavigate();
@@ -13,6 +14,8 @@ export function OrdersPage() {
   const [trackingId, setTrackingId] = useState(null);
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState({ type: "seller", id: "", name: "" });
+  const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
+  const [invoiceOrder, setInvoiceOrder] = useState(null);
 
   useDocumentMetadata({
     title: "My Orders",
@@ -73,6 +76,16 @@ export function OrdersPage() {
                   <button
                     type="button"
                     onClick={() => {
+                      setInvoiceOrder(order);
+                      setInvoiceModalOpen(true);
+                    }}
+                    className="px-3 py-1.5 border border-[#c4622d]/30 text-[#c4622d] rounded-lg text-xs font-semibold hover:bg-amber-50/10 transition-all cursor-pointer bg-white"
+                  >
+                    📄 Invoice
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
                       setReportTarget({ type: "seller", id: order.id, name: `Order #${order.id}` });
                       setReportModalOpen(true);
                     }}
@@ -111,6 +124,12 @@ export function OrdersPage() {
         reportType={reportTarget.type}
         targetId={reportTarget.id}
         targetName={reportTarget.name}
+      />
+      {/* Invoice Modal */}
+      <InvoiceModal
+        isOpen={invoiceModalOpen}
+        onClose={() => setInvoiceModalOpen(false)}
+        order={invoiceOrder}
       />
     </section>
   );
