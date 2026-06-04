@@ -5,11 +5,14 @@ import { useAppContext } from "../hooks/useAppContext";
 import { formatCurrency } from "../utils/formatCurrency";
 import { formatDate } from "../utils/formatDate";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
+import { ReportModal } from "../components/ui/ReportModal";
 
 export function OrdersPage() {
   const navigate = useNavigate();
   const { orders, user } = useAppContext();
   const [trackingId, setTrackingId] = useState(null);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [reportTarget, setReportTarget] = useState({ type: "seller", id: "", name: "" });
 
   useDocumentMetadata({
     title: "My Orders",
@@ -66,12 +69,24 @@ export function OrdersPage() {
               </div>
               <div className="order-footer">
                 <span className="order-total">{formatCurrency(order.total)}</span>
-                <button
-                  className="track-btn"
-                  onClick={() => setTrackingId((current) => (current === order.id ? null : order.id))}
-                >
-                  {trackingId === order.id ? "Hide Tracking ▲" : "Track Order ▼"}
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setReportTarget({ type: "seller", id: order.id, name: `Order #${order.id}` });
+                      setReportModalOpen(true);
+                    }}
+                    className="px-3 py-1.5 border border-gray-200 text-gray-500 rounded-lg text-xs font-semibold hover:text-red-650 hover:border-red-200 hover:bg-red-50/10 transition-all cursor-pointer"
+                  >
+                    ⚠️ Report Issue
+                  </button>
+                  <button
+                    className="track-btn"
+                    onClick={() => setTrackingId((current) => (current === order.id ? null : order.id))}
+                  >
+                    {trackingId === order.id ? "Hide Tracking ▲" : "Track Order ▼"}
+                  </button>
+                </div>
               </div>
             </div>
             {trackingId === order.id ? (
@@ -89,6 +104,14 @@ export function OrdersPage() {
           </div>
         ))}
       </div>
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        reportType={reportTarget.type}
+        targetId={reportTarget.id}
+        targetName={reportTarget.name}
+      />
     </section>
   );
 }
