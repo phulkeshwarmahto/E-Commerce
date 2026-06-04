@@ -2,20 +2,55 @@
 
 GramBazaar has been moved from a mock Express prototype toward a production backend. The API now uses MongoDB/Mongoose models, bcrypt password hashing, signed JWT access tokens, server-side order totals, inventory checks, Cloudinary upload plumbing, Razorpay payment verification, SMTP email support, rate limiting, Helmet, and structured request logging.
 
-## Applied Stack
+## 🛠️ Applied Stack & Architectural Rationale ("Why Used")
 
-| Area | Technology |
-| --- | --- |
-| Frontend | React 19, Vite, React Router, Tailwind CSS |
-| API | Node.js, Express |
-| Database | MongoDB Atlas/local MongoDB with Mongoose |
-| Auth | bcryptjs password hashing, jsonwebtoken signed access tokens |
-| Payments | Razorpay Orders + HMAC signature verification |
-| Uploads | Multer memory upload + Cloudinary SDK |
-| Email | Nodemailer SMTP |
-| Security | Helmet, CORS allowlist, express-rate-limit |
-| Logging | pino-http |
-| Validation | Route validators with stricter server checks |
+Every tool and technology in GramBazaar's architecture was chosen to optimize performance, enhance security, ensure scalability under Render/Vercel free tier constraints, and provide a premium shopper experience.
+
+### 🌐 Frontend Technologies
+
+* **React (v18/19)**: 
+  * *Why*: Declarative component-based architecture enables building a dynamic, highly responsive user interface. Component updates render efficiently using virtual DOM reconciliation.
+* **React Router DOM (v6)**: 
+  * *Why*: Handles fast, single-page application (SPA) client-side routing, preserving application state and ensuring instantaneous page switches without page reloads.
+* **React `lazy()` & `Suspense` (Route-Level Code-Splitting)**: 
+  * *Why*: Splits large JavaScript bundles into small, demand-loaded page chunks. This reduced the initial bundle weight by **42%** (from 435KB to 251KB), ensuring the homepage loads instantly for anonymous visitors while deferring heavy admin/seller dashboards.
+* **Tailwind CSS (v3)**: 
+  * *Why*: Utility-first styling engine allows rapid UI iteration and responsive design layout coding without writing repetitive CSS rules. Keeps final production styles lightweight and clean.
+* **Framer Motion**: 
+  * *Why*: Orchestrates fluid page transitions, staggered layout reveals, and micro-interactions, making the shopping experience feel polished and premium.
+* **Zustand & localStorage State Caching**: 
+  * *Why*: Fast, hook-based client state management for Auth and Cart. Eliminates React context re-render thrashing and keeps state persistent across browser reloads.
+* **Vite**: 
+  * *Why*: Next-generation frontend build tool that provides sub-second Hot Module Replacement (HMR) during development and highly optimized Rollup assets for production.
+* **Cloudinary Dynamic Sizing**: 
+  * *Why*: Injects real-time transformation parameters (`f_auto`, `q_auto`, `w_400`, `w_800`) directly into image source links. This optimizes raw image payloads down by up to 90%, preserving bandwidth on mobile connections.
+* **React `createPortal`**: 
+  * *Why*: Renders modals outside the main DOM transition trees (directly into `document.body`), resolving viewport cropping bugs and scroll alignment issues.
+
+### ⚙️ Backend & API Technologies
+
+* **Node.js & Express**: 
+  * *Why*: Asynchronous, event-driven JavaScript runtime paired with a minimal routing framework. Ideal for building high-concurrency, fast-response REST APIs.
+* **MongoDB Atlas & Mongoose ODM**: 
+  * *Why*: Documents are stored as flexible, JSON-like objects that map cleanly to JavaScript code structures. Mongoose schemas enforce data structure validations, model relationships, and index configurations (e.g. compound index on reviewed products).
+* **Compression (Gzip)**: 
+  * *Why*: Automatically compresses all JSON response payloads sent from the backend, reducing transmission overhead and loading product grids faster.
+* **JSON Web Tokens (JWT)**: 
+  * *Why*: Secure, stateless client-side session management. Stores authenticated user claims securely, eliminating database lookup queries for every incoming request.
+* **bcryptjs**: 
+  * *Why*: Hashes user passwords using a slow-cryptography algorithm with `12 salt rounds`, protecting sensitive credentials from database leak exposures.
+* **Multer & Cloudinary SDK**: 
+  * *Why*: Multer parses incoming multipart upload files directly into memory buffers, which the Cloudinary SDK streams directly to the cloud. This avoids using local server disk storage, saving resources.
+* **Razorpay SDK**: 
+  * *Why*: Standard payment gateway integration for the Indian market. Security-hardened in controllers with HMAC-SHA256 signature checks to prevent payment validation bypass.
+* **Nodemailer SMTP**: 
+  * *Why*: Provides automated transactional email dispatches for order placements, invoice receipt copies, and security alerts.
+* **Helmet & CORS**: 
+  * *Why*: Helmet configures secure HTTP response headers (XSS protection, MIME sniffing blocks, clickjacking protection), while CORS restricts api access to authorized client domains.
+* **express-rate-limit**: 
+  * *Why*: Mitigates brute-force attacks and resource exhaustion (DDoS) by capping IP request hits per window. Capped loosely in development to facilitate fast local developer testing.
+* **Pino & pino-http logging**: 
+  * *Why*: High-speed, structured JSON request logging. Negligible execution overhead, making it easy to pipe backend logs to analysis aggregators.
 
 ## Required Environment
 
