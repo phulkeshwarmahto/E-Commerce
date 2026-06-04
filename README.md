@@ -1241,6 +1241,11 @@ Here is a list of the premium updates and features added to GramBazaar:
 * **Dynamic Metadata**: Custom `useDocumentMetadata` hook dynamically configures title tags, description metas, and crawlers index settings.
 * **JSON-LD Schema Markup**: Automatic injection of Website/Store and rich Product JSON-LD structured schemas, allowing google search to index star reviews and pricing directly.
 
+### 8. 📸 Multi-Image Catalog & Verified Reviews
+* **Up to 10 Product Images**: Allows sellers and store admins to select, upload, preview, and delete up to 10 images per product. Alt descriptions can be set for each image to optimize search engine ranking.
+* **Verified Review Guards**: Enforces review validation checks both on the frontend and backend, locking review forms for non-buyers or cancelled orders.
+* **Review Photo Attachments**: Verified buyers can attach up to 5 photos to their product reviews, rendering high-resolution thumbnail strips inline with comments.
+
 ---
 
 ## 🤝 Contributing

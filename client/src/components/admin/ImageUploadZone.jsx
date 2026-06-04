@@ -1,8 +1,4 @@
 import { useState } from "react";
-import { uploadImageRequest } from "../../api/upload.api";
-import { useAppContext } from "../../hooks/useAppContext";
-
-import { useState } from "react";
 import { uploadImageRequest, uploadImagesRequest } from "../../api/upload.api";
 import { useAppContext } from "../../hooks/useAppContext";
 
