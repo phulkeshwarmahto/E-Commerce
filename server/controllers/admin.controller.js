@@ -40,7 +40,9 @@ export const getDashboard = async (_req, res) => {
 };
 
 export const updateOrderStatus = async (req, res) => {
-  if (!ORDER_STATUSES.includes(req.body.status)) {
+  const { status } = req.body;
+
+  if (!ORDER_STATUSES.includes(status)) {
     return res.status(400).json(new ApiResponse(false, "Invalid order status."));
   }
 
@@ -50,13 +52,39 @@ export const updateOrderStatus = async (req, res) => {
     return res.status(404).json(new ApiResponse(false, "Order not found."));
   }
 
-  order.status = req.body.status;
+  order.status = status;
+
+  let buyerMessage = `📦 Your order #${order.orderNumber} status has been updated to "${status}".`;
+  if (status === "Paid") {
+    buyerMessage = `🎉 Payment Confirmed! We have successfully received your payment for order #${order.orderNumber}. Sourcing your fresh items now!`;
+  } else if (status === "Shipped") {
+    buyerMessage = `🚚 Hurray! Your order #${order.orderNumber} is on the way! It's on time and your product is shipped. Track details in your dashboard.`;
+  } else if (status === "Delivered") {
+    buyerMessage = `🥳 Order Delivered! Your organic everyday essentials for order #${order.orderNumber} have arrived safely. Thank you for shopping with us!`;
+  } else if (status === "Cancelled") {
+    buyerMessage = `⚠️ Order Cancelled. Your order #${order.orderNumber} has been cancelled. Please contact support if you need refund help.`;
+  } else if (status === "Returned") {
+    buyerMessage = `↩️ Return Processed. The return request for order #${order.orderNumber} has been processed successfully.`;
+  }
+
   order.statusHistory.push({
-    status: req.body.status,
+    status,
     updatedAt: new Date(),
-    note: "Updated from admin",
+    note: buyerMessage,
   });
+
   await order.save();
+
+  // Notify buyer of the status update with a beautiful customized message
+  try {
+    await Notification.create({
+      userId: order.userId,
+      title: `🔔 Order Status Update: ${status}`,
+      message: buyerMessage,
+    });
+  } catch (notifErr) {
+    console.error("Error creating order status update notification for buyer (admin action):", notifErr);
+  }
 
   res.json(new ApiResponse(true, "Order updated.", { order: order.toClient() }));
 };

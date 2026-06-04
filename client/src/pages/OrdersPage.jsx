@@ -22,8 +22,6 @@ export function OrdersPage() {
     description: "Track your orders, view shipping status, and browse purchase history on GramBazaar."
   });
 
-  const trackSteps = ["Order Placed", "Order Confirmed", "Shipped", "Out for Delivery", "Delivered"];
-
   if (user?.role === "seller") {
     return (
       <section className="page-content text-center py-20 bg-gray-50 min-h-screen">
@@ -103,14 +101,93 @@ export function OrdersPage() {
               </div>
             </div>
             {trackingId === order.id ? (
-              <div className="track-panel">
-                <div className="track-steps">
-                  {trackSteps.map((step, index) => (
-                    <div key={step} className="track-step">
-                      <div className={`track-dot ${index < 2 ? "done" : index === 2 ? "current" : ""}`} />
-                      <span>{step}</span>
-                    </div>
-                  ))}
+              <div className="track-panel mt-4 border-t border-gray-150 bg-warm/30 p-6 rounded-xl">
+                {/* Visual Progress Bar Header */}
+                <div className="mb-5 flex justify-between items-center gap-2">
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Order Milestones</h4>
+                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${statusColors[order.status] || "bg-gray-100 text-gray-700"}`}>
+                    {order.status}
+                  </span>
+                </div>
+
+                {/* Visual Progress Bar (Horizontal) */}
+                <div className="relative mb-8 mt-2 px-6">
+                  {/* Background track line */}
+                  <div className="absolute top-3 left-6 right-6 h-[3px] bg-gray-200 -translate-y-1/2 rounded-full" />
+                  {/* Fill track line based on percentage */}
+                  <div 
+                    className="absolute top-3 left-6 h-[3px] bg-[#c4622d] -translate-y-1/2 rounded-full transition-all duration-500 ease-out" 
+                    style={{ width: `${getProgressPercentage(order)}%` }}
+                  />
+                  
+                  {/* Milestones nodes */}
+                  <div className="relative flex justify-between items-center">
+                    {getMilestonesForOrder(order).map((m, idx) => {
+                      const completed = order.statusHistory.some((h) => h.status === m.status);
+                      const isCurrent = order.status === m.status;
+                      return (
+                        <div key={m.status} className="flex flex-col items-center relative z-10">
+                          <div 
+                            className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border-2 transition-all duration-300 ${
+                              completed
+                                ? "bg-[#c4622d] border-[#c4622d] text-white shadow-sm"
+                                : isCurrent
+                                ? "bg-amber-50 border-[#c4622d] text-[#c4622d] scale-110"
+                                : "bg-white border-gray-200 text-gray-400"
+                            }`}
+                          >
+                            {completed ? "✓" : idx + 1}
+                          </div>
+                          <span className={`text-[9px] font-extrabold mt-2 tracking-wide uppercase ${
+                            isCurrent ? "text-[#c4622d]" : completed ? "text-gray-700" : "text-gray-400"
+                          }`}>
+                            {m.label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Detailed Status Logs */}
+                <div className="border-t border-gray-200/50 pt-5 mt-6">
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-gray-405 mb-5">Journey Timeline</h4>
+                  <div className="relative border-l border-dashed border-gray-300 ml-4 space-y-6">
+                    {order.statusHistory && order.statusHistory.length > 0 ? (
+                      [...order.statusHistory].reverse().map((history, idx) => {
+                        const config = getStatusTimelineConfig(history.status);
+                        return (
+                          <div key={idx} className="relative pl-7 transition-all duration-300 hover:translate-x-0.5">
+                            {/* Marker Icon Dot */}
+                            <div 
+                              className={`absolute left-0 top-1 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm border bg-white ${config.borderColor}`}
+                            >
+                              {config.icon}
+                            </div>
+                            {/* Milestone Content Box */}
+                            <div className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-gray-150 shadow-sm transition-all duration-300 hover:shadow-md hover:border-amber-200">
+                              <div className="flex justify-between items-center mb-1.5 flex-wrap gap-2">
+                                <span className={`text-[9px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full ${config.badgeClass}`}>
+                                  {history.status}
+                                </span>
+                                <span className="text-[10px] text-gray-400 font-bold">
+                                  {new Date(history.updatedAt).toLocaleString(undefined, {
+                                    dateStyle: "medium",
+                                    timeStyle: "short",
+                                  })}
+                                </span>
+                              </div>
+                              <p className="text-xs text-gray-700 leading-relaxed font-bold">
+                                {history.note || `Your order status changed to ${history.status}.`}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="pl-6 text-xs text-gray-400 italic">No activity logs recorded yet.</div>
+                    )}
+                  </div>
                 </div>
               </div>
             ) : null}
@@ -133,4 +210,89 @@ export function OrdersPage() {
       />
     </section>
   );
+}
+
+// Timeline Helper Functions
+function getProgressPercentage(order) {
+  const status = order.status;
+  if (status === "Cancelled" || status === "Returned") return 100;
+  
+  const historyStatuses = order.statusHistory.map(h => h.status);
+  let completedCount = 0;
+  const milestones = ["Processing", "Paid", "Shipped", "Delivered"];
+  milestones.forEach((m) => {
+    if (historyStatuses.includes(m)) completedCount++;
+  });
+  
+  if (completedCount <= 1) return 0;
+  return ((completedCount - 1) / (milestones.length - 1)) * 100;
+}
+
+function getMilestonesForOrder(order) {
+  if (order.status === "Cancelled") {
+    return [
+      { status: "Processing", label: "Processing" },
+      { status: "Cancelled", label: "Cancelled" },
+    ];
+  }
+  if (order.status === "Returned") {
+    return [
+      { status: "Processing", label: "Processing" },
+      { status: "Delivered", label: "Delivered" },
+      { status: "Returned", label: "Returned" },
+    ];
+  }
+  return [
+    { status: "Processing", label: "Processing" },
+    { status: "Paid", label: "Paid" },
+    { status: "Shipped", label: "Shipped" },
+    { status: "Delivered", label: "Delivered" },
+  ];
+}
+
+function getStatusTimelineConfig(status) {
+  switch (status) {
+    case "Processing":
+      return {
+        icon: "📦",
+        borderColor: "border-blue-200 text-blue-600",
+        badgeClass: "bg-blue-50 text-blue-700 border border-blue-150",
+      };
+    case "Paid":
+      return {
+        icon: "💳",
+        borderColor: "border-emerald-200 text-emerald-600",
+        badgeClass: "bg-emerald-50 text-emerald-700 border border-emerald-150",
+      };
+    case "Shipped":
+      return {
+        icon: "🚚",
+        borderColor: "border-amber-200 text-amber-600",
+        badgeClass: "bg-amber-50 text-amber-700 border border-amber-150",
+      };
+    case "Delivered":
+      return {
+        icon: "🥳",
+        borderColor: "border-green-200 text-green-600",
+        badgeClass: "bg-green-50 text-green-700 border border-green-150",
+      };
+    case "Cancelled":
+      return {
+        icon: "❌",
+        borderColor: "border-red-200 text-red-600",
+        badgeClass: "bg-red-50 text-red-700 border border-red-150",
+      };
+    case "Returned":
+      return {
+        icon: "↩️",
+        borderColor: "border-purple-200 text-purple-600",
+        badgeClass: "bg-purple-50 text-purple-700 border border-purple-150",
+      };
+    default:
+      return {
+        icon: "📌",
+        borderColor: "border-gray-200 text-gray-600",
+        badgeClass: "bg-gray-50 text-gray-700 border border-gray-150",
+      };
+  }
 }

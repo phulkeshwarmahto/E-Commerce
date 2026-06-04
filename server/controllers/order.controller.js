@@ -4,6 +4,7 @@ import { Cart } from "../models/Cart.model.js";
 import { Coupon } from "../models/Coupon.model.js";
 import { Order } from "../models/Order.model.js";
 import { Product } from "../models/Product.model.js";
+import { Notification } from "../models/Notification.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
 const SHIPPING_FREE_THRESHOLD = Number(process.env.SHIPPING_FREE_THRESHOLD || 500);
@@ -118,6 +119,25 @@ export const createOrder = async (req, res) => {
   }
 
   await Cart.findOneAndUpdate({ userId: req.user._id }, { $set: { items: [] } }, { upsert: true });
+
+  // Notify product sellers of the new order purchase
+  try {
+    const notifications = [];
+    for (const item of orderItems) {
+      if (item.product.seller) {
+        notifications.push({
+          userId: item.product.seller,
+          title: "📦 New Store Order Placed",
+          message: `Hurray! Customer ${req.user.name || req.user.email} has purchased your product "${item.product.name}" (Qty: ${item.quantity}). Order Ref: ${order.orderNumber}. Prepare the item for shipment!`,
+        });
+      }
+    }
+    if (notifications.length > 0) {
+      await Notification.insertMany(notifications);
+    }
+  } catch (notifErr) {
+    console.error("Error creating notifications for sellers on order placement:", notifErr);
+  }
 
   try {
     await sendEmail({
