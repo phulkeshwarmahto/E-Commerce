@@ -12,6 +12,9 @@ import {
   getCouponsAdmin,
   createCouponAdmin,
   deleteCouponAdmin,
+  getBrandsAdmin,
+  createBrandAdmin,
+  deleteBrandAdmin,
 } from "../controllers/admin.controller.js";
 import { requireAuth } from "../middleware/auth.middleware.js";
 import { isAdmin } from "../middleware/admin.middleware.js";
@@ -34,5 +37,8 @@ router.post("/send-notification", asyncHandler(sendNotification));
 router.get("/coupons", asyncHandler(getCouponsAdmin));
 router.post("/coupons", asyncHandler(createCouponAdmin));
 router.delete("/coupons/:id", asyncHandler(deleteCouponAdmin));
+router.get("/brands", asyncHandler(getBrandsAdmin));
+router.post("/brands", asyncHandler(createBrandAdmin));
+router.delete("/brands/:id", asyncHandler(deleteBrandAdmin));
 
 export default router;

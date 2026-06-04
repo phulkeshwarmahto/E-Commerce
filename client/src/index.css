@@ -1993,3 +1993,40 @@
     @apply max-w-full;
   }
 }
+
+.product-hscroll {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scrollbar-width: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
+}
+
+.product-hscroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.product-hscroll::-webkit-scrollbar-thumb {
+  background-color: rgba(196, 98, 45, 0.3);
+  border-radius: 4px;
+}
+
+.product-hscroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.product-hscroll .pcard {
+  flex: 0 0 240px !important;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 768px) {
+  .product-hscroll .pcard {
+    flex: 0 0 280px !important;
+  }
+}
+

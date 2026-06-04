@@ -1,8 +1,8 @@
 import { ProductCard } from "./ProductCard";
 
-export function ProductGrid({ products }) {
+export function ProductGrid({ products, scrollable = false }) {
   return (
-    <div className="product-grid">
+    <div className={scrollable ? "product-hscroll" : "product-grid"}>
       {products.map((product) => (
         <ProductCard key={product.id} product={product} />
       ))}

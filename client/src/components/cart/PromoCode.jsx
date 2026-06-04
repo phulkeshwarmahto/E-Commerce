@@ -59,7 +59,7 @@ export function PromoCode({ subtotal, onApply }) {
 
   return (
     <div className="promo-row">
-      <Input placeholder="SAVE20" value={code} onChange={(event) => setCode(event.target.value)} />
+      <Input placeholder="Have a discount code?" value={code} onChange={(event) => setCode(event.target.value)} />
       <Button variant="secondary" onClick={handleApply}>
         Apply
       </Button>

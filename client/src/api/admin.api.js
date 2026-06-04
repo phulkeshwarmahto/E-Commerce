@@ -24,3 +24,10 @@ export const createAdminCouponRequest = (payload) =>
   apiRequest("/admin/coupons", { method: "POST", body: payload });
 export const deleteAdminCouponRequest = (id) =>
   apiRequest(`/admin/coupons/${id}`, { method: "DELETE" });
+
+export const getAdminBrandsRequest = () =>
+  apiRequest("/admin/brands");
+export const createAdminBrandRequest = (payload) =>
+  apiRequest("/admin/brands", { method: "POST", body: payload });
+export const deleteAdminBrandRequest = (id) =>
+  apiRequest(`/admin/brands/${id}`, { method: "DELETE" });

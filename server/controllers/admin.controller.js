@@ -5,6 +5,7 @@ import { Product } from "../models/Product.model.js";
 import { Review } from "../models/Review.model.js";
 import { User } from "../models/User.model.js";
 import { Notification } from "../models/Notification.model.js";
+import { Brand } from "../models/Brand.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import { slugify } from "../utils/slugify.js";
 
@@ -268,3 +269,37 @@ export const deleteCouponAdmin = async (req, res) => {
   }
   res.json(new ApiResponse(true, "Coupon deleted successfully."));
 };
+
+export const getBrandsAdmin = async (_req, res) => {
+  const brands = await Brand.find().sort({ createdAt: -1 });
+  res.json(new ApiResponse(true, "All brands fetched.", { brands: brands.map((b) => b.toClient()) }));
+};
+
+export const createBrandAdmin = async (req, res) => {
+  const { brand, title, copy, offer, accent, image, active } = req.body;
+
+  if (!brand || !title || !copy || !offer || !image) {
+    return res.status(400).json(new ApiResponse(false, "Brand, title, copy, offer, and image are required."));
+  }
+
+  const brandDoc = await Brand.create({
+    brand: brand.trim(),
+    title: title.trim(),
+    copy: copy.trim(),
+    offer: offer.trim(),
+    accent: accent ? accent.trim() : "#2f5f4b",
+    image: image.trim(),
+    active: active ?? true,
+  });
+
+  res.status(201).json(new ApiResponse(true, "Brand spotlight created successfully.", { brand: brandDoc.toClient() }));
+};
+
+export const deleteBrandAdmin = async (req, res) => {
+  const brandDoc = await Brand.findByIdAndDelete(req.params.id);
+  if (!brandDoc) {
+    return res.status(404).json(new ApiResponse(false, "Brand spotlight not found."));
+  }
+  res.json(new ApiResponse(true, "Brand spotlight deleted successfully."));
+};
+

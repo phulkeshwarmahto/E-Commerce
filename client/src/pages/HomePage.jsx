@@ -5,6 +5,7 @@ import { Spinner } from "../components/ui/Spinner";
 import { categories } from "../constants/categories";
 import { useProducts } from "../hooks/useProducts";
 import { useTimer } from "../hooks/useTimer";
+import { getBrandsRequest } from "../api/brand.api";
 
 const brandAds = [
   {
@@ -90,6 +91,8 @@ export function HomePage() {
   const { products, featured, loading } = useProducts({});
   const timer = useTimer();
   const [activeAd, setActiveAd] = useState(0);
+  const [brands, setBrands] = useState([]);
+  const [loadingBrands, setLoadingBrands] = useState(true);
 
   const deal = [...products]
     .filter((p) => p.originalPrice)
@@ -110,9 +113,26 @@ export function HomePage() {
     .slice(0, 8);
 
   useEffect(() => {
-    const id = window.setInterval(() => setActiveAd((c) => (c + 1) % brandAds.length), 3500);
-    return () => window.clearInterval(id);
+    getBrandsRequest()
+      .then((res) => {
+        if (res.success && res.data?.brands?.length > 0) {
+          setBrands(res.data.brands);
+        } else {
+          setBrands(brandAds);
+        }
+      })
+      .catch((err) => {
+        console.error("Error loading brands:", err);
+        setBrands(brandAds);
+      })
+      .finally(() => setLoadingBrands(false));
   }, []);
+
+  useEffect(() => {
+    if (!brands.length) return;
+    const id = window.setInterval(() => setActiveAd((c) => (c + 1) % brands.length), 3500);
+    return () => window.clearInterval(id);
+  }, [brands.length]);
 
   return (
     <div className="min-h-screen bg-[#f5f0e8]">
@@ -232,9 +252,9 @@ export function HomePage() {
               className="flex transition-transform duration-500 ease-out"
               style={{ transform: `translateX(-${activeAd * 100}%)` }}
             >
-              {brandAds.map((ad) => (
+              {brands.map((ad) => (
                 <article
-                  key={ad.brand}
+                  key={ad.id || ad.brand}
                   className="min-w-full grid grid-cols-1 md:grid-cols-[1fr_280px] overflow-hidden"
                   style={{ background: `linear-gradient(135deg, ${ad.accent}, #2c1a0e)` }}
                 >
@@ -273,9 +293,9 @@ export function HomePage() {
 
           {/* Dots */}
           <div className="flex justify-center gap-2 py-3 bg-white border-t border-gray-100">
-            {brandAds.map((ad, i) => (
+            {brands.map((ad, i) => (
               <button
-                key={ad.brand}
+                key={ad.id || ad.brand}
                 onClick={() => setActiveAd(i)}
                 aria-label={`Show ${ad.brand}`}
                 className={`rounded-full transition-all duration-200
@@ -362,7 +382,7 @@ export function HomePage() {
             See all →
           </Link>
         </div>
-        {loading ? <Spinner /> : <ProductGrid products={topProducts} />}
+        {loading ? <Spinner /> : <ProductGrid products={topProducts} scrollable={true} />}
       </section>
 
       {/* ══════════════════════════════════
@@ -400,7 +420,7 @@ export function HomePage() {
             See all →
           </Link>
         </div>
-        {loading ? <Spinner /> : <ProductGrid products={newArrivals.length ? newArrivals : newestProducts} />}
+        {loading ? <Spinner /> : <ProductGrid products={newArrivals.length ? newArrivals : newestProducts} scrollable={true} />}
       </section>
     </div>
   );
