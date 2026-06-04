@@ -65,6 +65,12 @@ MAIL_FROM="GramBazaar <orders@your-domain.com>"
 - Added Helmet, rate limiting, cookie parsing, and request logging.
 - Updated seed scripts to seed MongoDB products, users, and coupons.
 - Removed demo credential hints from the admin UI.
+- Added purchase alerts for sellers and custom status transition notifications for buyers.
+- Replaced hardcoded tracking dots with a dynamic milestones bar and journey timeline displaying statusHistory notes.
+- Implemented an inline payment status select dropdown for COD orders in merchant and admin tables.
+- Added a tax-compliant, printable single-page PDF Invoice modal.
+- Integrated React `createPortal` centered modals with 6px glassmorphic blur overlays.
+- Built a premium SEO optimization framework with JSON-LD Product/WebSite markup schemas.
 
 ## Remaining Production Tasks
 

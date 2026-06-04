@@ -38,6 +38,7 @@
 14. [Scripts](#-scripts)
 15. [Deployment](#-deployment)
 16. [Contributing](#-contributing)
+17. [Recent Feature Updates](#-recent-feature-updates)
 
 ---
 
@@ -58,15 +59,22 @@ Login → Dashboard → Manage Products → Update Orders → Monitor Reviews
 ## ✨ Features
 
 ### 👤 User Features
-- **Authentication** — Sign up, sign in, sign out with JWT
+- **Authentication** — Sign up, sign in, sign out with JWT or passwordless **Google Authentication** (decoupling existing records dynamically).
 - **Product Browsing** — Category filters, search, sort, price range
-- **Product Detail** — Image gallery, specs, delivery check by pincode
+- **Product Detail** — Image gallery, specs, delivery check by pincode, and an interactive **Product Q&A (FAQ)** section where buyers can ask product questions.
 - **Shopping Cart** — Qty controls, promo codes, order summary
-- **Checkout** — Multi-step: Address → Payment → Review → Confirm
+- **Checkout** — Multi-step: Address (with Developer Quick-Fill Address autofill) → Payment → Review → Confirm
 - **Order Tracking** — Real-time status, step-by-step timeline
 - **Wishlist** — Save favourites, persistent across sessions
 - **Reviews** — Star rating, text, photo/video uploads, edit own review
 - **Account Dashboard** — Orders, wishlist, notifications, preferences
+
+### 🏪 Seller Features
+- **Merchant Overview** — Dedicated Seller Panel displaying merchant-specific sales revenue, listed product counts, and incoming orders containing their items.
+- **Product Management** — Full searchable product list with creation (auto-assigns merchant owner), updates, and soft deletions.
+- **Customer Reviews** — Dropdown menu allowing sellers to review buyer ratings and testimonials left on their catalog.
+- **Buyer FAQs** — View unanswered questions asked on their items and submit answers that update the product page live.
+- **Feature Restrictions** — Hidden checkout options, hidden cart navigation buttons, blocked order portals, and viewing-only locks on item reviews or purchase details to protect role logic integrity.
 
 ### 🛠️ Admin Features
 - **Dashboard** — Revenue, order, customer, and product stats
@@ -74,6 +82,7 @@ Login → Dashboard → Manage Products → Update Orders → Monitor Reviews
 - **Product Catalog** — Edit name, price, description, stock, badge
 - **Add Product** — Full form with multi-image upload via Cloudinary
 - **Review Moderation** — Approve or remove customer reviews
+- **Quick Test Tool** — Admin quick-login assistant pre-filling credentials for easy developers testing.
 
 ### 🎨 UI/UX
 - Smooth page transition animations (fade, slide)
@@ -82,6 +91,8 @@ Login → Dashboard → Manage Products → Update Orders → Monitor Reviews
 - Responsive sticky navigation
 - Deal of the Day countdown timer
 - Mobile-friendly layout
+- Scanline overlay animation for UPI gateway modals
+- Adaptive layout hiding buyer features for sellers and admins dynamically.
 
 ---
 
@@ -1156,6 +1167,81 @@ Output Directory: dist
 VITE_API_BASE_URL      = https://api.grambazaar.in/api
 VITE_RAZORPAY_KEY_ID   = rzp_live_xxxx
 ```
+
+### Backend → Railway
+```bash
+# Connect GitHub repo on railway.app
+# Set root directory to: server
+# Add environment variables from server/.env
+# Railway auto-detects Node.js and runs: npm start
+
+# Custom domain: api.grambazaar.in → Railway deployment URL
+```
+
+### Alternative: Docker Compose
+```yaml
+# docker-compose.yml
+version: "3.9"
+services:
+  server:
+    build: ./server
+    ports: ["5000:5000"]
+    env_file: ./server/.env
+    depends_on: [mongo]
+
+  client:
+    build: ./client
+    ports: ["80:80"]
+    depends_on: [server]
+
+  mongo:
+    image: mongo:6
+    volumes: [mongo_data:/data/db]
+    ports: ["27017:27017"]
+
+volumes:
+  mongo_data:
+```
+
+```bash
+docker-compose up --build
+```
+
+---
+
+## 🚀 Recent Feature Updates
+
+Here is a list of the premium updates and features added to GramBazaar:
+
+### 1. 🔔 Multi-Route Notification Triggers
+* **Purchase Alerts**: Product sellers receive instant notifications when a customer purchases their listed item(s).
+* **Review & Q&A Alerts**: Ratings, buyer testimonials, and product questions are automatically routed to store admins and the respective seller's panel in real-time.
+* **Report System Routing**: Users can report catalog issues to `"admin"`, `"seller"`, or `"both"`. The backend dynamically routes notifications and records target details.
+
+### 2. 🚚 On the Way Milestone & Journey Timeline
+* **Status Overhaul**: Removed `"Paid"` status and replaced `"Shipped"` with `"On the Way"` to align with standard e-commerce fulfilment states (Processing → On the Way → Delivered).
+* **Journey Tracker**: Upgraded the buyer's order tracking dashboard with a dynamic progress bar and vertical journey timeline rendering actual dates, badges, icons, and custom status update messages.
+
+### 3. 💳 Cash on Delivery Payment Control
+* **Inline Selectors**: Upgraded the merchant and admin order tables with a **Payment Status** column.
+* **COD Status Updates**: If the payment method is Cash on Delivery, admins and sellers see a dropdown to manually transition payment status (**Pending**, **Paid on Delivery**, **Cancelled**, **Returned**), which syncs with backend validation logs and buyer notifications.
+
+### 4. 📄 Tax-Compliant Invoice Generator
+* **PDF Preview**: Renders detail-oriented invoice overlays containing transaction references, billing summaries, itemized counts, and signator blocks.
+* **Dedicated Print CSS**: Custom CSS print media rules hide parent layouts during printing, forcing clean **1-page** physical document outputs.
+
+### 5. 🏠 Saved Addresses & Autofill Drawer
+* **Checkout Card Tray**: Loads default profile details and previous checkout history as quick-fill cards, letting buyers autofill entire delivery forms with one click.
+
+### 6. 🖼️ Glassmorphism Modals & Viewport Portal
+* **createPortal Fix**: Rendered layout overlays using React `createPortal` to bypass parent container CSS bugs and center modals on the viewport.
+* **Aesthetic Backdrop**: Injected a modern `backdrop-filter: blur(6px)` blur effect.
+
+### 7. 🏷️ Premium SEO Architecture & Sitemap
+* **Dynamic Metadata**: Custom `useDocumentMetadata` hook dynamically configures title tags, description metas, and crawlers index settings.
+* **JSON-LD Schema Markup**: Automatic injection of Website/Store and rich Product JSON-LD structured schemas, allowing google search to index star reviews and pricing directly.
+
+---
 
 ## 🤝 Contributing
 
