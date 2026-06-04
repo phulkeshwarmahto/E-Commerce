@@ -94,6 +94,37 @@ export function ProductDetailPage() {
     setReportModalOpen(true);
   };
 
+  const handleShareProduct = async () => {
+    const shareUrl = window.location.href;
+    const shareData = {
+      title: product.name,
+      text: `Check out ${product.name} on GramBazaar!`,
+      url: shareUrl,
+    };
+
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          copyToClipboard(shareUrl);
+        }
+      }
+    } else {
+      copyToClipboard(shareUrl);
+    }
+  };
+
+  const copyToClipboard = (url) => {
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        notify("Product link copied to clipboard! 📋");
+      })
+      .catch(() => {
+        notify("Failed to copy link.");
+      });
+  };
+
   // FAQ States
   const [faqs, setFaqs] = useState([]);
   const [questionDraft, setQuestionDraft] = useState("");
@@ -224,15 +255,24 @@ export function ProductDetailPage() {
                   {product.name}
                 </h1>
               </div>
-              {isAuthenticated && (
+              <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => handleOpenReport("product", product.id, product.name)}
-                  className="text-gray-400 hover:text-red-600 transition-colors text-xs font-semibold flex items-center gap-1 border border-gray-200 hover:border-red-200 rounded-lg px-2.5 py-1 bg-white cursor-pointer hover:bg-red-50/20"
+                  onClick={handleShareProduct}
+                  className="text-gray-400 hover:text-emerald-600 hover:border-emerald-200 transition-colors text-xs font-semibold flex items-center gap-1 border border-gray-200 rounded-lg px-2.5 py-1 bg-white cursor-pointer hover:bg-emerald-50/20"
                 >
-                  ⚠️ Report
+                  🔗 Share
                 </button>
-              )}
+                {isAuthenticated && (
+                  <button
+                    type="button"
+                    onClick={() => handleOpenReport("product", product.id, product.name)}
+                    className="text-gray-400 hover:text-red-600 hover:border-red-200 transition-colors text-xs font-semibold flex items-center gap-1 border border-gray-200 rounded-lg px-2.5 py-1 bg-white cursor-pointer hover:bg-red-50/20"
+                  >
+                    ⚠️ Report
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Rating row */}
