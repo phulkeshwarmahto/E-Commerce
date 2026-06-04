@@ -1,7 +1,14 @@
 import { Link, useParams } from "react-router-dom";
+import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 
 export function OrderSuccessPage() {
   const { orderId } = useParams();
+
+  useDocumentMetadata({
+    title: "Order Success",
+    description: "Thank you for shopping at GramBazaar! Your order is being processed.",
+    noindex: true
+  });
 
   return (
     <section className="page-content success-card">

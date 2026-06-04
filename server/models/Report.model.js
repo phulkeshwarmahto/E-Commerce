@@ -13,6 +13,12 @@ const reportSchema = new mongoose.Schema(
     targetName: { type: String, required: true },
     reason: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
+    recipient: {
+      type: String,
+      enum: ["admin", "seller", "both"],
+      default: "admin",
+      required: true,
+    },
   },
   { timestamps: true },
 );
@@ -27,6 +33,7 @@ reportSchema.methods.toClient = function toClient() {
     targetName: this.targetName,
     reason: this.reason,
     description: this.description,
+    recipient: this.recipient,
     createdAt: this.createdAt,
   };
 };

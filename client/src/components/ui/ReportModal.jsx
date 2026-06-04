@@ -8,6 +8,7 @@ export function ReportModal({ isOpen, onClose, reportType, targetId, targetName,
   const { notify } = useAppContext();
   const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
+  const [recipient, setRecipient] = useState("admin");
   const [submitting, setSubmitting] = useState(false);
 
   if (!isOpen) return null;
@@ -64,10 +65,12 @@ export function ReportModal({ isOpen, onClose, reportType, targetId, targetName,
         targetName,
         reason,
         description: description.trim(),
+        recipient,
       });
-      notify("⚠️ Report submitted successfully to the admin panel.");
+      notify("⚠️ Report submitted successfully.");
       setReason("");
       setDescription("");
+      setRecipient("admin");
       if (onSubmitSuccess) onSubmitSuccess();
       onClose();
     } catch (err) {
@@ -85,9 +88,25 @@ export function ReportModal({ isOpen, onClose, reportType, targetId, targetName,
             You are reporting: <strong className="text-gray-900">{targetName}</strong>
           </p>
           <p className="text-[11px] text-amber-600 bg-amber-50 rounded-lg p-2 leading-relaxed border border-amber-100">
-            Reports are sent directly to the store administrator panel for review. Abuse of this feature may lead to account suspension.
+            Reports will be sent to the selected party. Abuse of this feature may lead to account suspension.
           </p>
         </div>
+
+        {reportType !== "other" && (
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-gray-700">Send Report To</label>
+            <select
+              value={recipient}
+              onChange={(e) => setRecipient(e.target.value)}
+              className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-[#c4622d] bg-white cursor-pointer"
+              required
+            >
+              <option value="admin">Store Administrator</option>
+              <option value="seller">Product Seller / Merchant</option>
+              <option value="both">Both (Admin & Seller)</option>
+            </select>
+          </div>
+        )}
 
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-bold text-gray-700">Reason for Report</label>

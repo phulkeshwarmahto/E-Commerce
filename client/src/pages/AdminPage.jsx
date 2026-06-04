@@ -24,10 +24,17 @@ import { ProductTable } from "../components/admin/ProductTable";
 import { StatCard } from "../components/admin/StatCard";
 import { Modal } from "../components/ui/Modal";
 import { useAppContext } from "../hooks/useAppContext";
+import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 
 export function AdminPage() {
   const { user, notify } = useAppContext();
   const [section, setSection] = useState("overview");
+
+  useDocumentMetadata({
+    title: "Administrator Panel",
+    description: "Manage system dashboard, moderate products, review orders, verify user profiles, and send notifications on GramBazaar.",
+    noindex: true
+  });
   const [dashboard, setDashboard] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);

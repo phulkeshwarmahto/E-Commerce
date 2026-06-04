@@ -2,11 +2,17 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppContext } from "../hooks/useAppContext";
 import { Input } from "../components/ui/Input";
+import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 
 export function AccountPage() {
   const { user, logout, orders, updateProfile, notify } = useAppContext();
   const [profileOpen, setProfileOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  useDocumentMetadata({
+    title: "My Account Profile",
+    description: "Manage your personal profile, addresses, delivery settings, and account information on GramBazaar."
+  });
 
   // Edit profile states
   const [isEditing, setIsEditing] = useState(false);

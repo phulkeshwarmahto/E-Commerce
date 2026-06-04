@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../hooks/useAppContext";
+import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 
 const roles = [
   {
@@ -38,6 +39,11 @@ export function AuthPage() {
   const { login, register, googleLogin, notify } = useAppContext();
   const [mode, setMode] = useState("signin");
   const [selectedRole, setSelectedRole] = useState("user");
+
+  useDocumentMetadata({
+    title: "Sign In / Register",
+    description: "Log in or create a GramBazaar account. Join as a buyer to shop organic foods, or register as a merchant to sell online."
+  });
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);

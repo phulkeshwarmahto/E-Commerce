@@ -17,11 +17,18 @@ import { Modal } from "../components/ui/Modal";
 import { useAppContext } from "../hooks/useAppContext";
 import { formatCurrency } from "../utils/formatCurrency";
 import { ReportModal } from "../components/ui/ReportModal";
+import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 
 export function SellerPage() {
   const { user, notify } = useAppContext();
   const navigate = useNavigate();
   const [section, setSection] = useState("overview");
+
+  useDocumentMetadata({
+    title: "Merchant Dashboard",
+    description: "Manage your seller profile, list organic products, track store orders, and view performance insights on GramBazaar.",
+    noindex: true
+  });
   const [dashboard, setDashboard] = useState(null);
   const [faqs, setFaqs] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);

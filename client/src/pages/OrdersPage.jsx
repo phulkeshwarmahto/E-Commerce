@@ -4,11 +4,18 @@ import { statusColors } from "../constants/statusColors";
 import { useAppContext } from "../hooks/useAppContext";
 import { formatCurrency } from "../utils/formatCurrency";
 import { formatDate } from "../utils/formatDate";
+import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 
 export function OrdersPage() {
   const navigate = useNavigate();
   const { orders, user } = useAppContext();
   const [trackingId, setTrackingId] = useState(null);
+
+  useDocumentMetadata({
+    title: "My Orders",
+    description: "Track your orders, view shipping status, and browse purchase history on GramBazaar."
+  });
+
   const trackSteps = ["Order Placed", "Order Confirmed", "Shipped", "Out for Delivery", "Delivered"];
 
   if (user?.role === "seller") {
