@@ -10,6 +10,7 @@ import { useReviews } from "../hooks/useReviews";
 import { formatCurrency } from "../utils/formatCurrency";
 import { validatePincode } from "../utils/validatePincode";
 import { getProductFAQsRequest, createQuestionRequest } from "../api/faq.api";
+import { ReportModal } from "../components/ui/ReportModal";
 
 // Star SVGs
 function Star({ filled, half }) {
@@ -46,6 +47,15 @@ export function ProductDetailPage() {
   const [selectedThumb, setSelectedThumb] = useState(0);
   const [offersExpanded, setOffersExpanded] = useState(false);
   const [specsOpen, setSpecsOpen] = useState(true);
+
+  // Report States
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [reportTarget, setReportTarget] = useState({ type: "product", id: "", name: "" });
+
+  const handleOpenReport = (type, id, name) => {
+    setReportTarget({ type, id, name });
+    setReportModalOpen(true);
+  };
 
   // FAQ States
   const [faqs, setFaqs] = useState([]);
@@ -167,14 +177,25 @@ export function ProductDetailPage() {
 
           {/* ── Info Column ── */}
           <div className="space-y-4">
-            {/* Category + name */}
-            <div>
-              <p className="text-[0.72rem] font-bold uppercase tracking-widest text-[#9b6b3a] mb-1">
-                {product.category}
-              </p>
-              <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-snug">
-                {product.name}
-              </h1>
+            {/* Category + name + Report */}
+            <div className="flex justify-between items-start gap-4">
+              <div>
+                <p className="text-[0.72rem] font-bold uppercase tracking-widest text-[#9b6b3a] mb-1">
+                  {product.category}
+                </p>
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-snug">
+                  {product.name}
+                </h1>
+              </div>
+              {isAuthenticated && (
+                <button
+                  type="button"
+                  onClick={() => handleOpenReport("product", product.id, product.name)}
+                  className="text-gray-400 hover:text-red-600 transition-colors text-xs font-semibold flex items-center gap-1 border border-gray-200 hover:border-red-200 rounded-lg px-2.5 py-1 bg-white cursor-pointer hover:bg-red-50/20"
+                >
+                  ⚠️ Report
+                </button>
+              )}
             </div>
 
             {/* Rating row */}
@@ -442,7 +463,13 @@ export function ProductDetailPage() {
 
           {/* Review List */}
           <div className="space-y-4">
-            {reviews.map((review) => <ReviewCard key={review.id} review={review} />)}
+            {reviews.map((review) => (
+              <ReviewCard
+                key={review.id}
+                review={review}
+                onReport={isAuthenticated ? (rev) => handleOpenReport("review", rev.id, `Review by ${rev.name}`) : null}
+              />
+            ))}
             {reviews.length === 0 && (
               <p className="text-center text-gray-500 text-sm py-8">No reviews yet. Be the first!</p>
             )}
@@ -542,6 +569,14 @@ export function ProductDetailPage() {
             <ProductGrid products={relatedProducts} />
           </section>
         )}
+        {/* Report Modal */}
+        <ReportModal
+          isOpen={reportModalOpen}
+          onClose={() => setReportModalOpen(false)}
+          reportType={reportTarget.type}
+          targetId={reportTarget.id}
+          targetName={reportTarget.name}
+        />
       </div>
     </div>
   );

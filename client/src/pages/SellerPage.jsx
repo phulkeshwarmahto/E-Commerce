@@ -16,6 +16,7 @@ import { OrderTable } from "../components/admin/OrderTable";
 import { Modal } from "../components/ui/Modal";
 import { useAppContext } from "../hooks/useAppContext";
 import { formatCurrency } from "../utils/formatCurrency";
+import { ReportModal } from "../components/ui/ReportModal";
 
 export function SellerPage() {
   const { user, notify } = useAppContext();
@@ -26,6 +27,15 @@ export function SellerPage() {
   const [editingProduct, setEditingProduct] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Report States
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [reportTarget, setReportTarget] = useState({ type: "seller", id: "", name: "" });
+
+  const handleOpenReport = (type, id, name) => {
+    setReportTarget({ type, id, name });
+    setReportModalOpen(true);
+  };
   
   // Reviews Tab States
   const [selectedReviewProductId, setSelectedReviewProductId] = useState("");
@@ -169,6 +179,15 @@ export function SellerPage() {
               <span className="text-sm">{entry.label}</span>
             </button>
           ))}
+          <div className="border-t border-gray-200/50 my-4 pt-4 px-2">
+            <button
+              type="button"
+              onClick={() => handleOpenReport("seller", user.id || "seller-id", user.name)}
+              className="flex items-center gap-2 text-left py-2 px-3 w-full rounded-xl transition-all border border-red-200 bg-red-50/10 text-red-600 hover:bg-red-50 hover:text-red-700 font-semibold cursor-pointer text-xs"
+            >
+              ⚠️ Report Issue to Admin
+            </button>
+          </div>
         </aside>
 
         {/* Workspace */}
@@ -462,6 +481,14 @@ export function SellerPage() {
           />
         </Modal>
       ) : null}
+
+      <ReportModal
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        reportType={reportTarget.type}
+        targetId={reportTarget.id}
+        targetName={reportTarget.name}
+      />
     </section>
   );
 }
