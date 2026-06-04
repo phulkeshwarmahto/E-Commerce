@@ -5,6 +5,7 @@ import { Spinner } from "../components/ui/Spinner";
 import { categories } from "../constants/categories";
 import { useDebounce } from "../hooks/useDebounce";
 import { useProducts } from "../hooks/useProducts";
+import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 
 const sortOptions = [
   { value: "relevance",  label: "Relevance" },
@@ -46,6 +47,11 @@ function FilterSection({ title, children, defaultOpen = true }) {
 export function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  useDocumentMetadata({
+    title: "Shop Organic Essentials",
+    description: "Browse GramBazaar's premium catalog of 100% natural, farm-fresh products. Filter by category, price, and active deals with secure nationwide shipping."
+  });
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [inStockOnly, setInStockOnly] = useState(false);

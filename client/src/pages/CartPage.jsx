@@ -4,11 +4,17 @@ import { CartItem } from "../components/cart/CartItem";
 import { PromoCode } from "../components/cart/PromoCode";
 import { CartSummary } from "../components/cart/CartSummary";
 import { useAppContext } from "../hooks/useAppContext";
+import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 
 export function CartPage() {
   const navigate = useNavigate();
   const { cart, notify, user } = useAppContext();
   const [promo, setPromo] = useState({ code: "", discount: 0 });
+
+  useDocumentMetadata({
+    title: "Your Shopping Cart",
+    description: "Review your organic essentials, apply coupons, and checkout securely on GramBazaar."
+  });
 
   if (user?.role === "seller") {
     return (

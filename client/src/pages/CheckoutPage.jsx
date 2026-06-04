@@ -6,6 +6,7 @@ import { Modal } from "../components/ui/Modal";
 import { createPaymentOrderRequest, verifyPaymentRequest, verifyUpiPaymentRequest } from "../api/payment.api";
 import { useAppContext } from "../hooks/useAppContext";
 import { formatCurrency } from "../utils/formatCurrency";
+import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 
 const paymentOptions = [
   { id: "upi", icon: "📲", name: "UPI", desc: "PhonePe, GPay, Paytm" },
@@ -33,6 +34,11 @@ export function CheckoutPage() {
   const location = useLocation();
   const { cart, orders, isAuthenticated, notify, user } = useAppContext();
   const promo = location.state || { code: "", discount: 0 };
+
+  useDocumentMetadata({
+    title: "Secure Checkout",
+    description: "Complete your order safely on GramBazaar. Secure payment options and nationwide delivery."
+  });
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [placingOrder, setPlacingOrder] = useState(false);

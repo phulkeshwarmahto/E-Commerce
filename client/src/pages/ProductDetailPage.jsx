@@ -11,6 +11,7 @@ import { formatCurrency } from "../utils/formatCurrency";
 import { validatePincode } from "../utils/validatePincode";
 import { getProductFAQsRequest, createQuestionRequest } from "../api/faq.api";
 import { ReportModal } from "../components/ui/ReportModal";
+import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 
 // Star SVGs
 function Star({ filled, half }) {
@@ -47,6 +48,35 @@ export function ProductDetailPage() {
   const [selectedThumb, setSelectedThumb] = useState(0);
   const [offersExpanded, setOffersExpanded] = useState(false);
   const [specsOpen, setSpecsOpen] = useState(true);
+
+  // SEO Dynamic Metadata
+  useDocumentMetadata({
+    title: product ? `${product.name} - Buy Online` : "Loading Product...",
+    description: product ? `${product.description.slice(0, 150)}... Sourced directly from local partners, secure payments, free shipping on orders above ₹500.` : "Loading product details...",
+    schema: product ? {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": product.name,
+      "image": product.images?.[0]?.url || "",
+      "description": product.description,
+      "sku": product.id,
+      "offers": {
+        "@type": "Offer",
+        "url": window.location.href,
+        "priceCurrency": "INR",
+        "price": product.price,
+        "itemCondition": "https://schema.org/NewCondition",
+        "availability": product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+      },
+      ...(product.reviewCount > 0 ? {
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": product.rating,
+          "reviewCount": product.reviewCount
+        }
+      } : {})
+    } : null
+  });
 
   // Report States
   const [reportModalOpen, setReportModalOpen] = useState(false);
@@ -168,7 +198,7 @@ export function ProductDetailPage() {
                   style={{ background: product.bg || "#f5f0e8" }}
                 >
                   {product.images?.[i]?.url
-                    ? <img src={product.images[i].url} alt="" className="w-full h-full object-cover" />
+                    ? <img src={product.images[i].url} alt={`${product.name} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
                     : product.emoji || "📦"}
                 </button>
               ))}

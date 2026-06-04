@@ -6,6 +6,7 @@ import { categories } from "../constants/categories";
 import { useProducts } from "../hooks/useProducts";
 import { useTimer } from "../hooks/useTimer";
 import { getBrandsRequest } from "../api/brand.api";
+import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 
 const brandAds = [
   {
@@ -90,6 +91,19 @@ export function HomePage() {
   const navigate = useNavigate();
   const { products, featured, loading } = useProducts({});
   const timer = useTimer();
+
+  useDocumentMetadata({
+    title: "India's Finest Everyday Essentials",
+    description: "Shop organic and natural products direct from Indian local farmers and self-help groups. Fresh pantry items, beverages, organic care, and home essentials.",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "Store",
+      "name": "GramBazaar",
+      "description": "India's Finest Everyday Essentials. 100% natural, organic products sourced directly from local farmers.",
+      "url": window.location.origin,
+      "logo": `${window.location.origin}/favicon.png`,
+    }
+  });
   const [activeAd, setActiveAd] = useState(0);
   const [brands, setBrands] = useState([]);
   const [loadingBrands, setLoadingBrands] = useState(true);
