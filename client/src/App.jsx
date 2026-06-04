@@ -29,6 +29,7 @@ const OrderSuccessPage = lazy(() => import("./pages/OrderSuccessPage").then(m =>
 const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage").then(m => ({ default: m.ProductDetailPage })));
 const ShopPage = lazy(() => import("./pages/ShopPage").then(m => ({ default: m.ShopPage })));
 const WishlistPage = lazy(() => import("./pages/WishlistPage").then(m => ({ default: m.WishlistPage })));
+const VSCompetitorsPage = lazy(() => import("./pages/VSCompetitorsPage").then(m => ({ default: m.VSCompetitorsPage })));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -93,6 +94,7 @@ export default function App() {
                   <Route path="/admin" element={<AdminPage />} />
                   <Route path="/seller" element={<SellerPage />} />
                   <Route path="/auth" element={<AuthPage />} />
+                  <Route path="/vs-competitors" element={<VSCompetitorsPage />} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </Suspense>

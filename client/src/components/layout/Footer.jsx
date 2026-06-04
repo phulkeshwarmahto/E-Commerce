@@ -20,6 +20,7 @@ const footerLinks = {
   Company: [
     { label: "About Us", to: "#" },
     { label: "Blog", to: "#" },
+    { label: "Purity vs Aggregators", to: "/vs-competitors" },
     { label: "Careers", to: "#" },
     { label: "Press", to: "#" },
     { label: "Sustainability", to: "#" },

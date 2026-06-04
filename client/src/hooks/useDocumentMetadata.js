@@ -51,11 +51,27 @@ export function useDocumentMetadata({ title, description, schema, noindex = fals
       schemaScript.remove();
     }
 
-    // Cleanup schema script on unmount
+    // 5. Update Canonical Link
+    const canonicalId = "canonical-link";
+    let canonicalLink = document.getElementById(canonicalId);
+    if (!canonicalLink) {
+      canonicalLink = document.createElement("link");
+      canonicalLink.setAttribute("rel", "canonical");
+      canonicalLink.setAttribute("id", canonicalId);
+      document.head.appendChild(canonicalLink);
+    }
+    const currentCanonicalUrl = window.location.origin + window.location.pathname;
+    canonicalLink.setAttribute("href", currentCanonicalUrl);
+
+    // Cleanup script and canonical tag on unmount
     return () => {
       const activeScript = document.getElementById(schemaId);
       if (activeScript) {
         activeScript.remove();
+      }
+      const activeCanonical = document.getElementById(canonicalId);
+      if (activeCanonical) {
+        activeCanonical.remove();
       }
     };
   }, [title, description, schema, noindex]);
