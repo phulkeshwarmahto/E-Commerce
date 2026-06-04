@@ -37,6 +37,7 @@ export const getProducts = async (req, res) => {
     Product.find({ isFeatured: true }).sort({ rating: -1 }).limit(12),
   ]);
 
+  res.setHeader("Cache-Control", "public, max-age=30, s-maxage=120, stale-while-revalidate=59");
   res.json(
     new ApiResponse(true, "Products fetched.", {
       products: products.map((product) => product.toClient()),
@@ -62,6 +63,7 @@ export const getProductById = async (req, res) => {
     .sort({ rating: -1 })
     .limit(4);
 
+  res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=59");
   res.json(
     new ApiResponse(true, "Product fetched.", {
       product: product.toClient(),

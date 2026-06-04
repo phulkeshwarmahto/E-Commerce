@@ -22,6 +22,7 @@ export const getReviews = async (req, res) => {
   }
 
   const reviews = await Review.find({ productId: product._id, isApproved: true }).sort({ createdAt: -1 });
+  res.setHeader("Cache-Control", "public, max-age=60, s-maxage=120, stale-while-revalidate=59");
   res.json(new ApiResponse(true, "Reviews fetched.", { reviews: reviews.map((review) => review.toClient()) }));
 };
 

@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import helmet from "helmet";
 import pinoHttp from "pino-http";
+import compression from "compression";
 import authRoutes from "./routes/auth.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import orderRoutes from "./routes/order.routes.js";
@@ -21,6 +22,8 @@ import { apiRateLimiter } from "./middleware/rateLimit.middleware.js";
 import { errorHandler } from "./middleware/errorHandler.middleware.js";
 
 const app = express();
+
+app.use(compression());
 
 const allowedOrigins = [
   process.env.CLIENT_URL,
