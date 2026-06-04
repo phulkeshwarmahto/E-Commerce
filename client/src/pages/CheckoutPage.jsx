@@ -54,6 +54,54 @@ export function CheckoutPage() {
     pincode: user?.address?.pincode || "",
   });
 
+  const [savedAddresses, setSavedAddresses] = useState([]);
+
+  useEffect(() => {
+    const loadSavedAddresses = () => {
+      const local = localStorage.getItem("grambazaar_saved_addresses");
+      const parsed = local ? JSON.parse(local) : [];
+      
+      const list = [];
+      if (user && user.address?.line1 && user.address?.city) {
+        list.push({
+          id: "profile-default",
+          name: user.name || "",
+          phone: user.phone || "",
+          line1: user.address.line1,
+          city: user.address.city,
+          state: user.address.state,
+          pincode: user.address.pincode,
+          label: "📍 Profile Default"
+        });
+      }
+      
+      parsed.forEach((addr, idx) => {
+        list.push({
+          id: `local-${idx}`,
+          ...addr,
+          label: addr.label || `🏠 Saved Address ${idx + 1}`
+        });
+      });
+      
+      setSavedAddresses(list);
+    };
+
+    loadSavedAddresses();
+  }, [user]);
+
+  const handleSelectSavedAddress = (addr) => {
+    if (!addr) return;
+    setForm({
+      name: addr.name || "",
+      phone: addr.phone || "",
+      line1: addr.line1 || "",
+      city: addr.city || "",
+      state: addr.state || "",
+      pincode: addr.pincode || "",
+    });
+    notify(`📍 Loaded: ${addr.label}`);
+  };
+
   const { updateProfile } = useAppContext();
 
   useEffect(() => {
@@ -123,7 +171,32 @@ export function CheckoutPage() {
             pincode: form.pincode.trim(),
           },
         });
-        notify("📍 Delivery details saved to your profile!");
+        
+        // Save to local storage list
+        const localAddresses = localStorage.getItem("grambazaar_saved_addresses");
+        const parsed = localAddresses ? JSON.parse(localAddresses) : [];
+        
+        const isDuplicate = parsed.some(
+          (addr) =>
+            addr.line1.toLowerCase() === form.line1.trim().toLowerCase() &&
+            addr.city.toLowerCase() === form.city.trim().toLowerCase() &&
+            addr.pincode === form.pincode.trim()
+        );
+        
+        if (!isDuplicate) {
+          const newAddr = {
+            name: form.name.trim(),
+            phone: form.phone.trim(),
+            line1: form.line1.trim(),
+            city: form.city.trim(),
+            state: form.state.trim(),
+            pincode: form.pincode.trim(),
+            label: `🏠 Saved Address ${parsed.length + 1}`
+          };
+          const nextList = [newAddr, ...parsed];
+          localStorage.setItem("grambazaar_saved_addresses", JSON.stringify(nextList));
+        }
+        notify("📍 Delivery details saved to your profile and addresses list!");
       } catch (err) {
         console.error("Failed to save address to profile:", err);
       }
@@ -354,6 +427,29 @@ export function CheckoutPage() {
                   </button>
                 </div>
               </div>
+
+              {savedAddresses.length > 0 && (
+                <div className="mb-6 bg-gradient-to-br from-[#fdfbf7] to-[#f8f1e5] border border-[#ecdcc7] rounded-2xl p-4 shadow-sm">
+                  <span className="block text-xs font-black uppercase tracking-wider text-[#9b6b3a] mb-2.5">📋 Quick-Select Saved Address</span>
+                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none-style">
+                    {savedAddresses.map((addr) => (
+                      <button
+                        key={addr.id}
+                        type="button"
+                        onClick={() => handleSelectSavedAddress(addr)}
+                        className="flex flex-col text-left p-3.5 rounded-xl border border-gray-200 bg-white hover:border-[#c4622d] hover:shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer min-w-[170px] max-w-[220px] shrink-0"
+                      >
+                        <span className="text-xs font-bold text-gray-900 truncate mb-1">{addr.label}</span>
+                        <span className="text-[11px] font-semibold text-gray-700 truncate">{addr.name}</span>
+                        <span className="text-[10px] text-gray-500 truncate mb-1.5">{addr.phone}</span>
+                        <span className="text-[10px] text-gray-400 truncate mt-auto border-t border-gray-100 pt-1.5 w-full">
+                          {addr.line1}, {addr.city}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="form-row">
                 <Input label="Full name" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} required />
                 <Input label="Phone" value={form.phone} onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))} required />
