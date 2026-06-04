@@ -42,12 +42,18 @@ export function ProductDetailPage() {
   const { id } = useParams();
   const { product, relatedProducts, loading } = useProductDetail(id);
   const { reviews, submitReview } = useReviews(product?.id);
-  const { cart, notify, isAuthenticated, user } = useAppContext();
+  const { cart, notify, isAuthenticated, user, orders } = useAppContext();
   const [pincode, setPincode] = useState("");
   const [pinMessage, setPinMessage] = useState("");
   const [selectedThumb, setSelectedThumb] = useState(0);
   const [offersExpanded, setOffersExpanded] = useState(false);
   const [specsOpen, setSpecsOpen] = useState(true);
+
+  const orderList = orders?.orders || [];
+  const hasPurchased = orderList.some(order => 
+    order.status !== "Cancelled" && 
+    order.items?.some(item => (item.productId === product?.id || item.productId === product?._id))
+  );
 
   // SEO Dynamic Metadata
   useDocumentMetadata({
@@ -185,24 +191,24 @@ export function ProductDetailPage() {
             </div>
 
             {/* Thumbnails */}
-            <div className="flex gap-2">
-              {[0, 1, 2].map((i) => (
-                <button
-                  key={i}
-                  onClick={() => setSelectedThumb(i)}
-                  className={`w-16 h-16 rounded-xl border-2 flex items-center justify-center
-                             text-2xl overflow-hidden transition-all
-                             ${selectedThumb === i
-                               ? "border-[#c4622d] shadow-sm"
-                               : "border-gray-200 hover:border-gray-400"}`}
-                  style={{ background: product.bg || "#f5f0e8" }}
-                >
-                  {product.images?.[i]?.url
-                    ? <img src={product.images[i].url} alt={`${product.name} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
-                    : product.emoji || "📦"}
-                </button>
-              ))}
-            </div>
+            {product.images && product.images.length > 0 && (
+              <div className="flex gap-2 flex-wrap">
+                {product.images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedThumb(i)}
+                    className={`w-16 h-16 rounded-xl border-2 flex items-center justify-center
+                               text-2xl overflow-hidden transition-all shrink-0
+                               ${selectedThumb === i
+                                 ? "border-[#c4622d] shadow-sm"
+                                 : "border-gray-200 hover:border-gray-400"}`}
+                    style={{ background: product.bg || "#f5f0e8" }}
+                  >
+                    <img src={img.url} alt={`${product.name} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* ── Info Column ── */}
@@ -475,16 +481,34 @@ export function ProductDetailPage() {
               🏪 Merchant Viewing Mode: Sellers cannot submit ratings or reviews.
             </div>
           ) : isAuthenticated ? (
-            <div className="mb-8">
-              <h3 className="font-bold text-gray-800 mb-3 text-sm">Write a Review</h3>
-              <ReviewForm
-                productId={product.id}
-                onSubmit={async (payload) => {
-                  await submitReview(payload);
-                  notify("Review submitted.");
-                }}
-              />
-            </div>
+            hasPurchased ? (
+              <div className="mb-8">
+                <h3 className="font-bold text-gray-800 mb-3 text-sm">Write a Review</h3>
+                <ReviewForm
+                  productId={product.id}
+                  onSubmit={async (payload) => {
+                    try {
+                      await submitReview(payload);
+                      notify("Review submitted successfully! Thank you. 🌟");
+                    } catch (err) {
+                      notify(err.message || "Failed to submit review.");
+                    }
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="bg-amber-50 border border-[#e0d5c5] rounded-2xl p-5 mb-6 text-xs text-amber-805 flex items-start gap-3.5 shadow-sm max-w-2xl">
+                <span className="text-xl shrink-0">🔒</span>
+                <div>
+                  <p className="font-bold text-gray-900 text-sm mb-1">Verified Purchase Required</p>
+                  <p className="text-gray-600 leading-relaxed">
+                    Only verified buyers who have purchased this product can leave a review. 
+                    If you placed an order, please wait for payment confirmation or check its status under 
+                    <button onClick={() => navigate("/orders")} className="underline font-semibold text-amber-800 hover:text-amber-900 ml-1">My Orders</button>.
+                  </p>
+                </div>
+              </div>
+            )
           ) : (
             <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-6 text-sm text-blue-700">
               <button onClick={() => navigate("/auth")} className="font-semibold underline">Sign in</button> to leave a review.

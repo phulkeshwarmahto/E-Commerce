@@ -2,7 +2,7 @@ import multer from "multer";
 
 const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 
-export const upload = multer({
+const multerConfig = {
   storage: multer.memoryStorage(),
   limits: {
     fileSize: Number(process.env.UPLOAD_MAX_BYTES || 2 * 1024 * 1024),
@@ -15,4 +15,7 @@ export const upload = multer({
 
     callback(null, true);
   },
-}).single("image");
+};
+
+export const upload = multer(multerConfig).single("image");
+export const uploadMultiple = multer(multerConfig).array("images", 10);

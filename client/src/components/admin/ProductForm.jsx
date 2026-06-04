@@ -11,7 +11,7 @@ const baseState = {
   description: "",
   stockCount: 12,
   badge: "",
-  imageUrl: "",
+  images: [],
   deliveryFee: "",
 };
 
@@ -32,7 +32,7 @@ export function ProductForm({ product, onSubmit, onClose }) {
       description: product.description,
       stockCount: product.stockCount,
       badge: product.badge || "",
-      imageUrl: product.images?.[0]?.url || "",
+      images: product.images || [],
       deliveryFee: product.deliveryFee !== undefined ? product.deliveryFee : "",
     });
   }, [product]);
@@ -43,7 +43,7 @@ export function ProductForm({ product, onSubmit, onClose }) {
       ...product,
       ...form,
       deliveryFee: Number(form.deliveryFee || 0),
-      images: form.imageUrl ? [{ url: form.imageUrl, alt: form.name, publicId: "manual" }] : [],
+      images: form.images || [],
     });
     setForm(baseState);
   };
@@ -147,7 +147,12 @@ export function ProductForm({ product, onSubmit, onClose }) {
           />
         </label>
       </div>
-      <ImageUploadZone value={form.imageUrl} onChange={(imageUrl) => setForm((current) => ({ ...current, imageUrl }))} />
+      <ImageUploadZone
+        value={form.images}
+        onChange={(images) => setForm((current) => ({ ...current, images }))}
+        multiple={true}
+        label="Product Images (Up to 10)"
+      />
       <div className="modal-actions">
         <Button variant="ghost" onClick={onClose}>
           Cancel

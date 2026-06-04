@@ -4,6 +4,7 @@ import { Product } from "../models/Product.model.js";
 import { Review } from "../models/Review.model.js";
 import { User } from "../models/User.model.js";
 import { Notification } from "../models/Notification.model.js";
+import { Order } from "../models/Order.model.js";
 
 const resolveProduct = async (id) => {
   if (mongoose.Types.ObjectId.isValid(id)) {
@@ -29,6 +30,19 @@ export const createReview = async (req, res) => {
 
   if (!product) {
     return res.status(404).json(new ApiResponse(false, "Product not found."));
+  }
+
+  // Verified purchase check — user must have bought this product
+  const hasPurchased = await Order.exists({
+    userId: req.user._id,
+    "items.productId": product._id,
+    status: { $ne: "Cancelled" },
+  });
+
+  if (!hasPurchased) {
+    return res.status(403).json(
+      new ApiResponse(false, "You can only review products you have purchased."),
+    );
   }
 
   const review = await Review.findOneAndUpdate(
