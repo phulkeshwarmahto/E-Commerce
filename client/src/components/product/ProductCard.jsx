@@ -46,7 +46,7 @@ export function ProductCard({ product }) {
       {/* ── Image Area ── */}
       <Link to={`/products/${product.slug}`} className="block relative overflow-hidden"
         style={{ background: product.bg || "#f5f0e8" }}>
-        <div className="h-[160px] md:h-[200px] flex items-center justify-center overflow-hidden">
+        <div className="h-[120px] md:h-[150px] flex items-center justify-center overflow-hidden">
           {showImage ? (
             <img
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"

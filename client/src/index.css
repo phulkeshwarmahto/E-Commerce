@@ -2012,13 +2012,13 @@
 }
 
 .product-hscroll .pcard {
-  flex: 0 0 240px !important;
+  flex: 0 0 200px !important;
   scroll-snap-align: start;
 }
 
 @media (min-width: 768px) {
   .product-hscroll .pcard {
-    flex: 0 0 280px !important;
+    flex: 0 0 230px !important;
   }
 }
 
