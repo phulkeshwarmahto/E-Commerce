@@ -19,6 +19,7 @@ import faqRoutes from "./routes/faq.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import reportRoutes from "./routes/report.routes.js";
 import returnRoutes from "./routes/return.routes.js";
+import wishlistRoutes from "./routes/wishlist.routes.js";
 import sellerPublicRoutes from "./routes/sellerPublic.routes.js";
 import { apiRateLimiter } from "./middleware/rateLimit.middleware.js";
 import { errorHandler } from "./middleware/errorHandler.middleware.js";
@@ -74,6 +75,7 @@ app.use("/api/faqs", faqRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/returns", returnRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/sellers", sellerPublicRoutes);
 
 app.use(errorHandler);

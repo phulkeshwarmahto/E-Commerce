@@ -4,6 +4,7 @@ import { ORDER_STATUSES, PAYMENT_STATUSES, Order } from "../models/Order.model.j
 import { ProductFAQ } from "../models/ProductFAQ.model.js";
 import { Notification } from "../models/Notification.model.js";
 import { slugify } from "../utils/slugify.js";
+import { Wishlist } from "../models/Wishlist.model.js";
 
 export const getSellerDashboard = async (req, res) => {
   const sellerId = req.user._id;
@@ -92,6 +93,8 @@ export const updateSellerProduct = async (req, res) => {
     return res.status(403).json(new ApiResponse(false, "Not authorized to update this product."));
   }
 
+  const oldPrice = product.price;
+
   const { name, category, description, badge, emoji, images, tags, isFeatured, inStock, variants } = req.body;
 
   if (name !== undefined) product.name = name;
@@ -114,7 +117,25 @@ export const updateSellerProduct = async (req, res) => {
   product.stockCount = Number(req.body.stockCount ?? product.stockCount);
   product.deliveryFee = req.body.deliveryFee !== undefined ? Number(req.body.deliveryFee) : product.deliveryFee;
 
+  const newPrice = product.price;
   await product.save();
+
+  if (newPrice < oldPrice) {
+    try {
+      const wishlists = await Wishlist.find({ products: product._id });
+      const notifications = wishlists.map((wl) => ({
+        userId: wl.userId,
+        title: "📉 Price Drop Alert!",
+        message: `"${product.name}" is now available at a lower price of ₹${newPrice} (was ₹${oldPrice})!`,
+      }));
+      if (notifications.length > 0) {
+        await Notification.insertMany(notifications);
+      }
+    } catch (notifErr) {
+      console.error("Error creating price drop notifications (seller update):", notifErr);
+    }
+  }
+
   return res.json(new ApiResponse(true, "Product updated.", { product: product.toClient() }));
 };
 

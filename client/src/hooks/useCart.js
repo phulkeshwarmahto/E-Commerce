@@ -86,6 +86,26 @@ export function useCart(token) {
     });
   };
 
+  const bulkAddToCart = (products) => {
+    updateItems((current) => {
+      let next = [...current];
+      products.forEach((p) => {
+        const existingIdx = next.findIndex(
+          (item) => item.id === p.id && item.variantName === p.variantName,
+        );
+        if (existingIdx > -1) {
+          next[existingIdx] = {
+            ...next[existingIdx],
+            quantity: next[existingIdx].quantity + (p.quantity || 1),
+          };
+        } else {
+          next.push({ ...p, quantity: p.quantity || 1 });
+        }
+      });
+      return next;
+    });
+  };
+
   const updateQuantity = (productId, quantity, variantName) => {
     updateItems((current) =>
       current.map((item) =>
@@ -116,6 +136,7 @@ export function useCart(token) {
     items,
     loading,
     addToCart,
+    bulkAddToCart,
     updateQuantity,
     removeFromCart,
     clearCart,

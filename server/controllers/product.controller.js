@@ -33,6 +33,18 @@ const buildMongoQuery = (query = {}) => {
     filters.seller = seller;
   }
 
+  const priceMin = parseFloat(query.priceMin);
+  const priceMax = parseFloat(query.priceMax);
+  if (!isNaN(priceMin) || !isNaN(priceMax)) {
+    filters.price = {};
+    if (!isNaN(priceMin)) {
+      filters.price.$gte = priceMin;
+    }
+    if (!isNaN(priceMax)) {
+      filters.price.$lte = priceMax;
+    }
+  }
+
   return filters;
 };
 

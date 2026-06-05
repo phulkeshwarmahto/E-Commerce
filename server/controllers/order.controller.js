@@ -146,6 +146,8 @@ export const createOrder = async (req, res) => {
     total,
     status: "Processing",
     statusHistory: [{ status: "Processing", note: "Order created" }],
+    deliverySlot: req.body.deliverySlot || "",
+    estimatedDeliveryDate: req.body.estimatedDeliveryDate ? new Date(req.body.estimatedDeliveryDate) : undefined,
   });
 
   // Decrement stock levels

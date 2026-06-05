@@ -13,7 +13,7 @@ import { createReturnRequest } from "../api/return.api";
 
 export function OrdersPage() {
   const navigate = useNavigate();
-  const { orders, user, notify } = useAppContext();
+  const { orders, user, notify, cart } = useAppContext();
   const [trackingId, setTrackingId] = useState(null);
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState({ type: "seller", id: "", name: "" });
@@ -105,6 +105,25 @@ export function OrdersPage() {
               <div className="order-footer">
                 <span className="order-total">{formatCurrency(order.total)}</span>
                 <div className="flex gap-2 items-center flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const itemsToRestore = order.items.map((item) => ({
+                        id: item.productId,
+                        name: item.name,
+                        price: item.price,
+                        variantName: item.variantName,
+                        quantity: item.quantity,
+                        emoji: item.emoji || "📦",
+                      }));
+                      cart.bulkAddToCart(itemsToRestore);
+                      notify("Items added to your cart!");
+                      navigate("/cart");
+                    }}
+                    className="px-3 py-1.5 bg-[#c4622d] text-white rounded-lg text-xs font-bold hover:bg-[#e07a4a] transition-all cursor-pointer"
+                  >
+                    🔁 Buy Again
+                  </button>
                   <button
                     type="button"
                     onClick={() => {

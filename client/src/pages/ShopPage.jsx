@@ -53,8 +53,6 @@ export function ShopPage() {
     title: "Shop Organic Essentials",
     description: "Browse GramBazaar's premium catalog of 100% natural, farm-fresh products. Filter by category, price, and active deals with secure nationwide shipping."
   });
-  const [priceMin, setPriceMin] = useState("");
-  const [priceMax, setPriceMax] = useState("");
   const [inStockOnly, setInStockOnly] = useState(false);
 
   const search   = searchParams.get("search") || "";
@@ -62,25 +60,36 @@ export function ShopPage() {
   const badge    = searchParams.get("badge") || "";
   const sort     = searchParams.get("sort") || "relevance";
   const page     = Math.max(1, Number(searchParams.get("page") || 1));
+  const priceMin = searchParams.get("priceMin") || "";
+  const priceMax = searchParams.get("priceMax") || "";
 
   const debouncedSearch = useDebounce(search);
+  const debouncedPriceMin = useDebounce(priceMin);
+  const debouncedPriceMax = useDebounce(priceMax);
+
   const filters = useMemo(
-    () => ({ search: debouncedSearch, category, badge, page, limit: 12 }),
-    [badge, category, debouncedSearch, page]
+    () => ({
+      search: debouncedSearch,
+      category,
+      badge,
+      page,
+      priceMin: debouncedPriceMin,
+      priceMax: debouncedPriceMax,
+      limit: 12
+    }),
+    [badge, category, debouncedSearch, page, debouncedPriceMin, debouncedPriceMax]
   );
   const { products, loading, error, pagination } = useProducts(filters);
 
   const sortedProducts = useMemo(() => {
     let list = [...products];
     if (inStockOnly) list = list.filter((p) => p.inStock);
-    if (priceMin) list = list.filter((p) => p.price >= Number(priceMin));
-    if (priceMax) list = list.filter((p) => p.price <= Number(priceMax));
     if (sort === "price-asc")  return list.sort((a, b) => a.price - b.price);
     if (sort === "price-desc") return list.sort((a, b) => b.price - a.price);
     if (sort === "rating")     return list.sort((a, b) => b.rating - a.rating);
     if (sort === "newest")     return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     return list;
-  }, [products, sort, priceMin, priceMax, inStockOnly]);
+  }, [products, sort, inStockOnly]);
 
   const setParam = (key, value) => {
     const next = new URLSearchParams(searchParams);
@@ -92,7 +101,7 @@ export function ShopPage() {
 
   const clearAll = () => {
     setSearchParams(new URLSearchParams());
-    setPriceMin(""); setPriceMax(""); setInStockOnly(false);
+    setInStockOnly(false);
   };
 
   // Active filter chips
@@ -101,8 +110,8 @@ export function ShopPage() {
     ...(badge ? [{ label: `Badge: ${badge}`, clear: () => setParam("badge", "") }] : []),
     ...(search ? [{ label: `"${search}"`, clear: () => setParam("search", "") }] : []),
     ...(inStockOnly ? [{ label: "In Stock Only", clear: () => setInStockOnly(false) }] : []),
-    ...(priceMin ? [{ label: `Min ₹${priceMin}`, clear: () => setPriceMin("") }] : []),
-    ...(priceMax ? [{ label: `Max ₹${priceMax}`, clear: () => setPriceMax("") }] : []),
+    ...(priceMin ? [{ label: `Min ₹${priceMin}`, clear: () => setParam("priceMin", "") }] : []),
+    ...(priceMax ? [{ label: `Max ₹${priceMax}`, clear: () => setParam("priceMax", "") }] : []),
   ];
 
   const SidebarContent = () => (
@@ -141,7 +150,7 @@ export function ShopPage() {
             <input
               type="number"
               value={priceMin}
-              onChange={(e) => setPriceMin(e.target.value)}
+              onChange={(e) => setParam("priceMin", e.target.value)}
               placeholder="0"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
                          focus:outline-none focus:border-[#c4622d] focus:ring-1 focus:ring-[#c4622d]/30"
@@ -153,7 +162,7 @@ export function ShopPage() {
             <input
               type="number"
               value={priceMax}
-              onChange={(e) => setPriceMax(e.target.value)}
+              onChange={(e) => setParam("priceMax", e.target.value)}
               placeholder="∞"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
                          focus:outline-none focus:border-[#c4622d] focus:ring-1 focus:ring-[#c4622d]/30"

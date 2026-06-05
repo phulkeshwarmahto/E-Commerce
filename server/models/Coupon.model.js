@@ -8,6 +8,7 @@ const couponSchema = new mongoose.Schema(
     minOrderAmount: { type: Number, default: 0, min: 0 },
     active: { type: Boolean, default: true },
     expiresAt: { type: Date, default: null },
+    sellerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
   },
   { timestamps: true },
 );

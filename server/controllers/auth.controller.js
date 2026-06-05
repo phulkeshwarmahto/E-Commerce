@@ -30,6 +30,36 @@ export const register = async (req, res) => {
     membership: "Silver",
   });
 
+  // Send email verification on registration
+  try {
+    const token = crypto.randomBytes(32).toString("hex");
+    user.emailVerificationToken = token;
+    user.emailVerificationExpires = Date.now() + 24 * 3600000; // 24 hours
+    await user.save();
+
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+    const verifyUrl = `${clientUrl}/verify-email?token=${token}`;
+
+    await sendEmail({
+      to: user.email,
+      subject: "Welcome to GramBazaar! Verify Your Email Address",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
+          <h2 style="color: #ea580c; border-bottom: 2px solid #f97316; padding-bottom: 10px;">Verify Your Email Address</h2>
+          <p style="font-size: 16px; color: #333;">Hello ${user.name || "User"},</p>
+          <p style="font-size: 16px; color: #333;">Welcome to GramBazaar! Please click the button below to verify your email address:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verifyUrl}" style="background-color: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Verify Email</a>
+          </div>
+          <p style="font-size: 14px; color: #666;">This link is valid for 24 hours.</p>
+        </div>
+      `,
+      text: `Hello ${user.name || "User"}, welcome to GramBazaar! Verify your email using this link: ${verifyUrl}`,
+    });
+  } catch (emailErr) {
+    console.error("Failed to send welcome verification email during registration:", emailErr.message);
+  }
+
   return res.status(201).json(
     new ApiResponse(true, "Account created.", {
       user: user.toClient(),
@@ -43,6 +73,10 @@ export const login = async (req, res) => {
 
   if (!user || !(await bcrypt.compare(req.body.password, user.passwordHash))) {
     return res.status(401).json(new ApiResponse(false, "Invalid email or password."));
+  }
+
+  if (user.isActive === false) {
+    return res.status(403).json(new ApiResponse(false, "This account has been deactivated. Please contact support."));
   }
 
   return res.json(
@@ -241,4 +275,111 @@ export const resetPassword = async (req, res) => {
   await user.save();
 
   return res.json(new ApiResponse(true, "Password has been reset successfully. You can now log in."));
+};
+
+export const changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json(new ApiResponse(false, "Current password and new password are required."));
+  }
+  if (newPassword.length < 8) {
+    return res.status(400).json(new ApiResponse(false, "New password must be at least 8 characters."));
+  }
+
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return res.status(404).json(new ApiResponse(false, "User not found."));
+  }
+
+  if (user.passwordHash && !(await bcrypt.compare(currentPassword, user.passwordHash))) {
+    return res.status(401).json(new ApiResponse(false, "Incorrect current password."));
+  }
+
+  user.passwordHash = await bcrypt.hash(
+    newPassword,
+    Number(process.env.BCRYPT_SALT_ROUNDS || 12)
+  );
+  await user.save();
+
+  return res.json(new ApiResponse(true, "Password changed successfully."));
+};
+
+export const sendEmailVerification = async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return res.status(404).json(new ApiResponse(false, "User not found."));
+  }
+  if (user.isVerified) {
+    return res.status(400).json(new ApiResponse(false, "Email is already verified."));
+  }
+
+  const token = crypto.randomBytes(32).toString("hex");
+  user.emailVerificationToken = token;
+  user.emailVerificationExpires = Date.now() + 24 * 3600000; // 24 hours
+  await user.save();
+
+  const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+  const verifyUrl = `${clientUrl}/verify-email?token=${token}`;
+
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: "GramBazaar Email Verification Link",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
+          <h2 style="color: #ea580c; border-bottom: 2px solid #f97316; padding-bottom: 10px;">Verify Your Email Address</h2>
+          <p style="font-size: 16px; color: #333;">Hello ${user.name || "User"},</p>
+          <p style="font-size: 16px; color: #333;">Welcome to GramBazaar! Please click the button below to verify your email address:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verifyUrl}" style="background-color: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Verify Email</a>
+          </div>
+          <p style="font-size: 14px; color: #666;">This link is valid for 24 hours.</p>
+        </div>
+      `,
+      text: `Hello ${user.name || "User"}, welcome to GramBazaar! Verify your email using this link: ${verifyUrl}`,
+    });
+    return res.json(new ApiResponse(true, "Verification email sent successfully."));
+  } catch (err) {
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpires = undefined;
+    await user.save();
+    console.error("Failed to send email verification:", err.message);
+    return res.status(500).json(new ApiResponse(false, "Could not send verification email. Please try again later."));
+  }
+};
+
+export const verifyEmail = async (req, res) => {
+  const { token } = req.body;
+  if (!token) {
+    return res.status(400).json(new ApiResponse(false, "Token is required."));
+  }
+
+  const user = await User.findOne({
+    emailVerificationToken: token,
+    emailVerificationExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return res.status(400).json(new ApiResponse(false, "Verification token is invalid or has expired."));
+  }
+
+  user.isVerified = true;
+  user.emailVerificationToken = undefined;
+  user.emailVerificationExpires = undefined;
+  await user.save();
+
+  return res.json(new ApiResponse(true, "Email verified successfully! You can now access all features."));
+};
+
+export const deleteAccount = async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return res.status(404).json(new ApiResponse(false, "User not found."));
+  }
+
+  user.isActive = false;
+  user.isBanned = true;
+  await user.save();
+
+  return res.json(new ApiResponse(true, "Your account has been deactivated successfully."));
 };

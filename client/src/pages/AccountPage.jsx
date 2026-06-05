@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAppContext } from "../hooks/useAppContext";
 import { Input } from "../components/ui/Input";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
+import { changePasswordRequest, sendVerificationRequest, deleteAccountRequest } from "../api/auth.api";
 
 export function AccountPage() {
   const { user, logout, orders, updateProfile, notify } = useAppContext();
@@ -22,6 +23,13 @@ export function AccountPage() {
   });
   const [saving, setSaving] = useState(false);
 
+  // Phase 2 States
+  const [verifying, setVerifying] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "" });
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [deactivating, setDeactivating] = useState(false);
+
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (!editForm.name.trim()) return;
@@ -37,6 +45,50 @@ export function AccountPage() {
       notify(err.message || "Failed to update profile.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (!passwordForm.currentPassword || !passwordForm.newPassword) return;
+    setChangingPassword(true);
+    try {
+      await changePasswordRequest(passwordForm);
+      notify("Password changed successfully.");
+      setPasswordForm({ currentPassword: "", newPassword: "" });
+      setShowPasswordForm(false);
+    } catch (err) {
+      notify(err.message || "Failed to change password.");
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
+  const handleSendVerification = async () => {
+    setVerifying(true);
+    try {
+      await sendVerificationRequest();
+      notify("Verification link sent to your email address!");
+    } catch (err) {
+      notify(err.message || "Failed to send verification email.");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleDeactivate = async () => {
+    if (window.confirm("Are you sure you want to deactivate your account? This action is permanent and you will be logged out.")) {
+      setDeactivating(true);
+      try {
+        await deleteAccountRequest();
+        notify("Your account has been deactivated. Logging out...");
+        setTimeout(() => {
+          logout();
+        }, 2000);
+      } catch (err) {
+        notify(err.message || "Failed to deactivate account.");
+        setDeactivating(false);
+      }
     }
   };
 
@@ -59,6 +111,27 @@ export function AccountPage() {
     <section className="page-content">
       <div className="account-page">
         <h2 className="account-title">👤 My Account</h2>
+
+        {/* Verification Alert Banner */}
+        {!user.isVerified && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl shrink-0">📧</span>
+              <div className="text-left">
+                <h4 className="text-sm font-bold text-amber-800">Verify your email address</h4>
+                <p className="text-[11px] text-amber-700 mt-0.5">Please verify your email to unlock all features, reviews, and secure storefront listings.</p>
+              </div>
+            </div>
+            <button
+              onClick={handleSendVerification}
+              disabled={verifying}
+              className="bg-amber-500 hover:bg-amber-600 text-gray-950 font-bold text-xs py-2 px-4 rounded-xl shadow-sm transition-all border-0 cursor-pointer whitespace-nowrap disabled:opacity-50"
+            >
+              {verifying ? "Sending..." : "Send Verification Link"}
+            </button>
+          </div>
+        )}
+
         <div className="account-grid">
           <div className={`mobile-collapsible ${profileOpen ? "is-open" : ""}`}>
             <button
@@ -167,9 +240,53 @@ export function AccountPage() {
               <Link className="acct-link" to="/checkout">
                 <span className="al-icon">📍</span>Saved Addresses<span className="al-arrow">›</span>
               </Link>
-              <button className="acct-link signout-link" onClick={logout}>
+              <button className="acct-link signout-link border-0 w-full text-left bg-transparent cursor-pointer" onClick={logout}>
                 <span className="al-icon">🚪</span>Sign Out<span className="al-arrow">›</span>
               </button>
+
+              {/* Password Change and Deactivation section */}
+              <div className="border-t border-gray-200/50 mt-4 pt-4 space-y-4">
+                <button
+                  onClick={() => setShowPasswordForm(!showPasswordForm)}
+                  className="w-full text-left acct-link !border-0 bg-transparent flex items-center justify-between cursor-pointer py-1.5"
+                >
+                  <span className="flex items-center gap-2"><span className="al-icon">🔐</span> Change Password</span>
+                  <span className="text-xs text-gray-400 font-bold">{showPasswordForm ? "Hide ▲" : "Show ▼"}</span>
+                </button>
+                {showPasswordForm && (
+                  <form onSubmit={handlePasswordSubmit} className="bg-gray-50/50 border border-gray-150 rounded-2xl p-4 space-y-3 mt-2 text-left">
+                    <Input
+                      type="password"
+                      label="Current Password"
+                      value={passwordForm.currentPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                      required
+                    />
+                    <Input
+                      type="password"
+                      label="New Password"
+                      value={passwordForm.newPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                      required
+                    />
+                    <button
+                      type="submit"
+                      disabled={changingPassword || !passwordForm.currentPassword || !passwordForm.newPassword}
+                      className="w-full bg-[#c4622d] hover:bg-[#a95223] text-white font-bold py-2 rounded-xl text-xs shadow-sm cursor-pointer border-0 disabled:opacity-50 mt-2"
+                    >
+                      {changingPassword ? "Updating Password..." : "Change Password"}
+                    </button>
+                  </form>
+                )}
+                
+                <button
+                  onClick={handleDeactivate}
+                  disabled={deactivating}
+                  className="w-full text-left acct-link !border-0 bg-transparent flex items-center gap-2 cursor-pointer py-1.5 text-red-650 hover:text-red-750 font-bold"
+                >
+                  <span className="al-icon">🗑️</span> {deactivating ? "Deactivating..." : "Deactivate Account"}
+                </button>
+              </div>
             </div>
           </div>
         </div>

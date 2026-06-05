@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login, me, register, googleLogin, updateProfile, forgotPassword, resetPassword } from "../controllers/auth.controller.js";
+import { login, me, register, googleLogin, updateProfile, forgotPassword, resetPassword, changePassword, sendEmailVerification, verifyEmail, deleteAccount } from "../controllers/auth.controller.js";
 import { validate } from "../middleware/validate.middleware.js";
 import { requireAuth } from "../middleware/auth.middleware.js";
 import { authRateLimiter } from "../middleware/rateLimit.middleware.js";
@@ -15,5 +15,11 @@ router.get("/me", asyncHandler(requireAuth), me);
 router.put("/profile", asyncHandler(requireAuth), asyncHandler(updateProfile));
 router.post("/forgot-password", authRateLimiter, asyncHandler(forgotPassword));
 router.post("/reset-password", authRateLimiter, asyncHandler(resetPassword));
+
+// New Phase 2 routes
+router.put("/change-password", asyncHandler(requireAuth), asyncHandler(changePassword));
+router.post("/send-verification", asyncHandler(requireAuth), asyncHandler(sendEmailVerification));
+router.post("/verify-email", asyncHandler(verifyEmail));
+router.delete("/delete-account", asyncHandler(requireAuth), asyncHandler(deleteAccount));
 
 export default router;

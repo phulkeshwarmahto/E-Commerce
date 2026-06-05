@@ -9,6 +9,7 @@ import { Brand } from "../models/Brand.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import { slugify } from "../utils/slugify.js";
 import { Report } from "../models/Report.model.js";
+import { Wishlist } from "../models/Wishlist.model.js";
 
 export const getDashboard = async (_req, res) => {
   const [revenueResult, orders, productCount, userCount, products, recentOrders, topProducts, reviews] =
@@ -141,6 +142,8 @@ export const updateProduct = async (req, res) => {
     return res.status(404).json(new ApiResponse(false, "Product not found."));
   }
 
+  const oldPrice = product.price;
+
   // Only pick mutable fields — never assign _id, __v, seller (populated), etc.
   const { name, category, description, badge, emoji, images, tags, isFeatured, inStock } = req.body;
 
@@ -163,7 +166,25 @@ export const updateProduct = async (req, res) => {
   product.stockCount = Number(req.body.stockCount ?? product.stockCount);
   product.deliveryFee = req.body.deliveryFee !== undefined ? Number(req.body.deliveryFee) : product.deliveryFee;
 
+  const newPrice = product.price;
   await product.save();
+
+  if (newPrice < oldPrice) {
+    try {
+      const wishlists = await Wishlist.find({ products: product._id });
+      const notifications = wishlists.map((wl) => ({
+        userId: wl.userId,
+        title: "📉 Price Drop Alert!",
+        message: `"${product.name}" is now available at a lower price of ₹${newPrice} (was ₹${oldPrice})!`,
+      }));
+      if (notifications.length > 0) {
+        await Notification.insertMany(notifications);
+      }
+    } catch (notifErr) {
+      console.error("Error creating price drop notifications (admin update):", notifErr);
+    }
+  }
+
   res.json(new ApiResponse(true, "Product updated.", { product: product.toClient() }));
 };
 

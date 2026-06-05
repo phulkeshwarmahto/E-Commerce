@@ -9,7 +9,7 @@ const reviewSchema = new mongoose.Schema(
     title: { type: String, default: "Customer review" },
     body: { type: String, required: true },
     media: { type: [String], default: [] },
-    isApproved: { type: Boolean, default: true },
+    isApproved: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

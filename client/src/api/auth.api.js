@@ -12,3 +12,13 @@ export const forgotPasswordRequest = (payload) =>
   apiRequest("/auth/forgot-password", { method: "POST", body: payload });
 export const resetPasswordRequest = (payload) =>
   apiRequest("/auth/reset-password", { method: "POST", body: payload });
+
+export const changePasswordRequest = (payload) =>
+  apiRequest("/auth/change-password", { method: "PUT", body: payload });
+export const sendVerificationRequest = () =>
+  apiRequest("/auth/send-verification", { method: "POST" });
+export const verifyEmailRequest = (payload) =>
+  apiRequest("/auth/verify-email", { method: "POST", body: payload });
+export const deleteAccountRequest = () =>
+  apiRequest("/auth/delete-account", { method: "DELETE" });
+

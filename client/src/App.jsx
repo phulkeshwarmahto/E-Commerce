@@ -14,6 +14,7 @@ import { useAuth } from "./hooks/useAuth";
 import { useCart } from "./hooks/useCart";
 import { useOrders } from "./hooks/useOrders";
 import { getStoredWishlist, setStoredWishlist } from "./store/wishlistStore";
+import { getWishlistRequest, toggleWishlistRequest } from "./api/wishlist.api";
 
 // Lazy loaded page components for optimal initial bundle sizes and fast page loads
 const AccountPage = lazy(() => import("./pages/AccountPage").then(m => ({ default: m.AccountPage })));
@@ -33,8 +34,10 @@ const VSCompetitorsPage = lazy(() => import("./pages/VSCompetitorsPage").then(m 
 const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage").then(m => ({ default: m.ForgotPasswordPage })));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage").then(m => ({ default: m.ResetPasswordPage })));
 const SellerStorePage = lazy(() => import("./pages/SellerStorePage").then(m => ({ default: m.SellerStorePage })));
+const VerifyEmailPage = lazy(() => import("./pages/VerifyEmailPage").then(m => ({ default: m.VerifyEmailPage })));
 
 function ScrollToTop() {
+
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -51,12 +54,39 @@ export default function App() {
   const [wishlistIds, setWishlistIds] = useState(() => getStoredWishlist());
   const [toastMessage, setToastMessage] = useState("");
 
-  const toggleWishlist = (id) => {
-    setWishlistIds((current) => {
-      const next = current.includes(id) ? current.filter((entry) => entry !== id) : [...current, id];
-      setStoredWishlist(next);
-      return next;
-    });
+  useEffect(() => {
+    if (auth.token) {
+      getWishlistRequest()
+        .then((res) => {
+          if (res.success && res.data) {
+            setWishlistIds(res.data.products.map((p) => p.id));
+          }
+        })
+        .catch(() => {});
+    } else {
+      setWishlistIds(getStoredWishlist());
+    }
+  }, [auth.token]);
+
+  const toggleWishlist = async (id) => {
+    if (auth.token) {
+      try {
+        const res = await toggleWishlistRequest(id);
+        if (res.success && res.data) {
+          setWishlistIds(res.data.products.map((p) => p.id));
+          setToastMessage(res.message);
+        }
+      } catch (err) {
+        setToastMessage(err.message || "Failed to update wishlist.");
+      }
+    } else {
+      setWishlistIds((current) => {
+        const next = current.includes(id) ? current.filter((entry) => entry !== id) : [...current, id];
+        setStoredWishlist(next);
+        return next;
+      });
+      setToastMessage("Wishlist updated.");
+    }
   };
 
   const contextValue = useMemo(
@@ -100,6 +130,7 @@ export default function App() {
                   <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                   <Route path="/reset-password" element={<ResetPasswordPage />} />
                   <Route path="/seller/:id" element={<SellerStorePage />} />
+                  <Route path="/verify-email" element={<VerifyEmailPage />} />
                   <Route path="/vs-competitors" element={<VSCompetitorsPage />} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>

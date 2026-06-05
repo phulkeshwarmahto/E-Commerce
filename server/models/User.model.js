@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema(
     isBanned: { type: Boolean, default: false },
     passwordResetToken: { type: String },
     passwordResetExpires: { type: Date },
+    isVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String },
+    emailVerificationExpires: { type: Date },
+    isActive: { type: Boolean, default: true },
   },
   { timestamps: true },
 );
@@ -37,6 +41,8 @@ userSchema.methods.toClient = function toClient() {
     creditScore: this.creditScore ?? 750,
     phone: this.phone || "",
     address: this.address || { line1: "", city: "", state: "", pincode: "" },
+    isVerified: this.isVerified,
+    isActive: this.isActive,
   };
 };
 

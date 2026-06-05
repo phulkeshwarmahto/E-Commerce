@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
@@ -34,6 +34,48 @@ export function CheckoutPage() {
   const location = useLocation();
   const { cart, orders, isAuthenticated, notify, user } = useAppContext();
   const promo = location.state || { code: "", discount: 0 };
+
+  const dateOptions = useMemo(() => {
+    const dates = [];
+    const now = new Date();
+    const startHour = now.getHours();
+    // If ordered before 4 PM (16:00), we can deliver today (evening/night)
+    const startOffset = startHour < 16 ? 0 : 1;
+    for (let i = startOffset; i < startOffset + 3; i++) {
+      const d = new Date();
+      d.setDate(now.getDate() + i);
+      dates.push(d);
+    }
+    return dates;
+  }, []);
+
+  const [selectedDate, setSelectedDate] = useState(dateOptions[0]);
+  const [selectedSlot, setSelectedSlot] = useState("");
+
+  const slotOptions = useMemo(() => {
+    const slots = [
+      { id: "morning", label: "🌅 Morning", time: "7:00 AM - 11:00 AM", maxHour: 7 },
+      { id: "noon", label: "☀️ Noon", time: "11:00 AM - 3:00 PM", maxHour: 11 },
+      { id: "evening", label: "🌇 Evening", time: "3:00 PM - 7:00 PM", maxHour: 15 },
+      { id: "night", label: "🌙 Night", time: "7:00 PM - 10:00 PM", maxHour: 19 },
+    ];
+    
+    const now = new Date();
+    const isToday = selectedDate && selectedDate.toDateString() === now.toDateString();
+    if (isToday) {
+      const currentHour = now.getHours();
+      return slots.filter(s => currentHour < s.maxHour);
+    }
+    return slots;
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if (slotOptions.length > 0) {
+      setSelectedSlot(slotOptions[0].id);
+    } else {
+      setSelectedSlot("");
+    }
+  }, [slotOptions]);
 
   useDocumentMetadata({
     title: "Secure Checkout",
@@ -310,6 +352,8 @@ export function CheckoutPage() {
         shippingAddress: form,
         paymentMethod,
         couponCode: promo.code,
+        deliverySlot: selectedSlot ? `${selectedDate.toLocaleDateString(undefined, { month: "short", day: "numeric" })}: ${slotOptions.find(s => s.id === selectedSlot)?.time}` : "",
+        estimatedDeliveryDate: selectedDate ? selectedDate.toISOString() : undefined,
       });
 
       if (paymentMethod === "cod") {
@@ -528,6 +572,85 @@ export function CheckoutPage() {
                 <strong>Payment:</strong>
                 <p>{paymentOptions.find((option) => option.id === paymentMethod)?.name}</p>
               </div>
+
+              {/* Delivery Slot Selection */}
+              <div className="review-box bg-gradient-to-br from-[#fdfbf7] to-[#f8f1e5] border border-[#ecdcc7] rounded-2xl p-4 shadow-sm mb-4">
+                <strong className="block text-xs font-black uppercase tracking-wider text-[#9b6b3a] mb-3">🚚 Select Delivery Date & Slot</strong>
+                
+                {/* Date Options */}
+                <div className="flex gap-2.5 mb-4 overflow-x-auto pb-1 scrollbar-none-style">
+                  {dateOptions.map((date, idx) => {
+                    const isSelected = selectedDate && selectedDate.toDateString() === date.toDateString();
+                    const isToday = date.toDateString() === new Date().toDateString();
+                    const label = isToday ? "Today" : idx === 1 && dateOptions[0].toDateString() === new Date().toDateString() ? "Tomorrow" : date.toLocaleDateString(undefined, { weekday: "short" });
+                    const dayNum = date.getDate();
+                    const monthLabel = date.toLocaleDateString(undefined, { month: "short" });
+                    
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setSelectedDate(date)}
+                        className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all cursor-pointer min-w-[75px] ${
+                          isSelected
+                            ? "bg-[#c4622d] text-white border-[#c4622d] shadow-sm scale-[1.03]"
+                            : "bg-white text-gray-700 border-gray-200 hover:border-amber-300 hover:bg-amber-50/10"
+                        }`}
+                      >
+                        <span className="text-[10px] font-extrabold uppercase tracking-wide opacity-80">{label}</span>
+                        <span className="text-lg font-black my-0.5">{dayNum}</span>
+                        <span className="text-[9px] font-bold uppercase opacity-80">{monthLabel}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Slot Options */}
+                <div>
+                  <span className="block text-[10px] font-extrabold uppercase tracking-wider text-gray-500 mb-2">Available Slots</span>
+                  {slotOptions.length === 0 ? (
+                    <p className="text-xs text-red-500 font-semibold italic">No slots available for today. Please select tomorrow.</p>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      {slotOptions.map((slot) => {
+                        const isSelected = selectedSlot === slot.id;
+                        return (
+                          <button
+                            key={slot.id}
+                            type="button"
+                            onClick={() => setSelectedSlot(slot.id)}
+                            className={`flex flex-col text-left p-2.5 rounded-xl border transition-all cursor-pointer ${
+                              isSelected
+                                ? "bg-white border-[#c4622d] ring-2 ring-[#c4622d]/20 shadow-sm"
+                                : "bg-white border-gray-200 hover:border-[#c4622d] hover:bg-amber-50/10"
+                            }`}
+                          >
+                            <span className="text-xs font-bold text-gray-900 flex items-center gap-1">
+                              {slot.label}
+                            </span>
+                            <span className="text-[10px] text-gray-500 font-semibold mt-0.5">{slot.time}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {selectedDate && selectedSlot && slotOptions.find(s => s.id === selectedSlot) && (
+                <div className="review-box bg-[#c4622d]/5 border border-[#c4622d]/10 rounded-xl p-3.5 flex items-center justify-between mb-4">
+                  <div>
+                    <span className="block text-[9px] font-extrabold uppercase tracking-wider text-[#c4622d]">Estimated Delivery Date</span>
+                    <strong className="text-xs text-gray-800 font-black mt-0.5 block">
+                      {selectedDate.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
+                    </strong>
+                    <span className="text-[10px] text-gray-500 font-semibold block mt-0.5">
+                      During {slotOptions.find(s => s.id === selectedSlot)?.label} ({slotOptions.find(s => s.id === selectedSlot)?.time})
+                    </span>
+                  </div>
+                  <span className="text-3xl">🚚</span>
+                </div>
+              )}
 
               <div className="space-y-1.5 border-b border-gray-100 pb-3 mb-3 text-xs text-gray-600">
                 <div className="flex justify-between">

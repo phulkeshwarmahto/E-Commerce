@@ -52,6 +52,8 @@ const orderSchema = new mongoose.Schema(
     total: { type: Number, required: true, min: 0 },
     status: { type: String, enum: ORDER_STATUSES, default: "Processing" },
     statusHistory: { type: [statusHistorySchema], default: [] },
+    deliverySlot: { type: String, default: "" },
+    estimatedDeliveryDate: { type: Date },
   },
   { timestamps: true },
 );
