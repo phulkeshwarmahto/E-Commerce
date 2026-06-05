@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, lazy, Suspense } from "react";
+import { useEffect, useMemo, useState, lazy, Suspense, useCallback } from "react";
 import {
   BrowserRouter,
   Route,
@@ -15,6 +15,7 @@ import { useCart } from "./hooks/useCart";
 import { useOrders } from "./hooks/useOrders";
 import { getStoredWishlist, setStoredWishlist } from "./store/wishlistStore";
 import { getWishlistRequest, toggleWishlistRequest } from "./api/wishlist.api";
+import { getCategoriesRequest } from "./api/category.api";
 
 // Lazy loaded page components for optimal initial bundle sizes and fast page loads
 const AccountPage = lazy(() => import("./pages/AccountPage").then(m => ({ default: m.AccountPage })));
@@ -35,6 +36,7 @@ const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage").then(
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage").then(m => ({ default: m.ResetPasswordPage })));
 const SellerStorePage = lazy(() => import("./pages/SellerStorePage").then(m => ({ default: m.SellerStorePage })));
 const VerifyEmailPage = lazy(() => import("./pages/VerifyEmailPage").then(m => ({ default: m.VerifyEmailPage })));
+const ContactPage = lazy(() => import("./pages/ContactPage").then(m => ({ default: m.ContactPage })));
 
 function ScrollToTop() {
 
@@ -53,6 +55,29 @@ export default function App() {
   const orders = useOrders(auth.token);
   const [wishlistIds, setWishlistIds] = useState(() => getStoredWishlist());
   const [toastMessage, setToastMessage] = useState("");
+
+  const [categories, setCategories] = useState([
+    { id: "1", name: "Pantry", emoji: "🥫", slug: "pantry" },
+    { id: "2", name: "Beverages", emoji: "🥤", slug: "beverages" },
+    { id: "3", name: "Home", emoji: "🏠", slug: "home" },
+    { id: "4", name: "Personal Care", emoji: "🧴", slug: "personal-care" },
+    { id: "5", name: "Health", emoji: "🩺", slug: "health" }
+  ]);
+
+  const reloadCategories = useCallback(async () => {
+    try {
+      const res = await getCategoriesRequest();
+      if (res.success && res.data) {
+        setCategories(res.data);
+      }
+    } catch (err) {
+      console.error("Failed to load categories:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    reloadCategories().catch(() => {});
+  }, [reloadCategories]);
 
   useEffect(() => {
     if (auth.token) {
@@ -96,9 +121,11 @@ export default function App() {
       orders,
       wishlistIds,
       toggleWishlist,
+      categories,
+      reloadCategories,
       notify: setToastMessage,
     }),
-    [auth, cart, orders, wishlistIds],
+    [auth, cart, orders, wishlistIds, categories, reloadCategories],
   );
 
   return (
@@ -131,6 +158,7 @@ export default function App() {
                   <Route path="/reset-password" element={<ResetPasswordPage />} />
                   <Route path="/seller/:id" element={<SellerStorePage />} />
                   <Route path="/verify-email" element={<VerifyEmailPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
                   <Route path="/vs-competitors" element={<VSCompetitorsPage />} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>

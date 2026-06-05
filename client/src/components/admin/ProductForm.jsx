@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { categories } from "../../constants/categories";
+import { useAppContext } from "../../hooks/useAppContext";
 import { Button } from "../ui/Button";
 import { ImageUploadZone } from "./ImageUploadZone";
 
@@ -17,6 +17,7 @@ const baseState = {
 };
 
 export function ProductForm({ product, onSubmit, onClose }) {
+  const { categories } = useAppContext();
   const [form, setForm] = useState(baseState);
   const [newVariant, setNewVariant] = useState({
     name: "",
@@ -108,8 +109,8 @@ export function ProductForm({ product, onSubmit, onClose }) {
               setForm((current) => ({ ...current, category: event.target.value }))
             }
           >
-            {categories.filter((category) => category !== "All").map((category) => (
-              <option key={category}>{category}</option>
+            {categories.filter((category) => category.name !== "All").map((category) => (
+              <option key={category.id || category.name} value={category.name}>{category.name}</option>
             ))}
           </select>
         </label>

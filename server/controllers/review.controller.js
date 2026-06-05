@@ -55,7 +55,7 @@ export const createReview = async (req, res) => {
         title: req.body.title || "Customer review",
         body: req.body.body,
         media: req.body.media || [],
-        isApproved: true,
+        isApproved: false,
       },
     },
     { upsert: true, new: true, setDefaultsOnInsert: true },

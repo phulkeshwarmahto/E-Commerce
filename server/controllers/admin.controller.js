@@ -193,9 +193,17 @@ export const getUsers = async (req, res) => {
   const limit = Math.max(1, Number(req.query.limit || 10));
   const skip = (page - 1) * limit;
 
+  const filters = {};
+  if (req.query.role) {
+    filters.role = req.query.role;
+  }
+  if (req.query.certificationStatus) {
+    filters.certificationStatus = req.query.certificationStatus;
+  }
+
   const [users, totalItems] = await Promise.all([
-    User.find().sort({ name: 1 }).skip(skip).limit(limit),
-    User.countDocuments(),
+    User.find(filters).sort({ name: 1 }).skip(skip).limit(limit),
+    User.countDocuments(filters),
   ]);
 
   const totalPages = Math.ceil(totalItems / limit);
@@ -570,5 +578,74 @@ export const getSalesAnalytics = async (req, res) => {
       orderData,
     })
   );
+};
+
+export const getPendingReviews = async (req, res) => {
+  const page = Math.max(1, Number(req.query.page || 1));
+  const limit = Math.max(1, Number(req.query.limit || 10));
+  const skip = (page - 1) * limit;
+
+  const [reviews, totalItems] = await Promise.all([
+    Review.find({ isApproved: false })
+      .populate("userId", "name email")
+      .populate("productId", "name emoji")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
+    Review.countDocuments({ isApproved: false }),
+  ]);
+
+  const totalPages = Math.ceil(totalItems / limit);
+
+  res.json(
+    new ApiResponse(true, "Pending reviews fetched.", {
+      reviews: reviews.map((r) => {
+        const client = r.toClient();
+        return {
+          ...client,
+          user: r.userId ? { name: r.userId.name, email: r.userId.email } : null,
+          product: r.productId ? { name: r.productId.name, emoji: r.productId.emoji } : null,
+        };
+      }),
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+    })
+  );
+};
+
+export const approveReview = async (req, res) => {
+  const review = await Review.findById(req.params.id);
+  if (!review) {
+    return res.status(404).json(new ApiResponse(false, "Review not found."));
+  }
+
+  review.isApproved = true;
+  await review.save();
+
+  // Recalculate product rating and count
+  const product = await Product.findById(review.productId);
+  if (product) {
+    const productReviews = await Review.find({ productId: product._id, isApproved: true });
+    product.reviewCount = productReviews.length;
+    product.rating =
+      productReviews.reduce((sum, entry) => sum + entry.rating, 0) / Math.max(productReviews.length, 1);
+    await product.save();
+  }
+
+  res.json(new ApiResponse(true, "Review approved and published.", { review: review.toClient() }));
+};
+
+export const rejectReview = async (req, res) => {
+  const review = await Review.findById(req.params.id);
+  if (!review) {
+    return res.status(404).json(new ApiResponse(false, "Review not found."));
+  }
+
+  await Review.deleteOne({ _id: req.params.id });
+  res.json(new ApiResponse(true, "Review rejected and deleted."));
 };
 

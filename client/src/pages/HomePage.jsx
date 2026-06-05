@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ProductGrid } from "../components/product/ProductGrid";
 import { Spinner } from "../components/ui/Spinner";
-import { categories } from "../constants/categories";
+import { useAppContext } from "../hooks/useAppContext";
 import { useProducts } from "../hooks/useProducts";
 import { useTimer } from "../hooks/useTimer";
 import { getBrandsRequest } from "../api/brand.api";
@@ -43,14 +43,7 @@ const brandAds = [
   },
 ];
 
-const categoryData = [
-  { name: "All",          emoji: "🛒", color: "bg-amber-50 border-amber-200",  text: "text-amber-700" },
-  { name: "Pantry",       emoji: "🫙", color: "bg-orange-50 border-orange-200", text: "text-orange-700" },
-  { name: "Beverages",    emoji: "☕", color: "bg-brown-50 border-[#c4622d]/20", text: "text-[#c4622d]" },
-  { name: "Home",         emoji: "🏠", color: "bg-blue-50 border-blue-200",    text: "text-blue-700" },
-  { name: "Personal Care",emoji: "💆", color: "bg-pink-50 border-pink-200",    text: "text-pink-700" },
-  { name: "Health",       emoji: "💊", color: "bg-green-50 border-green-200",  text: "text-green-700" },
-];
+// Deleted static categoryData
 
 const trustItems = [
   { icon: "🚚", title: "Free Delivery", sub: "On orders above ₹500" },
@@ -91,6 +84,40 @@ export function HomePage() {
   const navigate = useNavigate();
   const { products, featured, loading } = useProducts({});
   const timer = useTimer();
+  const { categories } = useAppContext();
+
+  const getCategoryStyles = (name, index) => {
+    const presets = {
+      pantry: { color: "bg-orange-50 border-orange-200", text: "text-orange-700" },
+      beverages: { color: "bg-brown-50 border-[#c4622d]/20", text: "text-[#c4622d]" },
+      home: { color: "bg-blue-50 border-blue-200", text: "text-blue-700" },
+      "personal care": { color: "bg-pink-50 border-pink-200", text: "text-pink-700" },
+      health: { color: "bg-green-50 border-green-200", text: "text-green-700" },
+    };
+    const key = name.toLowerCase().trim();
+    if (presets[key]) return presets[key];
+
+    const colors = [
+      { color: "bg-amber-50 border-amber-200", text: "text-amber-700" },
+      { color: "bg-orange-50 border-orange-200", text: "text-orange-700" },
+      { color: "bg-emerald-50 border-emerald-200", text: "text-emerald-700" },
+    ];
+    return colors[index % colors.length];
+  };
+
+  const displayCategories = useMemo(() => {
+    return [
+      { name: "All", emoji: "🛒", color: "bg-amber-50 border-amber-200", text: "text-amber-700" },
+      ...categories.map((c, idx) => {
+        const styles = getCategoryStyles(c.name, idx);
+        return {
+          name: c.name,
+          emoji: c.emoji || "📦",
+          ...styles
+        };
+      })
+    ];
+  }, [categories]);
 
   useDocumentMetadata({
     title: "India's Finest Everyday Essentials",
@@ -230,7 +257,7 @@ export function HomePage() {
           </div>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-          {categoryData.map(({ name, emoji, color, text }) => (
+          {displayCategories.map(({ name, emoji, color, text }) => (
             <Link
               key={name}
               to={name === "All" ? "/shop" : `/shop?category=${encodeURIComponent(name)}`}

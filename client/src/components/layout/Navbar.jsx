@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { categories } from "../../constants/categories";
 import { useAppContext } from "../../hooks/useAppContext";
 import { Modal } from "../ui/Modal";
 import {
@@ -109,7 +108,8 @@ function NavIconBtn({ icon, label, badge, onClick }) {
 export function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { cart, wishlistIds, user } = useAppContext();
+  const { cart, wishlistIds, user, categories } = useAppContext();
+  const categoryNames = ["All", ...categories.map((c) => c.name)];
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
@@ -215,7 +215,7 @@ export function Navbar() {
                        outline-none cursor-pointer hover:bg-[#e9e9e9] transition-colors
                        min-w-[130px] max-w-[160px]"
           >
-            {categories.map((cat) => (
+            {categoryNames.map((cat) => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
@@ -332,7 +332,7 @@ export function Navbar() {
             className="bg-[#f3f3f3] text-gray-700 text-sm px-2 border-r border-gray-300
                        outline-none min-w-[110px]"
           >
-            {categories.map((cat) => (
+            {categoryNames.map((cat) => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
@@ -381,7 +381,7 @@ export function Navbar() {
             Shop All
           </NavLink>
           <div className="w-px h-4 bg-white/20 mx-1" />
-          {categories.filter(c => c !== "All").map((cat) => (
+          {categoryNames.filter(c => c !== "All").map((cat) => (
             <NavLink
               key={cat}
               to={`/shop?category=${encodeURIComponent(cat)}`}

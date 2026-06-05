@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ProductGrid } from "../components/product/ProductGrid";
 import { Spinner } from "../components/ui/Spinner";
-import { categories } from "../constants/categories";
+import { useAppContext } from "../hooks/useAppContext";
 import { useDebounce } from "../hooks/useDebounce";
 import { useProducts } from "../hooks/useProducts";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
@@ -48,6 +48,8 @@ function FilterSection({ title, children, defaultOpen = true }) {
 export function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const { categories } = useAppContext();
+  const categoryNames = useMemo(() => ["All", ...categories.map((c) => c.name)], [categories]);
 
   useDocumentMetadata({
     title: "Shop Organic Essentials",
@@ -119,7 +121,7 @@ export function ShopPage() {
       {/* Category */}
       <FilterSection title="Category">
         <div className="space-y-1.5">
-          {categories.map((cat) => (
+          {categoryNames.map((cat) => (
             <label
               key={cat}
               className="flex items-center gap-2.5 cursor-pointer group"

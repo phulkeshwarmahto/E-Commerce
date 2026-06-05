@@ -8,7 +8,12 @@ export const createProductRequest = (payload) =>
 export const updateProductRequest = (id, payload) =>
   apiRequest(`/admin/products/${id}`, { method: "PUT", body: payload });
 
-export const getUsersRequest = (page = 1, limit = 10) => apiRequest(`/admin/users?page=${page}&limit=${limit}`);
+export const getUsersRequest = (page = 1, limit = 10, role = "", certificationStatus = "") => {
+  let query = `/admin/users?page=${page}&limit=${limit}`;
+  if (role) query += `&role=${role}`;
+  if (certificationStatus) query += `&certificationStatus=${certificationStatus}`;
+  return apiRequest(query);
+};
 export const banUserRequest = (id) => apiRequest(`/admin/users/${id}/ban`, { method: "PATCH" });
 export const unbanUserRequest = (id) => apiRequest(`/admin/users/${id}/unban`, { method: "PATCH" });
 
@@ -42,3 +47,10 @@ export const createAdminBrandRequest = (payload) =>
   apiRequest("/admin/brands", { method: "POST", body: payload });
 export const deleteAdminBrandRequest = (id) =>
   apiRequest(`/admin/brands/${id}`, { method: "DELETE" });
+
+export const getPendingReviewsRequest = (page = 1, limit = 10) =>
+  apiRequest(`/admin/reviews/pending?page=${page}&limit=${limit}`);
+export const approveReviewRequest = (id) =>
+  apiRequest(`/admin/reviews/${id}/approve`, { method: "PATCH" });
+export const rejectReviewRequest = (id) =>
+  apiRequest(`/admin/reviews/${id}/reject`, { method: "DELETE" });

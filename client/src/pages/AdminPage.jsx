@@ -21,8 +21,16 @@ import {
   getAdminReportsRequest,
   resolveReportRequest,
   getAdminSalesAnalyticsRequest,
+  getPendingReviewsRequest,
+  approveReviewRequest,
+  rejectReviewRequest,
 } from "../api/admin.api";
 import { getReturnRequests, updateReturnRequestStatus } from "../api/return.api";
+import {
+  createCategoryRequest,
+  updateCategoryRequest,
+  deleteCategoryRequest,
+} from "../api/category.api";
 import { AdminSidebar } from "../components/admin/AdminSidebar";
 import { OrderTable } from "../components/admin/OrderTable";
 import { ProductForm } from "../components/admin/ProductForm";
@@ -35,8 +43,30 @@ import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 import { ImageUploadZone } from "../components/admin/ImageUploadZone";
 
 export function AdminPage() {
-  const { user, notify } = useAppContext();
+  const { user, notify, categories, reloadCategories } = useAppContext();
   const [section, setSection] = useState("overview");
+
+  // Seller Verification states
+  const [sellersList, setSellersList] = useState([]);
+  const [loadingSellers, setLoadingSellers] = useState(false);
+  const [sellersPage, setSellersPage] = useState(1);
+  const [sellersPagination, setSellersPagination] = useState({
+    totalItems: 0,
+    totalPages: 1,
+    currentPage: 1,
+    limit: 10,
+  });
+
+  // Review Moderation states
+  const [pendingReviewsList, setPendingReviewsList] = useState([]);
+  const [loadingPendingReviews, setLoadingPendingReviews] = useState(false);
+  const [pendingReviewsPage, setPendingReviewsPage] = useState(1);
+  const [pendingReviewsPagination, setPendingReviewsPagination] = useState({
+    totalItems: 0,
+    totalPages: 1,
+    currentPage: 1,
+    limit: 10,
+  });
 
   useDocumentMetadata({
     title: "Administrator Panel",
@@ -193,6 +223,67 @@ export function AdminPage() {
       setLoadingAnalytics(false);
     }
   }, [notify]);
+
+  const loadPendingSellers = useCallback(async (page = 1) => {
+    setLoadingSellers(true);
+    try {
+      const data = await getUsersRequest(page, 10, "seller", "new");
+      setSellersList(data.users || []);
+      if (data.pagination) {
+        setSellersPagination(data.pagination);
+      }
+    } catch (err) {
+      notify(err.message || "Failed to load pending sellers.");
+    } finally {
+      setLoadingSellers(false);
+    }
+  }, [notify]);
+
+  const handleApproveSeller = async (sellerId) => {
+    try {
+      await updateUserCertificationRequest(sellerId, "certified");
+      notify("Seller verified and certified successfully!");
+      loadPendingSellers(sellersPage).catch(() => {});
+    } catch (err) {
+      notify(err.message || "Failed to verify seller.");
+    }
+  };
+
+  const loadPendingReviews = useCallback(async (page = 1) => {
+    setLoadingPendingReviews(true);
+    try {
+      const data = await getPendingReviewsRequest(page, 10);
+      setPendingReviewsList(data.reviews || []);
+      if (data.pagination) {
+        setPendingReviewsPagination(data.pagination);
+      }
+    } catch (err) {
+      notify(err.message || "Failed to load pending reviews.");
+    } finally {
+      setLoadingPendingReviews(false);
+    }
+  }, [notify]);
+
+  const handleApproveReview = async (id) => {
+    try {
+      await approveReviewRequest(id);
+      notify("Review approved and published!");
+      loadPendingReviews(pendingReviewsPage).catch(() => {});
+    } catch (err) {
+      notify(err.message || "Failed to approve review.");
+    }
+  };
+
+  const handleRejectReview = async (id) => {
+    if (!confirm("Are you sure you want to REJECT and delete this review?")) return;
+    try {
+      await rejectReviewRequest(id);
+      notify("Review rejected and deleted.");
+      loadPendingReviews(pendingReviewsPage).catch(() => {});
+    } catch (err) {
+      notify(err.message || "Failed to reject review.");
+    }
+  };
 
   const drawLineChart = (data, width = 600, height = 200) => {
     if (!data || data.length === 0) return { points: [], path: "", areaPath: "" };
@@ -427,6 +518,18 @@ export function AdminPage() {
       loadBrands().catch(() => {});
     }
   }, [section, loadBrands, user]);
+
+  useEffect(() => {
+    if (user?.role === "admin" && section === "seller-verifications") {
+      loadPendingSellers(sellersPage).catch(() => {});
+    }
+  }, [section, loadPendingSellers, user, sellersPage]);
+
+  useEffect(() => {
+    if (user?.role === "admin" && section === "review-moderations") {
+      loadPendingReviews(pendingReviewsPage).catch(() => {});
+    }
+  }, [section, loadPendingReviews, user, pendingReviewsPage]);
 
   if (!user || user.role !== "admin") {
     return (
@@ -1498,6 +1601,160 @@ export function AdminPage() {
               )}
             </div>
           ) : null}
+
+          {section === "categories" ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 stack">
+              <div className="section-head mb-4">
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900">📁 Category Management</h2>
+                  <p className="text-xs text-gray-500">Manage categories in the store catalog. Dynamic updates propagate storefront-wide immediately.</p>
+                </div>
+              </div>
+
+              {/* Create Category Form */}
+              <CategoryFormSection onCreated={reloadCategories} notify={notify} />
+
+              {/* Categories List */}
+              <CategoryListSection
+                categories={categories}
+                onUpdated={reloadCategories}
+                onDeleted={reloadCategories}
+                notify={notify}
+              />
+            </div>
+          ) : null}
+
+          {section === "seller-verifications" ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 stack">
+              <h2 className="text-lg font-bold text-gray-900 mb-1">🏪 Seller Verification Queue</h2>
+              <p className="text-xs text-gray-500 mb-4">Review and approve registration requests from new merchants on GramBazaar.</p>
+
+              {loadingSellers ? (
+                <p className="text-sm text-gray-500 py-6 text-center animate-pulse">Loading pending sellers...</p>
+              ) : sellersList.length > 0 ? (
+                <div className="table-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto mt-4">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-gray-50 border-b-2 border-gray-200">
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-left">Merchant</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-left">Email</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-left">Verification Status</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sellersList.map((seller) => (
+                        <tr key={seller.id} className="hover:bg-amber-50/20 transition-colors border-b border-gray-100 last:border-0">
+                          <td className="!py-3 !px-4 whitespace-nowrap">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xs shrink-0">
+                                {seller.name?.[0]?.toUpperCase() || "S"}
+                              </div>
+                              <span className="font-semibold text-gray-900 text-sm">{seller.name || "Unknown Merchant"}</span>
+                            </div>
+                          </td>
+                          <td className="!py-3 !px-4 text-gray-600 text-xs whitespace-nowrap">{seller.email}</td>
+                          <td className="!py-3 !px-4">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-amber-50 text-amber-700 border border-amber-200">
+                              {seller.certificationStatus || "new"}
+                            </span>
+                          </td>
+                          <td className="!py-3 !px-4 text-right">
+                            <button
+                              type="button"
+                              onClick={() => handleApproveSeller(seller.id)}
+                              className="px-3.5 py-2 bg-[#c4622d] text-white rounded-lg text-xs font-bold hover:bg-[#e07a4a] transition-all cursor-pointer border-0 shadow-sm"
+                            >
+                              ✅ Approve & Certify
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <Pagination
+                    currentPage={sellersPagination.currentPage}
+                    totalPages={sellersPagination.totalPages}
+                    onPageChange={(p) => setSellersPage(p)}
+                  />
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 py-10 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                  🎉 No pending seller verifications in the queue!
+                </p>
+              )}
+            </div>
+          ) : null}
+
+          {section === "review-moderations" ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 stack">
+              <h2 className="text-lg font-bold text-gray-900 mb-1">🛡️ Review Moderation Queue</h2>
+              <p className="text-xs text-gray-500 mb-4">Approve or reject customer product reviews before they are published to the storefront.</p>
+
+              {loadingPendingReviews ? (
+                <p className="text-sm text-gray-500 py-6 text-center animate-pulse">Loading pending reviews...</p>
+              ) : pendingReviewsList.length > 0 ? (
+                <div className="table-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto mt-4">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-gray-50 border-b-2 border-gray-200">
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-left">Product</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-left">Customer</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-left">Rating</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-left">Review</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pendingReviewsList.map((rev) => (
+                        <tr key={rev.id} className="hover:bg-amber-50/20 transition-colors border-b border-gray-100 last:border-0">
+                          <td className="!py-3 !px-4 text-xs font-semibold text-gray-900 whitespace-nowrap">
+                            <span className="mr-1">{rev.product?.emoji || "📦"}</span>
+                            {rev.product?.name || "Unknown Product"}
+                          </td>
+                          <td className="!py-3 !px-4 text-xs text-gray-750 whitespace-nowrap">
+                            {rev.name} ({rev.user?.email || "No email"})
+                          </td>
+                          <td className="!py-3 !px-4 text-amber-500 font-bold whitespace-nowrap">{"★".repeat(rev.rating)}</td>
+                          <td className="!py-3 !px-4 text-xs text-gray-600 max-w-[250px] break-words">
+                            <strong className="block text-gray-800 font-bold mb-0.5">{rev.title}</strong>
+                            {rev.body}
+                          </td>
+                          <td className="!py-3 !px-4 text-right whitespace-nowrap">
+                            <div className="flex justify-end gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => handleApproveReview(rev.id)}
+                                className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all cursor-pointer border-0"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleRejectReview(rev.id)}
+                                className="px-2.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition-all cursor-pointer border-0"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <Pagination
+                    currentPage={pendingReviewsPagination.currentPage}
+                    totalPages={pendingReviewsPagination.totalPages}
+                    onPageChange={(p) => setPendingReviewsPage(p)}
+                  />
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 py-10 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                  🎉 All customer reviews are fully moderated!
+                </p>
+              )}
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -1582,5 +1839,183 @@ export function AdminPage() {
         </Modal>
       ) : null}
     </section>
+  );
+}
+
+function CategoryFormSection({ onCreated, notify }) {
+  const [name, setName] = useState("");
+  const [emoji, setEmoji] = useState("📦");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    setSubmitting(true);
+    try {
+      await createCategoryRequest({ name: name.trim(), emoji: emoji.trim() });
+      notify("Category created successfully.");
+      setName("");
+      setEmoji("📦");
+      onCreated();
+    } catch (err) {
+      notify(err.message || "Failed to create category.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-gray-50 rounded-xl border border-gray-150 p-5 flex flex-wrap gap-4 items-end mb-6 text-sm">
+      <div className="field flex-grow min-w-[200px]">
+        <label className="label text-xs font-semibold text-gray-700">Category Name</label>
+        <input
+          type="text"
+          className="input py-2"
+          required
+          placeholder="e.g. Organic Grains"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </div>
+      <div className="field w-24">
+        <label className="label text-xs font-semibold text-gray-700">Emoji Icon</label>
+        <input
+          type="text"
+          className="input py-2 text-center"
+          required
+          placeholder="📦"
+          value={emoji}
+          onChange={(e) => setEmoji(e.target.value)}
+        />
+      </div>
+      <button type="submit" className="button button-primary py-2 font-bold px-5" disabled={submitting}>
+        {submitting ? "Creating..." : "➕ Add Category"}
+      </button>
+    </form>
+  );
+}
+
+function CategoryListSection({ categories, onUpdated, onDeleted, notify }) {
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({ name: "", emoji: "" });
+
+  const handleStartEdit = (cat) => {
+    setEditingId(cat.id);
+    setEditForm({ name: cat.name, emoji: cat.emoji });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+  };
+
+  const handleSaveEdit = async (id) => {
+    if (!editForm.name.trim()) return;
+    try {
+      await updateCategoryRequest(id, { name: editForm.name.trim(), emoji: editForm.emoji.trim() });
+      notify("Category updated successfully.");
+      setEditingId(null);
+      onUpdated();
+    } catch (err) {
+      notify(err.message || "Failed to update category.");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this category? Products in this category will need manual reassignment.")) return;
+    try {
+      await deleteCategoryRequest(id);
+      notify("Category deleted successfully.");
+      onDeleted();
+    } catch (err) {
+      notify(err.message || "Failed to delete category.");
+    }
+  };
+
+  return (
+    <div className="table-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <table className="w-full">
+        <thead>
+          <tr className="bg-gray-50 border-b border-gray-150">
+            <th className="w-16 text-center !py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Icon</th>
+            <th className="text-left !py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Name</th>
+            <th className="text-left !py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Slug</th>
+            <th className="w-48 text-right !py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {categories.map((cat) => {
+            const isEditing = editingId === cat.id;
+            return (
+              <tr key={cat.id || cat.name} className="hover:bg-amber-50/20 border-b border-gray-100 last:border-0 transition-colors">
+                <td className="text-center text-2xl !py-3 !px-4">
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      className="input py-1 text-center w-12 text-base"
+                      value={editForm.emoji}
+                      onChange={(e) => setEditForm({ ...editForm, emoji: e.target.value })}
+                    />
+                  ) : (
+                    cat.emoji
+                  )}
+                </td>
+                <td className="font-bold text-gray-900 !py-3 !px-4">
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      className="input py-1 text-sm w-full"
+                      value={editForm.name}
+                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                    />
+                  ) : (
+                    cat.name
+                  )}
+                </td>
+                <td className="text-gray-500 font-mono text-xs !py-3 !px-4">{cat.slug}</td>
+                <td className="text-right !py-3 !px-4">
+                  <div className="flex justify-end gap-2">
+                    {isEditing ? (
+                      <>
+                        <button
+                          type="button"
+                          className="text-emerald-600 hover:text-emerald-800 font-semibold text-xs py-1.5 px-3 border border-emerald-200 rounded-lg bg-emerald-50/50 hover:bg-emerald-50 transition-colors"
+                          onClick={() => handleSaveEdit(cat.id)}
+                        >
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          className="text-gray-500 hover:text-gray-750 font-semibold text-xs py-1.5 px-3 border border-gray-200 rounded-lg bg-white transition-colors"
+                          onClick={handleCancelEdit}
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          className="text-[#c4622d] hover:text-[#e07a4a] font-semibold text-xs py-1.5 px-3 border border-[#c4622d]/25 rounded-lg bg-amber-50/10 hover:bg-amber-50/30 transition-colors"
+                          onClick={() => handleStartEdit(cat)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="text-red-500 hover:text-red-700 font-semibold text-xs py-1.5 px-3 border border-red-200 rounded-lg bg-red-50/10 hover:bg-red-50/30 transition-colors"
+                          onClick={() => handleDelete(cat.id)}
+                        >
+                          Delete
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }

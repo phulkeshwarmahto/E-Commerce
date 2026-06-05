@@ -14,7 +14,7 @@ const footerLinks = {
     { label: "Shipping Policy", to: "#" },
     { label: "Easy Returns", to: "#" },
     { label: "Track Order", to: "/orders" },
-    { label: "Contact Us", to: "#" },
+    { label: "Contact Us", to: "/contact" },
     { label: "FAQ", to: "#" },
   ],
   Company: [

@@ -23,3 +23,23 @@ export const requireAuth = async (req, res, next) => {
   req.user = user;
   next();
 };
+
+export const optionalAuth = async (req, res, next) => {
+  const header = req.headers.authorization || "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
+  if (!token) {
+    return next();
+  }
+  try {
+    const tokenUser = parseToken(token);
+    if (tokenUser?.id) {
+      const user = await User.findById(tokenUser.id);
+      if (user && !user.isBanned) {
+        req.user = user;
+      }
+    }
+  } catch (err) {
+    // Ignore invalid token
+  }
+  next();
+};

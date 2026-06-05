@@ -21,6 +21,8 @@ import reportRoutes from "./routes/report.routes.js";
 import returnRoutes from "./routes/return.routes.js";
 import wishlistRoutes from "./routes/wishlist.routes.js";
 import sellerPublicRoutes from "./routes/sellerPublic.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
+import supportRoutes from "./routes/support.routes.js";
 import { apiRateLimiter } from "./middleware/rateLimit.middleware.js";
 import { errorHandler } from "./middleware/errorHandler.middleware.js";
 
@@ -77,6 +79,8 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/returns", returnRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/sellers", sellerPublicRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/support", supportRoutes);
 
 app.use(errorHandler);
 
