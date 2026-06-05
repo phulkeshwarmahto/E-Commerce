@@ -18,6 +18,9 @@ const userSchema = new mongoose.Schema(
       state: { type: String, default: "" },
       pincode: { type: String, default: "" },
     },
+    isBanned: { type: Boolean, default: false },
+    passwordResetToken: { type: String },
+    passwordResetExpires: { type: Date },
   },
   { timestamps: true },
 );

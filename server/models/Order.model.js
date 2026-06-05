@@ -12,6 +12,7 @@ const orderItemSchema = new mongoose.Schema(
     quantity: { type: Number, required: true, min: 1 },
     emoji: { type: String, default: "📦" },
     image: { type: String, default: "" },
+    variantName: { type: String },
   },
   { _id: false },
 );

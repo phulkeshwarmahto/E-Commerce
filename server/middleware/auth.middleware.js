@@ -16,6 +16,10 @@ export const requireAuth = async (req, res, next) => {
     return res.status(401).json({ success: false, message: "Authentication required." });
   }
 
+  if (user.isBanned) {
+    return res.status(403).json({ success: false, message: "Your account has been suspended by an administrator." });
+  }
+
   req.user = user;
   next();
 };

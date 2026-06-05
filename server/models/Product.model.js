@@ -30,6 +30,14 @@ const productSchema = new mongoose.Schema(
     isFeatured: { type: Boolean, default: false },
     seller: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },
     deliveryFee: { type: Number, default: 0, min: 0 },
+    variants: [
+      {
+        name: { type: String, required: true },
+        price: { type: Number, required: true },
+        originalPrice: { type: Number, default: null },
+        stockCount: { type: Number, default: 0 },
+      }
+    ],
   },
   { timestamps: true },
 );
