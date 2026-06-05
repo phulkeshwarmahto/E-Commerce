@@ -279,6 +279,18 @@ export function AuthPage() {
                 </div>
               </div>
 
+              {mode === "signin" && (
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/forgot-password")}
+                    className="text-xs font-semibold text-[#c4622d] hover:underline"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
+
               {/* Error */}
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3

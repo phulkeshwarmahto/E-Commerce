@@ -54,24 +54,63 @@ const buildOrderItems = async (rawItems) => {
     }
 
     const product = await Product.findById(productId);
-
-    if (!product || !product.inStock || product.stockCount < quantity) {
-      throw new Error(`${product?.name || "Product"} is unavailable in the requested quantity.`);
+    if (!product) {
+      throw new Error("One or more products were not found.");
     }
 
-    items.push({
-      product,
-      quantity,
-      subtotal: product.price * quantity,
-    });
+    if (item.variantName) {
+      const variant = product.variants.find((v) => v.name === item.variantName);
+      if (!variant || variant.stockCount < quantity) {
+        throw new Error(`Product "${product.name}" (${item.variantName}) is out of stock or unavailable in the requested quantity.`);
+      }
+      items.push({
+        product,
+        quantity,
+        variantName: item.variantName,
+        price: variant.price,
+        subtotal: variant.price * quantity,
+      });
+    } else {
+      if (!product.inStock || product.stockCount < quantity) {
+        throw new Error(`Product "${product.name}" is out of stock or unavailable in the requested quantity.`);
+      }
+      items.push({
+        product,
+        quantity,
+        price: product.price,
+        subtotal: product.price * quantity,
+      });
+    }
   }
 
   return items;
 };
 
 export const getOrders = async (req, res) => {
-  const orders = await Order.find({ userId: req.user._id }).sort({ createdAt: -1 });
-  res.json(new ApiResponse(true, "Orders fetched.", { orders: orders.map((order) => order.toClient()) }));
+  const page = Math.max(1, Number(req.query.page || 1));
+  const limit = Math.max(1, Number(req.query.limit || 10));
+  const skip = (page - 1) * limit;
+
+  const filters = { userId: req.user._id };
+
+  const [orders, totalItems] = await Promise.all([
+    Order.find(filters).sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Order.countDocuments(filters),
+  ]);
+
+  const totalPages = Math.ceil(totalItems / limit);
+
+  res.json(
+    new ApiResponse(true, "Orders fetched.", {
+      orders: orders.map((order) => order.toClient()),
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+    })
+  );
 };
 
 export const createOrder = async (req, res) => {
@@ -86,18 +125,19 @@ export const createOrder = async (req, res) => {
   const order = await Order.create({
     orderNumber,
     userId: req.user._id,
-    items: orderItems.map(({ product, quantity }) => ({
+    items: orderItems.map(({ product, quantity, variantName, price }) => ({
       productId: product._id,
       name: product.name,
-      price: product.price,
+      price,
       quantity,
       emoji: product.emoji,
       image: product.images?.[0]?.url || "",
+      variantName,
     })),
     shippingAddress: req.body.shippingAddress,
     payment: {
       method: paymentMethod,
-      status: paymentMethod === "cod" ? "pending" : "pending",
+      status: "pending",
     },
     subtotal,
     shippingFee,
@@ -108,14 +148,54 @@ export const createOrder = async (req, res) => {
     statusHistory: [{ status: "Processing", note: "Order created" }],
   });
 
+  // Decrement stock levels
   for (const item of orderItems) {
-    await Product.updateOne(
-      { _id: item.product._id },
-      {
-        $inc: { stockCount: -item.quantity },
-        $set: { inStock: item.product.stockCount - item.quantity > 0 },
-      },
-    );
+    if (item.variantName) {
+      await Product.updateOne(
+        { _id: item.product._id, "variants.name": item.variantName },
+        {
+          $inc: { "variants.$.stockCount": -item.quantity },
+        }
+      );
+    } else {
+      await Product.updateOne(
+        { _id: item.product._id },
+        {
+          $inc: { stockCount: -item.quantity },
+          $set: { inStock: item.product.stockCount - item.quantity > 0 },
+        },
+      );
+    }
+
+    // Trigger low stock check
+    try {
+      const refreshedProduct = await Product.findById(item.product._id);
+      let isLow = false;
+      let remaining = 0;
+
+      if (item.variantName) {
+        const matchingVariant = refreshedProduct.variants.find((v) => v.name === item.variantName);
+        if (matchingVariant && matchingVariant.stockCount < 5) {
+          isLow = true;
+          remaining = matchingVariant.stockCount;
+        }
+      } else {
+        if (refreshedProduct.stockCount < 5) {
+          isLow = true;
+          remaining = refreshedProduct.stockCount;
+        }
+      }
+
+      if (isLow && refreshedProduct.seller) {
+        await Notification.create({
+          userId: refreshedProduct.seller,
+          title: "⚠️ Low Stock Warning",
+          message: `Your product "${refreshedProduct.name}" ${item.variantName ? `(${item.variantName}) ` : ""}is running low. Only ${remaining} units remaining. Please replenish stock!`,
+        });
+      }
+    } catch (err) {
+      console.error("Error triggering low stock warning notification:", err);
+    }
   }
 
   await Cart.findOneAndUpdate({ userId: req.user._id }, { $set: { items: [] } }, { upsert: true });
@@ -128,7 +208,7 @@ export const createOrder = async (req, res) => {
         notifications.push({
           userId: item.product.seller,
           title: "📦 New Store Order Placed",
-          message: `Hurray! Customer ${req.user.name || req.user.email} has purchased your product "${item.product.name}" (Qty: ${item.quantity}). Order Ref: ${order.orderNumber}. Prepare the item for shipment!`,
+          message: `Hurray! Customer ${req.user.name || req.user.email} has purchased your product "${item.product.name}"${item.variantName ? ` (${item.variantName})` : ""} (Qty: ${item.quantity}). Order Ref: ${order.orderNumber}. Prepare the item for shipment!`,
         });
       }
     }
@@ -150,4 +230,68 @@ export const createOrder = async (req, res) => {
   }
 
   res.status(201).json(new ApiResponse(true, "Order placed.", { order: order.toClient() }));
+};
+
+export const cancelOrder = async (req, res) => {
+  const { id } = req.params;
+  const order = await Order.findOne({ orderNumber: id });
+
+  if (!order) {
+    return res.status(404).json(new ApiResponse(false, "Order not found."));
+  }
+
+  const isOwner = order.userId.toString() === req.user._id.toString();
+  const isAdmin = req.user.role === "admin";
+
+  if (!isOwner && !isAdmin) {
+    return res.status(403).json(new ApiResponse(false, "Unauthorized to cancel this order."));
+  }
+
+  if (order.status !== "Processing") {
+    return res.status(400).json(new ApiResponse(false, `Cannot cancel order in "${order.status}" status.`));
+  }
+
+  // Restore stock counts
+  for (const item of order.items) {
+    if (item.variantName) {
+      await Product.updateOne(
+        { _id: item.productId, "variants.name": item.variantName },
+        { $inc: { "variants.$.stockCount": item.quantity } }
+      );
+    } else {
+      await Product.updateOne(
+        { _id: item.productId },
+        {
+          $inc: { stockCount: item.quantity },
+          $set: { inStock: true },
+        }
+      );
+    }
+  }
+
+  order.status = "Cancelled";
+  order.statusHistory.push({ status: "Cancelled", note: `Cancelled by ${isAdmin ? "administrator" : "buyer"}` });
+  await order.save();
+
+  // Notify sellers
+  try {
+    const notifications = [];
+    for (const item of order.items) {
+      const product = await Product.findById(item.productId);
+      if (product && product.seller) {
+        notifications.push({
+          userId: product.seller,
+          title: "❌ Order Cancelled",
+          message: `Order ${order.orderNumber} containing "${item.name}"${item.variantName ? ` (${item.variantName})` : ""} was cancelled by the ${isAdmin ? "administrator" : "buyer"}.`,
+        });
+      }
+    }
+    if (notifications.length > 0) {
+      await Notification.insertMany(notifications);
+    }
+  } catch (err) {
+    console.error("Failed to notify sellers on cancellation:", err);
+  }
+
+  return res.json(new ApiResponse(true, "Order cancelled successfully.", { order: order.toClient() }));
 };

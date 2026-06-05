@@ -8,3 +8,7 @@ export const googleLoginRequest = (payload) =>
 export const meRequest = () => apiRequest("/auth/me");
 export const updateProfileRequest = (payload) =>
   apiRequest("/auth/profile", { method: "PUT", body: payload });
+export const forgotPasswordRequest = (payload) =>
+  apiRequest("/auth/forgot-password", { method: "POST", body: payload });
+export const resetPasswordRequest = (payload) =>
+  apiRequest("/auth/reset-password", { method: "POST", body: payload });

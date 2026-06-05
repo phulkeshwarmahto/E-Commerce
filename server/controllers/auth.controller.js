@@ -1,7 +1,9 @@
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { generateToken } from "../utils/generateToken.js";
 import { User } from "../models/User.model.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 export const register = async (req, res) => {
   const email = req.body.email.trim().toLowerCase();
@@ -168,4 +170,75 @@ export const updateProfile = async (req, res) => {
       user: user.toClient(),
     })
   );
+};
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json(new ApiResponse(false, "Email is required."));
+  }
+  const user = await User.findOne({ email: email.trim().toLowerCase() });
+  if (!user) {
+    return res.json(new ApiResponse(true, "If that email exists in our records, a reset link has been sent."));
+  }
+  const token = crypto.randomBytes(32).toString("hex");
+  user.passwordResetToken = token;
+  user.passwordResetExpires = Date.now() + 3600000; // 1 hour
+  await user.save();
+
+  const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+  const resetUrl = `${clientUrl}/reset-password?token=${token}`;
+
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: "GramBazaar Password Reset Link",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
+          <h2 style="color: #ea580c; border-bottom: 2px solid #f97316; padding-bottom: 10px;">Password Reset Request</h2>
+          <p style="font-size: 16px; color: #333;">Hello ${user.name || "User"},</p>
+          <p style="font-size: 16px; color: #333;">You requested to reset your password. Please click the button below to choose a new password:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetUrl}" style="background-color: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Reset Password</a>
+          </div>
+          <p style="font-size: 14px; color: #666;">This link is valid for 1 hour. If you did not request this, you can ignore this email safely.</p>
+        </div>
+      `,
+      text: `Hello ${user.name || "User"}, you requested a password reset. Please use the following link to reset your password: ${resetUrl}`,
+    });
+    return res.json(new ApiResponse(true, "If that email exists in our records, a reset link has been sent."));
+  } catch (err) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+    console.error("Failed to send forgot password email:", err.message);
+    return res.status(500).json(new ApiResponse(false, "Could not send password reset email. Please try again later."));
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password) {
+    return res.status(400).json(new ApiResponse(false, "Token and new password are required."));
+  }
+  if (password.length < 8) {
+    return res.status(400).json(new ApiResponse(false, "Password must be at least 8 characters."));
+  }
+  const user = await User.findOne({
+    passwordResetToken: token,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+  if (!user) {
+    return res.status(400).json(new ApiResponse(false, "Token is invalid or has expired."));
+  }
+
+  user.passwordHash = await bcrypt.hash(
+    password,
+    Number(process.env.BCRYPT_SALT_ROUNDS || 12)
+  );
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  return res.json(new ApiResponse(true, "Password has been reset successfully. You can now log in."));
 };
