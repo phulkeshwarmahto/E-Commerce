@@ -713,6 +713,22 @@ export function CheckoutPage() {
                 </div>
               )}
 
+              {/* Special Instructions */}
+              <div className="review-box bg-white border border-gray-150 rounded-2xl p-4 mb-4">
+                <label className="block text-[10px] font-extrabold uppercase tracking-wider text-gray-500 mb-2">
+                  📝 Special Instructions (Optional)
+                </label>
+                <textarea
+                  value={specialInstructions}
+                  onChange={(e) => setSpecialInstructions(e.target.value)}
+                  placeholder="e.g. Leave at door, ring bell twice, call before delivery..."
+                  maxLength={300}
+                  rows={2}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-xs text-gray-700 placeholder:text-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-[#c4622d]/30 focus:border-[#c4622d] transition-all bg-gray-50/50"
+                />
+                <span className="block text-right text-[9px] text-gray-400 mt-1">{specialInstructions.length}/300</span>
+              </div>
+
               <div className="space-y-1.5 border-b border-gray-100 pb-3 mb-3 text-xs text-gray-600">
                 <div className="flex justify-between">
                   <span>Subtotal</span>

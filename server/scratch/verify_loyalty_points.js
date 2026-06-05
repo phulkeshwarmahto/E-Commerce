@@ -1,94 +1,74 @@
-import mongoose from "mongoose";
-import dotenv from "dotenv";
-import { User } from "../models/User.model.js";
-import { Order } from "../models/Order.model.js";
+/**
+ * verify_loyalty_points.js
+ * ────────────────────────
+ * Validates the loyalty-points logic used by GramBazaar.
+ *
+ *   ▸ Points earning : 1 pt per ₹100 spent (floor)
+ *   ▸ Tier thresholds: Silver (0–500), Gold (501–1500), Platinum (1501+)
+ *   ▸ Checkout discount: Silver → 0%, Gold → 5%, Platinum → 10%
+ *
+ * Run:  node server/scratch/verify_loyalty_points.js
+ */
 
-dotenv.config({ path: "server/.env" });
+function calcPointsEarned(orderTotal) {
+  return Math.floor(orderTotal / 100);
+}
 
-const run = async () => {
-  console.log("Connecting to MongoDB...");
-  await mongoose.connect(process.env.MONGODB_URI);
-  console.log("Connected to MongoDB.");
+function calcTier(loyaltyPoints) {
+  if (loyaltyPoints > 1500) return "Platinum";
+  if (loyaltyPoints > 500) return "Gold";
+  return "Silver";
+}
 
-  // Create a temporary test user
-  const email = `test_loyalty_${Date.now()}@grambazaar.com`;
-  const testUser = await User.create({
-    name: "Loyalty Tester",
-    email,
-    loyaltyPoints: 0,
-    membership: "Silver",
-    role: "user",
-    isVerified: true
-  });
-  console.log(`Created test user: ${testUser.name} (${testUser.email}), Initial Points: ${testUser.loyaltyPoints}, Tier: ${testUser.membership}`);
+function calcCheckoutDiscount(loyaltyPoints, subtotal) {
+  let pct = 0;
+  if (loyaltyPoints > 1500) pct = 10;
+  else if (loyaltyPoints > 500) pct = 5;
+  return Math.round((subtotal * pct) / 100);
+}
 
-  // Helper to calculate loyalty discount locally
-  const getLoyaltyDiscount = (subtotal, points) => {
-    let loyaltyDiscountPercent = 0;
-    if (points > 1500) {
-      loyaltyDiscountPercent = 10;
-    } else if (points > 500) {
-      loyaltyDiscountPercent = 5;
+const cases = [
+  { name: "New user – zero points",       pts: 0,    subtotal: 1000, expectTier: "Silver",   expectDiscount: 0   },
+  { name: "Edge – exactly 500 pts",       pts: 500,  subtotal: 1000, expectTier: "Silver",   expectDiscount: 0   },
+  { name: "Gold threshold – 501 pts",     pts: 501,  subtotal: 1000, expectTier: "Gold",     expectDiscount: 50  },
+  { name: "Gold upper – 1500 pts",        pts: 1500, subtotal: 1000, expectTier: "Gold",     expectDiscount: 50  },
+  { name: "Platinum threshold – 1501 pts",pts: 1501, subtotal: 1000, expectTier: "Platinum", expectDiscount: 100 },
+  { name: "Platinum – 3000 pts",          pts: 3000, subtotal: 2500, expectTier: "Platinum", expectDiscount: 250 },
+  { name: "Points earned from ₹1350",     pts: 0,    subtotal: 1350, expectTier: "Silver",   expectDiscount: 0,  expectPointsEarned: 13 },
+  { name: "Points earned from ₹99",       pts: 0,    subtotal: 99,   expectTier: "Silver",   expectDiscount: 0,  expectPointsEarned: 0  },
+];
+
+let passed = 0;
+let failed = 0;
+
+console.log("\n🔍 Loyalty Points Verification\n");
+console.log("─".repeat(70));
+
+for (const tc of cases) {
+  const tier = calcTier(tc.pts);
+  const discount = calcCheckoutDiscount(tc.pts, tc.subtotal);
+  const earnedCheck = tc.expectPointsEarned !== undefined;
+
+  let ok = tier === tc.expectTier && discount === tc.expectDiscount;
+  if (earnedCheck) {
+    const earned = calcPointsEarned(tc.subtotal);
+    ok = ok && earned === tc.expectPointsEarned;
+  }
+
+  if (ok) {
+    console.log(`  ✅ PASS  ${tc.name}`);
+    passed++;
+  } else {
+    console.log(`  ❌ FAIL  ${tc.name}`);
+    console.log(`          Expected tier=${tc.expectTier}, got=${tier}`);
+    console.log(`          Expected discount=${tc.expectDiscount}, got=${discount}`);
+    if (earnedCheck) {
+      console.log(`          Expected pointsEarned=${tc.expectPointsEarned}, got=${calcPointsEarned(tc.subtotal)}`);
     }
-    return Math.round((subtotal * loyaltyDiscountPercent) / 100);
-  };
-
-  // 1. Initial State: Silver (0 points)
-  // Subtotal = 1000. Expected discount = 0.
-  let subtotal = 1000;
-  let discount = getLoyaltyDiscount(subtotal, testUser.loyaltyPoints);
-  console.log(`\n--- Test Case 1: Silver Tier (0 points) ---`);
-  console.log(`Subtotal: ₹${subtotal}, Expected Discount: ₹0, Calculated: ₹${discount}`);
-  if (discount === 0) {
-    console.log("✅ Case 1 Passed!");
-  } else {
-    console.error("❌ Case 1 Failed!");
+    failed++;
   }
+}
 
-  // Simulate updating points to Gold tier (e.g. 600 points)
-  testUser.loyaltyPoints = 600;
-  testUser.membership = "Gold";
-  await testUser.save();
-  console.log(`\nSimulating User Upgrade -> Points: ${testUser.loyaltyPoints}, Tier: ${testUser.membership}`);
-
-  // 2. Gold State: (600 points)
-  // Subtotal = 1000. Expected discount = 50 (5% of 1000).
-  discount = getLoyaltyDiscount(subtotal, testUser.loyaltyPoints);
-  console.log(`--- Test Case 2: Gold Tier (600 points) ---`);
-  console.log(`Subtotal: ₹${subtotal}, Expected Discount: ₹50, Calculated: ₹${discount}`);
-  if (discount === 50) {
-    console.log("✅ Case 2 Passed!");
-  } else {
-    console.error("❌ Case 2 Failed!");
-  }
-
-  // Simulate updating points to Platinum tier (e.g. 1600 points)
-  testUser.loyaltyPoints = 1600;
-  testUser.membership = "Platinum";
-  await testUser.save();
-  console.log(`\nSimulating User Upgrade -> Points: ${testUser.loyaltyPoints}, Tier: ${testUser.membership}`);
-
-  // 3. Platinum State: (1600 points)
-  // Subtotal = 1000. Expected discount = 100 (10% of 1000).
-  discount = getLoyaltyDiscount(subtotal, testUser.loyaltyPoints);
-  console.log(`--- Test Case 3: Platinum Tier (1600 points) ---`);
-  console.log(`Subtotal: ₹${subtotal}, Expected Discount: ₹100, Calculated: ₹${discount}`);
-  if (discount === 100) {
-    console.log("✅ Case 3 Passed!");
-  } else {
-    console.error("❌ Case 3 Failed!");
-  }
-
-  // Cleanup test user
-  await User.deleteOne({ _id: testUser._id });
-  console.log("\nCleaned up test user.");
-
-  await mongoose.disconnect();
-  console.log("Disconnected from MongoDB.");
-  process.exit(0);
-};
-
-run().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+console.log("─".repeat(70));
+console.log(`\n📊 Results: ${passed} passed, ${failed} failed out of ${cases.length}\n`);
+process.exit(failed > 0 ? 1 : 0);

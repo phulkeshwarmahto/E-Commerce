@@ -306,6 +306,7 @@ export function ProductForm({ product, onSubmit, onClose }) {
             </Button>
           </div>
         </div>
+      </div>
       <div className="quantity-discounts-container border border-dashed border-bd/60 rounded-xl p-4 mb-6 bg-dk/5">
         <h3 className="text-sm font-semibold text-orange mb-1">Quantity / Bulk Discounts</h3>
         <p className="text-[0.75rem] text-dk/60 mb-4">
