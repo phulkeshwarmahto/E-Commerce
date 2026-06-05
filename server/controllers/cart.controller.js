@@ -24,6 +24,7 @@ const buildCartItems = async (userId) => {
     .map((item) => ({
       productId: item.productId._id.toString(),
       quantity: item.quantity,
+      variantName: item.variantName,
       product: item.productId.toClient(),
     }));
 };
@@ -45,11 +46,22 @@ export const updateCart = async (req, res) => {
     }
 
     const product = await Product.findById(productId);
-    if (!product || !product.inStock || product.stockCount < quantity) {
+    if (!product || !product.inStock) {
       continue;
     }
 
-    normalized.push({ productId, quantity });
+    if (item.variantName) {
+      const variant = product.variants.find((v) => v.name === item.variantName);
+      if (!variant || variant.stockCount < quantity) {
+        continue;
+      }
+    } else {
+      if (product.stockCount < quantity) {
+        continue;
+      }
+    }
+
+    normalized.push({ productId, quantity, variantName: item.variantName });
   }
 
   await Cart.findOneAndUpdate(

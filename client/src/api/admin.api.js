@@ -8,7 +8,16 @@ export const createProductRequest = (payload) =>
 export const updateProductRequest = (id, payload) =>
   apiRequest(`/admin/products/${id}`, { method: "PUT", body: payload });
 
-export const getUsersRequest = () => apiRequest("/admin/users");
+export const getUsersRequest = (page = 1, limit = 10) => apiRequest(`/admin/users?page=${page}&limit=${limit}`);
+export const banUserRequest = (id) => apiRequest(`/admin/users/${id}/ban`, { method: "PATCH" });
+export const unbanUserRequest = (id) => apiRequest(`/admin/users/${id}/unban`, { method: "PATCH" });
+
+export const getAdminReportsRequest = (page = 1, limit = 10) => apiRequest(`/admin/reports?page=${page}&limit=${limit}`);
+export const resolveReportRequest = (id, action) =>
+  apiRequest(`/admin/reports/${id}/resolve`, { method: "PATCH", body: { action } });
+
+export const getAdminSalesAnalyticsRequest = () => apiRequest("/admin/analytics/sales");
+
 export const updateUserCreditScoreRequest = (id, score) =>
   apiRequest(`/admin/users/${id}/credit-score`, { method: "PATCH", body: { score } });
 export const updateUserCertificationRequest = (id, certificationStatus) =>

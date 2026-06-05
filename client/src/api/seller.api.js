@@ -15,3 +15,17 @@ export const deleteSellerProductRequest = (id) =>
 
 export const updateSellerOrderStatusRequest = (id, status, paymentStatus) =>
   apiRequest(`/seller/orders/${id}/status`, { method: "PATCH", body: { status, paymentStatus } });
+
+export const getSellerProductsRequest = (page = 1, limit = 10) =>
+  apiRequest(`/seller/products?page=${page}&limit=${limit}`);
+
+export const getSellerOrdersRequest = (page = 1, limit = 10) =>
+  apiRequest(`/seller/orders?page=${page}&limit=${limit}`);
+
+export const getSellerSalesAnalyticsRequest = () =>
+  apiRequest("/seller/analytics/sales");
+
+export const getSellerPublicProfileRequest = (id) =>
+  apiRequest(`/sellers/${id}`);
+
+

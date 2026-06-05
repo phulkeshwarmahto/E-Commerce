@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { statusColors } from "../constants/statusColors";
 import { useAppContext } from "../hooks/useAppContext";
@@ -7,15 +7,47 @@ import { formatDate } from "../utils/formatDate";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 import { ReportModal } from "../components/ui/ReportModal";
 import { InvoiceModal } from "../components/ui/InvoiceModal";
+import { Pagination } from "../components/ui/Pagination";
+import { Modal } from "../components/ui/Modal";
+import { createReturnRequest } from "../api/return.api";
 
 export function OrdersPage() {
   const navigate = useNavigate();
-  const { orders, user } = useAppContext();
+  const { orders, user, notify } = useAppContext();
   const [trackingId, setTrackingId] = useState(null);
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState({ type: "seller", id: "", name: "" });
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
   const [invoiceOrder, setInvoiceOrder] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [returnOrder, setReturnOrder] = useState(null);
+  const [returnReason, setReturnReason] = useState("");
+  const [returnItems, setReturnItems] = useState({});
+  const [submittingReturn, setSubmittingReturn] = useState(false);
+  const [returnModalOpen, setReturnModalOpen] = useState(false);
+
+  useEffect(() => {
+    orders.reload(currentPage, 5);
+  }, [currentPage, orders.reload]);
+
+  const handleOpenReturnModal = (order) => {
+    setReturnOrder(order);
+    const initialItems = {};
+    order.items.forEach((item) => {
+      const key = `${item.productId}-${item.variantName || ""}`;
+      initialItems[key] = {
+        productId: item.productId,
+        name: item.name,
+        quantity: item.quantity,
+        variantName: item.variantName,
+        selected: true,
+      };
+    });
+    setReturnItems(initialItems);
+    setReturnReason("");
+    setReturnModalOpen(true);
+  };
 
   useDocumentMetadata({
     title: "My Orders",
@@ -66,11 +98,13 @@ export function OrdersPage() {
             </div>
             <div className="order-card-body">
               <div className="order-items">
-                {order.items.map((item) => item.name).join(" · ")}
+                {order.items
+                  .map((item) => `${item.name}${item.variantName ? ` (${item.variantName})` : ""}`)
+                  .join(" · ")}
               </div>
               <div className="order-footer">
                 <span className="order-total">{formatCurrency(order.total)}</span>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center flex-wrap">
                   <button
                     type="button"
                     onClick={() => {
@@ -81,13 +115,40 @@ export function OrdersPage() {
                   >
                     📄 Invoice
                   </button>
+                  {order.status === "Delivered" && (
+                    <button
+                      type="button"
+                      onClick={() => handleOpenReturnModal(order)}
+                      className="px-3 py-1.5 border border-purple-200 text-purple-600 rounded-lg text-xs font-semibold hover:bg-purple-50 transition-all cursor-pointer bg-white"
+                    >
+                      ↩️ Request Return
+                    </button>
+                  )}
+                  {order.status === "Processing" && (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (confirm("Are you sure you want to cancel this order?")) {
+                          try {
+                            await orders.cancelOrder(order.id);
+                            notify("Order cancelled successfully.");
+                          } catch (err) {
+                            notify(err.message || "Failed to cancel order.");
+                          }
+                        }
+                      }}
+                      className="px-3 py-1.5 border border-red-200 text-red-500 rounded-lg text-xs font-semibold hover:text-red-700 hover:bg-red-50 transition-all cursor-pointer bg-white"
+                    >
+                      ❌ Cancel Order
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => {
                       setReportTarget({ type: "seller", id: order.id, name: `Order #${order.id}` });
                       setReportModalOpen(true);
                     }}
-                    className="px-3 py-1.5 border border-gray-200 text-gray-500 rounded-lg text-xs font-semibold hover:text-red-650 hover:border-red-200 hover:bg-red-50/10 transition-all cursor-pointer"
+                    className="px-3 py-1.5 border border-gray-200 text-gray-500 rounded-lg text-xs font-semibold hover:text-red-650 hover:border-red-200 hover:bg-red-50/10 transition-all cursor-pointer bg-white"
                   >
                     ⚠️ Report Issue
                   </button>
@@ -194,6 +255,13 @@ export function OrdersPage() {
           </div>
         ))}
       </div>
+        {orders.pagination && (
+          <Pagination
+            currentPage={orders.pagination.currentPage}
+            totalPages={orders.pagination.totalPages}
+            onPageChange={(p) => setCurrentPage(p)}
+          />
+        )}
       {/* Report Modal */}
       <ReportModal
         isOpen={reportModalOpen}
@@ -208,6 +276,134 @@ export function OrdersPage() {
         onClose={() => setInvoiceModalOpen(false)}
         order={invoiceOrder}
       />
+
+      {/* Return Request Modal */}
+      {returnModalOpen && returnOrder && (
+        <Modal title={`Return Request - Order #${returnOrder.orderNumber || returnOrder.id}`} onClose={() => setReturnModalOpen(false)}>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const itemsToReturn = Object.values(returnItems)
+                .filter((i) => i.selected)
+                .map((i) => ({
+                  productId: i.productId,
+                  name: i.name,
+                  quantity: i.quantity,
+                  variantName: i.variantName,
+                }));
+
+              if (itemsToReturn.length === 0) {
+                notify("Please select at least one item to return.");
+                return;
+              }
+
+              if (!returnReason.trim()) {
+                notify("Please provide a reason for the return.");
+                return;
+              }
+
+              setSubmittingReturn(true);
+              try {
+                await createReturnRequest({
+                  orderNumber: returnOrder.orderNumber || returnOrder.id,
+                  items: itemsToReturn,
+                  reason: returnReason.trim(),
+                });
+                notify("Return request submitted successfully. We will notify you once it's reviewed!");
+                setReturnModalOpen(false);
+                orders.reload(currentPage, 5);
+              } catch (err) {
+                notify(err.message || "Failed to submit return request.");
+              } finally {
+                setSubmittingReturn(false);
+              }
+            }}
+            className="p-5 space-y-4 text-left max-w-md"
+          >
+            <p className="text-xs text-gray-500">
+              Select items and quantities you wish to return, and provide a clear reason.
+            </p>
+
+            <div className="space-y-2.5 max-h-40 overflow-y-auto pr-1">
+              {Object.keys(returnItems).map((key) => {
+                const item = returnItems[key];
+                return (
+                  <div key={key} className="flex items-center justify-between border-b border-gray-100 pb-2 text-xs">
+                    <label className="flex items-center gap-2 font-semibold text-gray-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={item.selected}
+                        onChange={(e) =>
+                          setReturnItems((c) => ({
+                            ...c,
+                            [key]: { ...c[key], selected: e.target.checked },
+                          }))
+                        }
+                      />
+                      <span>
+                        {item.name} {item.variantName ? `(${item.variantName})` : ""}
+                      </span>
+                    </label>
+
+                    {item.selected && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-[10px] text-gray-400">Qty:</span>
+                        <input
+                          type="number"
+                          min="1"
+                          max={
+                            returnOrder.items.find(
+                              (oi) =>
+                                oi.productId === item.productId &&
+                                (oi.variantName || "") === (item.variantName || "")
+                            )?.quantity || 1
+                          }
+                          value={item.quantity}
+                          onChange={(e) =>
+                            setReturnItems((c) => ({
+                              ...c,
+                              [key]: { ...c[key], quantity: Math.max(1, Number(e.target.value)) },
+                            }))
+                          }
+                          className="w-12 border border-gray-300 rounded px-1.5 py-0.5 text-center font-bold text-gray-800 bg-white"
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="field block">
+              <span className="field-label text-xs font-bold text-gray-650 block mb-1">Reason for Return</span>
+              <textarea
+                value={returnReason}
+                onChange={(e) => setReturnReason(e.target.value)}
+                placeholder="e.g. Items received damaged, wrong item shipped, or quality issues"
+                className="input textarea text-xs h-20"
+                required
+              />
+            </div>
+
+            <div className="modal-actions pt-2 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setReturnModalOpen(false)}
+                className="px-4 py-2 border border-gray-200 text-gray-500 rounded-xl text-xs font-semibold hover:bg-gray-50 transition-all cursor-pointer bg-white"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={submittingReturn}
+                className="px-4 py-2 bg-[#c4622d] text-white rounded-xl text-xs font-bold hover:bg-[#e07a4a] transition-all cursor-pointer disabled:opacity-50"
+              >
+                {submittingReturn ? "Submitting..." : "Submit Return"}
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
     </section>
   );
 }

@@ -16,13 +16,20 @@ import {
   getAdminBrandsRequest,
   createAdminBrandRequest,
   deleteAdminBrandRequest,
+  banUserRequest,
+  unbanUserRequest,
+  getAdminReportsRequest,
+  resolveReportRequest,
+  getAdminSalesAnalyticsRequest,
 } from "../api/admin.api";
+import { getReturnRequests, updateReturnRequestStatus } from "../api/return.api";
 import { AdminSidebar } from "../components/admin/AdminSidebar";
 import { OrderTable } from "../components/admin/OrderTable";
 import { ProductForm } from "../components/admin/ProductForm";
 import { ProductTable } from "../components/admin/ProductTable";
 import { StatCard } from "../components/admin/StatCard";
 import { Modal } from "../components/ui/Modal";
+import { Pagination } from "../components/ui/Pagination";
 import { useAppContext } from "../hooks/useAppContext";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 import { ImageUploadZone } from "../components/admin/ImageUploadZone";
@@ -41,6 +48,37 @@ export function AdminPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [usersList, setUsersList] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
+  const [usersPage, setUsersPage] = useState(1);
+  const [usersPagination, setUsersPagination] = useState({
+    totalItems: 0,
+    totalPages: 1,
+    currentPage: 1,
+    limit: 10,
+  });
+
+  const [reportsList, setReportsList] = useState([]);
+  const [loadingReports, setLoadingReports] = useState(false);
+  const [reportsPage, setReportsPage] = useState(1);
+  const [reportsPagination, setReportsPagination] = useState({
+    totalItems: 0,
+    totalPages: 1,
+    currentPage: 1,
+    limit: 10,
+  });
+
+  const [returnsList, setReturnsList] = useState([]);
+  const [loadingReturns, setLoadingReturns] = useState(false);
+  const [returnsPage, setReturnsPage] = useState(1);
+  const [returnsPagination, setReturnsPagination] = useState({
+    totalItems: 0,
+    totalPages: 1,
+    currentPage: 1,
+    limit: 10,
+  });
+
+  const [salesAnalytics, setSalesAnalytics] = useState(null);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
+  const [hoveredPoint, setHoveredPoint] = useState(null);
 
   // Message modal state
   const [selectedUserForMsg, setSelectedUserForMsg] = useState(null);
@@ -99,17 +137,91 @@ export function AdminPage() {
     setDashboard(data);
   }, []);
 
-  const loadUsers = useCallback(async () => {
+  const loadUsers = useCallback(async (page = 1) => {
     setLoadingUsers(true);
     try {
-      const data = await getUsersRequest();
+      const data = await getUsersRequest(page, 10);
       setUsersList(data.users || []);
+      if (data.pagination) {
+        setUsersPagination(data.pagination);
+      }
     } catch (err) {
       notify(err.message || "Failed to load users.");
     } finally {
       setLoadingUsers(false);
     }
   }, [notify]);
+
+  const loadReports = useCallback(async (page = 1) => {
+    setLoadingReports(true);
+    try {
+      const res = await getAdminReportsRequest(page, 10);
+      setReportsList(res.reports || []);
+      if (res.pagination) {
+        setReportsPagination(res.pagination);
+      }
+    } catch (err) {
+      notify(err.message || "Failed to load reports.");
+    } finally {
+      setLoadingReports(false);
+    }
+  }, [notify]);
+
+  const loadReturns = useCallback(async (page = 1) => {
+    setLoadingReturns(true);
+    try {
+      const res = await getReturnRequests(page, 10);
+      setReturnsList(res.returns || []);
+      if (res.pagination) {
+        setReturnsPagination(res.pagination);
+      }
+    } catch (err) {
+      notify(err.message || "Failed to load returns.");
+    } finally {
+      setLoadingReturns(false);
+    }
+  }, [notify]);
+
+  const loadAnalytics = useCallback(async () => {
+    setLoadingAnalytics(true);
+    try {
+      const data = await getAdminSalesAnalyticsRequest();
+      setSalesAnalytics(data);
+    } catch (err) {
+      notify(err.message || "Failed to load sales analytics.");
+    } finally {
+      setLoadingAnalytics(false);
+    }
+  }, [notify]);
+
+  const drawLineChart = (data, width = 600, height = 200) => {
+    if (!data || data.length === 0) return { points: [], path: "", areaPath: "" };
+    const maxVal = Math.max(...data, 100);
+    const points = data.map((val, idx) => {
+      const x = (idx / (data.length - 1)) * (width - 40) + 20;
+      const y = height - ((val / maxVal) * (height - 40) + 20);
+      return { x, y, val, label: salesAnalytics.labels[idx] };
+    });
+    let path = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 1; i < points.length; i++) {
+      path += ` L ${points[i].x} ${points[i].y}`;
+    }
+    const areaPath = `${path} L ${points[points.length - 1].x} ${height - 10} L ${points[0].x} ${height - 10} Z`;
+    return { points, path, areaPath };
+  };
+
+  const drawBarChart = (data, width = 600, height = 200) => {
+    if (!data || data.length === 0) return [];
+    const maxVal = Math.max(...data, 5);
+    const barWidth = ((width - 40) / data.length) * 0.7;
+    const gap = ((width - 40) / data.length) * 0.3;
+    return data.map((val, idx) => {
+      const x = 20 + idx * (barWidth + gap);
+      const barHeight = (val / maxVal) * (height - 40);
+      const y = height - barHeight - 20;
+      return { x, y, width: barWidth, height: barHeight, val, label: salesAnalytics.labels[idx] };
+    });
+  };
 
   const loadCoupons = useCallback(async () => {
     setLoadingCoupons(true);
@@ -282,9 +394,27 @@ export function AdminPage() {
 
   useEffect(() => {
     if (user?.role === "admin" && (section === "users" || section === "messaging")) {
-      loadUsers().catch(() => {});
+      loadUsers(usersPage).catch(() => {});
     }
-  }, [section, loadUsers, user]);
+  }, [section, loadUsers, user, usersPage]);
+
+  useEffect(() => {
+    if (user?.role === "admin" && section === "reports") {
+      loadReports(reportsPage).catch(() => {});
+    }
+  }, [section, loadReports, user, reportsPage]);
+
+  useEffect(() => {
+    if (user?.role === "admin" && section === "returns") {
+      loadReturns(returnsPage).catch(() => {});
+    }
+  }, [section, loadReturns, user, returnsPage]);
+
+  useEffect(() => {
+    if (user?.role === "admin" && section === "overview") {
+      loadAnalytics().catch(() => {});
+    }
+  }, [section, loadAnalytics, user]);
 
   useEffect(() => {
     if (user?.role === "admin" && section === "coupons") {
@@ -380,6 +510,125 @@ export function AdminPage() {
                 <StatCard label="Products" value={dashboard.stats.products} />
                 <StatCard label="Users" value={dashboard.stats.users} />
               </div>
+
+              {/* Custom Interactive SVG Charts */}
+              {salesAnalytics ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-6 relative">
+                  {/* Revenue Line Chart */}
+                  <div className="bg-white rounded-2xl border border-gray-150 p-5 shadow-sm relative">
+                    <h3 className="text-xs font-black uppercase tracking-wider text-[#9b6b3a] mb-4">💰 30-Day Revenue Trend</h3>
+                    {(() => {
+                      const { points, path, areaPath } = drawLineChart(salesAnalytics.revenueData);
+                      return (
+                        <div className="relative">
+                          <svg className="w-full h-52 overflow-visible" viewBox="0 0 600 200">
+                            <defs>
+                              <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#c4622d" stopOpacity="0.4" />
+                                <stop offset="100%" stopColor="#c4622d" stopOpacity="0.0" />
+                              </linearGradient>
+                            </defs>
+                            {/* Gridlines */}
+                            <line x1="20" y1="20" x2="580" y2="20" stroke="#f1f1f1" strokeWidth="1" />
+                            <line x1="20" y1="80" x2="580" y2="80" stroke="#f1f1f1" strokeWidth="1" />
+                            <line x1="20" y1="140" x2="580" y2="140" stroke="#f1f1f1" strokeWidth="1" />
+                            <line x1="20" y1="180" x2="580" y2="180" stroke="#e0e0e0" strokeWidth="1.5" />
+
+                            {/* Area Path */}
+                            <path d={areaPath} fill="url(#revGrad)" />
+
+                            {/* Line Path */}
+                            <path d={path} fill="none" stroke="#c4622d" strokeWidth="3" strokeLinecap="round" />
+
+                            {/* Interactive Dots */}
+                            {points.map((p, idx) => (
+                              <circle
+                                key={idx}
+                                cx={p.x}
+                                cy={p.y}
+                                r="5"
+                                className="fill-white stroke-[#c4622d] stroke-[2px] cursor-pointer hover:r-[7px] hover:fill-[#c4622d] transition-all"
+                                onMouseEnter={() => setHoveredPoint({ ...p, type: "revenue" })}
+                                onMouseLeave={() => setHoveredPoint(null)}
+                              />
+                            ))}
+                          </svg>
+
+                          {/* Chart X Labels */}
+                          <div className="flex justify-between text-[9px] font-bold text-gray-400 mt-2 px-4">
+                            <span>{salesAnalytics.labels[0]}</span>
+                            <span>{salesAnalytics.labels[14]}</span>
+                            <span>{salesAnalytics.labels[29]}</span>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+
+                  {/* Orders Bar Chart */}
+                  <div className="bg-white rounded-2xl border border-gray-150 p-5 shadow-sm relative">
+                    <h3 className="text-xs font-black uppercase tracking-wider text-[#9b6b3a] mb-4">📦 30-Day Orders Volume</h3>
+                    {(() => {
+                      const bars = drawBarChart(salesAnalytics.orderData);
+                      return (
+                        <div className="relative">
+                          <svg className="w-full h-52 overflow-visible" viewBox="0 0 600 200">
+                            {/* Gridlines */}
+                            <line x1="20" y1="20" x2="580" y2="20" stroke="#f1f1f1" strokeWidth="1" />
+                            <line x1="20" y1="80" x2="580" y2="80" stroke="#f1f1f1" strokeWidth="1" />
+                            <line x1="20" y1="140" x2="580" y2="140" stroke="#f1f1f1" strokeWidth="1" />
+                            <line x1="20" y1="180" x2="580" y2="180" stroke="#e0e0e0" strokeWidth="1.5" />
+
+                            {/* Bars */}
+                            {bars.map((b, idx) => (
+                              <rect
+                                key={idx}
+                                x={b.x}
+                                y={b.y}
+                                width={b.width}
+                                height={b.height}
+                                rx="3"
+                                className="fill-[#e0a96d] hover:fill-[#c4622d] transition-colors cursor-pointer"
+                                onMouseEnter={() => setHoveredPoint({ ...b, type: "orders" })}
+                                onMouseLeave={() => setHoveredPoint(null)}
+                              />
+                            ))}
+                          </svg>
+
+                          {/* Chart X Labels */}
+                          <div className="flex justify-between text-[9px] font-bold text-gray-400 mt-2 px-4">
+                            <span>{salesAnalytics.labels[0]}</span>
+                            <span>{salesAnalytics.labels[14]}</span>
+                            <span>{salesAnalytics.labels[29]}</span>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+
+                  {/* Tooltip Overlay */}
+                  {hoveredPoint && (
+                    <div
+                      className="absolute z-20 bg-gray-900/90 text-white rounded-xl px-3 py-2 text-[10px] shadow-lg pointer-events-none font-bold backdrop-blur-sm border border-gray-800"
+                      style={{
+                        left: `${(hoveredPoint.x / 600) * 100}%`,
+                        top: `${(hoveredPoint.y / 200) * 100 - 25}%`,
+                        transform: "translateX(-50%)",
+                      }}
+                    >
+                      <div>Date: {hoveredPoint.label}</div>
+                      <div className="text-orange mt-0.5">
+                        {hoveredPoint.type === "revenue"
+                          ? `Revenue: ₹${hoveredPoint.val}`
+                          : `Orders: ${hoveredPoint.val}`}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs text-gray-405 italic my-4 px-2">Loading interactive sales charts...</p>
+              )}
+
               <OrderTable
                 orders={dashboard.recentOrders}
                 readOnly={true}
@@ -592,23 +841,264 @@ export function AdminPage() {
                               <span className="text-[10px] text-gray-400 font-semibold">/1000</span>
                             </div>
                           </td>
-                          <td className="!py-3 !px-4">
-                            <button
-                              type="button"
-                              className="button button-secondary text-[11px] px-3 py-1.5 inline-flex items-center gap-1 font-semibold whitespace-nowrap"
-                              onClick={() => setSelectedUserForMsg(usr)}
-                            >
-                              ✉️ Message
-                            </button>
+                          <td className="!py-3 !px-4 whitespace-nowrap">
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                className="button button-secondary text-[11px] px-3 py-1.5 inline-flex items-center gap-1 font-semibold whitespace-nowrap"
+                                onClick={() => setSelectedUserForMsg(usr)}
+                              >
+                                ✉️ Message
+                              </button>
+                              {usr.role !== "admin" && (
+                                usr.isBanned ? (
+                                  <button
+                                    type="button"
+                                    className="button text-[11px] px-3 py-1.5 inline-flex items-center gap-1 font-semibold whitespace-nowrap bg-emerald-600 hover:bg-emerald-700 text-white border-0 cursor-pointer rounded-lg"
+                                    onClick={async () => {
+                                      try {
+                                        await unbanUserRequest(usr.id);
+                                        notify(`${usr.name || "User"} has been unbanned.`);
+                                        loadUsers(usersPage).catch(() => {});
+                                      } catch (err) {
+                                        notify(err.message || "Failed to unban user.");
+                                      }
+                                    }}
+                                  >
+                                    😇 Unban
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className="button text-[11px] px-3 py-1.5 inline-flex items-center gap-1 font-semibold whitespace-nowrap bg-red-600 hover:bg-red-700 text-white border-0 cursor-pointer rounded-lg"
+                                    onClick={async () => {
+                                      if (confirm(`Are you sure you want to ban ${usr.name || "this user"}? They won't be able to log in.`)) {
+                                        try {
+                                          await banUserRequest(usr.id);
+                                          notify(`${usr.name || "User"} has been banned.`);
+                                          loadUsers(usersPage).catch(() => {});
+                                        } catch (err) {
+                                          notify(err.message || "Failed to ban user.");
+                                        }
+                                      }
+                                    }}
+                                  >
+                                    🚫 Ban
+                                  </button>
+                                )
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
+                  <Pagination
+                    currentPage={usersPagination.currentPage}
+                    totalPages={usersPagination.totalPages}
+                    onPageChange={(p) => setUsersPage(p)}
+                  />
                 </div>
               ) : (
                 <p className="text-sm text-gray-500 py-10 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
                   No users match your filters.
+                </p>
+              )}
+            </div>
+          ) : null}
+
+          {section === "reports" ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 stack">
+              <h2 className="text-lg font-bold text-gray-900 mb-1">⚠️ Reports Moderation Dashboard</h2>
+              <p className="text-xs text-gray-500 mb-4">Investigate and handle reports on products or reviews from users.</p>
+
+              {loadingReports ? (
+                <p className="text-sm text-gray-500 py-6 text-center animate-pulse">Loading reports...</p>
+              ) : reportsList.length > 0 ? (
+                <div className="table-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto mt-4">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-gray-50 border-b-2 border-gray-200">
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Reported By</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Target Type</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Reason</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Date</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {reportsList.map((rpt) => (
+                        <tr key={rpt.id} className="hover:bg-amber-50/40 transition-colors">
+                          <td className="!py-3 !px-4 text-sm font-semibold text-gray-900 whitespace-nowrap">
+                            {rpt.reporterName} ({rpt.reporterEmail})
+                          </td>
+                          <td className="!py-3 !px-4 whitespace-nowrap">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                              rpt.targetType === "product" ? "bg-amber-100 text-amber-800" : "bg-blue-100 text-blue-800"
+                            }`}>
+                              {rpt.targetType}
+                            </span>
+                          </td>
+                          <td className="!py-3 !px-4 text-gray-700 text-xs">{rpt.reason}</td>
+                          <td className="!py-3 !px-4 text-gray-505 text-xs whitespace-nowrap">
+                            {new Date(rpt.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="!py-3 !px-4">
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                className="button text-[10px] px-2.5 py-1.5 font-bold bg-gray-500 hover:bg-gray-600 text-white rounded-lg border-0 cursor-pointer"
+                                onClick={async () => {
+                                  try {
+                                    await resolveReportRequest(rpt.id, "resolve");
+                                    notify("Report marked as resolved.");
+                                    loadReports(reportsPage).catch(() => {});
+                                  } catch (err) {
+                                    notify(err.message || "Failed to resolve report.");
+                                  }
+                                }}
+                              >
+                                Dismiss
+                              </button>
+                              <button
+                                type="button"
+                                className="button text-[10px] px-2.5 py-1.5 font-bold bg-red-600 hover:bg-red-700 text-white rounded-lg border-0 cursor-pointer"
+                                onClick={async () => {
+                                  if (confirm(`Are you sure you want to resolve and DELETE the reported ${rpt.targetType}?`)) {
+                                    try {
+                                      await resolveReportRequest(rpt.id, "deleteTarget");
+                                      notify(`Report resolved and target ${rpt.targetType} deleted.`);
+                                      loadReports(reportsPage).catch(() => {});
+                                      loadDashboard().catch(() => {});
+                                    } catch (err) {
+                                      notify(err.message || "Failed to delete target.");
+                                    }
+                                  }
+                                }}
+                              >
+                                Delete Target
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <Pagination
+                    currentPage={reportsPagination.currentPage}
+                    totalPages={reportsPagination.totalPages}
+                    onPageChange={(p) => setReportsPage(p)}
+                  />
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 py-10 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                  No active reports to moderate.
+                </p>
+              )}
+            </div>
+          ) : null}
+
+          {section === "returns" ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 stack">
+              <h2 className="text-lg font-bold text-gray-900 mb-1">🔄 Customer Returns Management</h2>
+              <p className="text-xs text-gray-500 mb-4">Review, approve, or reject customer return requests. Approvals will restore stock and trigger refunds.</p>
+
+              {loadingReturns ? (
+                <p className="text-sm text-gray-500 py-6 text-center animate-pulse">Loading return requests...</p>
+              ) : returnsList.length > 0 ? (
+                <div className="table-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto mt-4">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-gray-50 border-b-2 border-gray-200">
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Buyer</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Order Number</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Items</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Reason</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Status</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {returnsList.map((ret) => (
+                        <tr key={ret.id} className="hover:bg-amber-50/40 transition-colors">
+                          <td className="!py-3 !px-4 text-sm font-semibold text-gray-900 whitespace-nowrap">
+                            {ret.userId?.name || "Customer"} ({ret.userId?.email || ""})
+                          </td>
+                          <td className="!py-3 !px-4 font-bold text-xs text-gray-650 whitespace-nowrap">
+                            #{ret.orderNumber}
+                          </td>
+                          <td className="!py-3 !px-4 text-xs text-gray-800">
+                            {ret.items.map((it) => `${it.name} ${it.variantName ? `(${it.variantName})` : ""} ×${it.quantity}`).join(" · ")}
+                          </td>
+                          <td className="!py-3 !px-4 text-xs text-gray-600">{ret.reason}</td>
+                          <td className="!py-3 !px-4 whitespace-nowrap">
+                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide border ${
+                              ret.status === "pending"
+                                ? "bg-amber-50 text-amber-700 border-amber-200"
+                                : ret.status === "approved"
+                                ? "bg-green-50 text-green-700 border-green-200"
+                                : "bg-red-50 text-red-700 border-red-200"
+                            }`}>
+                              {ret.status}
+                            </span>
+                          </td>
+                          <td className="!py-3 !px-4">
+                            <div className="flex gap-2">
+                              {ret.status === "pending" ? (
+                                <>
+                                  <button
+                                    type="button"
+                                    className="button text-[10px] px-2.5 py-1.5 font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg border-0 cursor-pointer"
+                                    onClick={async () => {
+                                      if (confirm("Are you sure you want to APPROVE this return request? Stock will be restored and refund initiated.")) {
+                                        try {
+                                          await updateReturnRequestStatus(ret.id, "approved");
+                                          notify("Return request approved.");
+                                          loadReturns(returnsPage).catch(() => {});
+                                        } catch (err) {
+                                          notify(err.message || "Failed to approve return.");
+                                        }
+                                      }
+                                    }}
+                                  >
+                                    Approve
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="button text-[10px] px-2.5 py-1.5 font-bold bg-red-600 hover:bg-red-700 text-white rounded-lg border-0 cursor-pointer"
+                                    onClick={async () => {
+                                      if (confirm("Are you sure you want to REJECT this return request?")) {
+                                        try {
+                                          await updateReturnRequestStatus(ret.id, "rejected");
+                                          notify("Return request rejected.");
+                                          loadReturns(returnsPage).catch(() => {});
+                                        } catch (err) {
+                                          notify(err.message || "Failed to reject return.");
+                                        }
+                                      }
+                                    }}
+                                  >
+                                    Reject
+                                  </button>
+                                </>
+                              ) : (
+                                <span className="text-gray-400 text-xs italic">Handled</span>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <Pagination
+                    currentPage={returnsPagination.currentPage}
+                    totalPages={returnsPagination.totalPages}
+                    onPageChange={(p) => setReturnsPage(p)}
+                  />
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 py-10 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                  No return requests recorded yet.
                 </p>
               )}
             </div>

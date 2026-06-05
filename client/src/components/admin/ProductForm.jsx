@@ -13,10 +13,17 @@ const baseState = {
   badge: "",
   images: [],
   deliveryFee: "",
+  variants: [],
 };
 
 export function ProductForm({ product, onSubmit, onClose }) {
   const [form, setForm] = useState(baseState);
+  const [newVariant, setNewVariant] = useState({
+    name: "",
+    price: "",
+    originalPrice: "",
+    stockCount: "",
+  });
 
   useEffect(() => {
     if (!product) {
@@ -34,8 +41,39 @@ export function ProductForm({ product, onSubmit, onClose }) {
       badge: product.badge || "",
       images: product.images || [],
       deliveryFee: product.deliveryFee !== undefined ? product.deliveryFee : "",
+      variants: product.variants || [],
     });
   }, [product]);
+
+  const handleAddVariant = () => {
+    if (!newVariant.name || !newVariant.price) {
+      alert("Please enter variant name and price.");
+      return;
+    }
+    const variant = {
+      name: newVariant.name,
+      price: Number(newVariant.price),
+      originalPrice: newVariant.originalPrice ? Number(newVariant.originalPrice) : null,
+      stockCount: Number(newVariant.stockCount || 0),
+    };
+    setForm((current) => ({
+      ...current,
+      variants: [...(current.variants || []), variant],
+    }));
+    setNewVariant({
+      name: "",
+      price: "",
+      originalPrice: "",
+      stockCount: "",
+    });
+  };
+
+  const handleRemoveVariant = (indexToRemove) => {
+    setForm((current) => ({
+      ...current,
+      variants: (current.variants || []).filter((_, index) => index !== indexToRemove),
+    }));
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -44,6 +82,7 @@ export function ProductForm({ product, onSubmit, onClose }) {
       ...form,
       deliveryFee: Number(form.deliveryFee || 0),
       images: form.images || [],
+      variants: form.variants || [],
     });
     setForm(baseState);
   };
@@ -147,6 +186,90 @@ export function ProductForm({ product, onSubmit, onClose }) {
           />
         </label>
       </div>
+
+      <div className="variants-container border border-dashed border-bd/60 rounded-xl p-4 mb-6 bg-dk/5">
+        <h3 className="text-sm font-semibold text-orange mb-1">Product Variants (Weight / Size)</h3>
+        <p className="text-[0.75rem] text-dk/60 mb-4">
+          Add options like "250g", "1kg", or "pack of 4" with custom pricing and stock.
+        </p>
+
+        {form.variants && form.variants.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {form.variants.map((v, idx) => (
+              <div
+                key={idx}
+                className="flex items-center gap-2 bg-orange/10 border border-orange/20 text-orange rounded-full px-3 py-1 text-xs"
+              >
+                <span className="font-bold">{v.name}</span>
+                <span className="opacity-75">
+                  ₹{v.price} {v.originalPrice ? <del className="text-[10px]">₹{v.originalPrice}</del> : ""} (Stock: {v.stockCount})
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveVariant(idx)}
+                  className="hover:text-red-500 font-bold ml-1"
+                  title="Remove variant"
+                >
+                  &times;
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 items-end">
+          <label className="field mb-0">
+            <span className="field-label text-[10px]">Variant Name</span>
+            <input
+              className="input text-xs py-1"
+              placeholder="e.g. 500g"
+              value={newVariant.name}
+              onChange={(e) => setNewVariant((c) => ({ ...c, name: e.target.value }))}
+            />
+          </label>
+          <label className="field mb-0">
+            <span className="field-label text-[10px]">Price (₹)</span>
+            <input
+              className="input text-xs py-1"
+              type="number"
+              placeholder="150"
+              value={newVariant.price}
+              onChange={(e) => setNewVariant((c) => ({ ...c, price: e.target.value }))}
+            />
+          </label>
+          <label className="field mb-0">
+            <span className="field-label text-[10px]">Original Price (₹)</span>
+            <input
+              className="input text-xs py-1"
+              type="number"
+              placeholder="180"
+              value={newVariant.originalPrice}
+              onChange={(e) => setNewVariant((c) => ({ ...c, originalPrice: e.target.value }))}
+            />
+          </label>
+          <div className="flex gap-2 items-end">
+            <label className="field mb-0 flex-1">
+              <span className="field-label text-[10px]">Stock</span>
+              <input
+                className="input text-xs py-1"
+                type="number"
+                placeholder="20"
+                value={newVariant.stockCount}
+                onChange={(e) => setNewVariant((c) => ({ ...c, stockCount: e.target.value }))}
+              />
+            </label>
+            <Button
+              type="button"
+              variant="secondary"
+              className="h-[38px] px-3 text-xs shrink-0"
+              onClick={handleAddVariant}
+            >
+              Add
+            </Button>
+          </div>
+        </div>
+      </div>
+
       <ImageUploadZone
         value={form.images}
         onChange={(images) => setForm((current) => ({ ...current, images }))}

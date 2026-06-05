@@ -3,9 +3,15 @@ import { createOrderRequest, getOrdersRequest } from "../api/orders.api";
 
 export function useOrders(token) {
   const [orders, setOrders] = useState([]);
+  const [pagination, setPagination] = useState({
+    totalItems: 0,
+    totalPages: 1,
+    currentPage: 1,
+    limit: 10,
+  });
   const [loading, setLoading] = useState(false);
 
-  const loadOrders = useCallback(async () => {
+  const loadOrders = useCallback(async (page = 1, limit = 10) => {
     if (!token) {
       setOrders([]);
       return;
@@ -13,8 +19,11 @@ export function useOrders(token) {
 
     setLoading(true);
     try {
-      const data = await getOrdersRequest();
+      const data = await getOrdersRequest(page, limit);
       setOrders(data.orders);
+      if (data.pagination) {
+        setPagination(data.pagination);
+      }
     } finally {
       setLoading(false);
     }
@@ -30,5 +39,20 @@ export function useOrders(token) {
     return data.order;
   };
 
-  return { orders, loading, placeOrder, reload: loadOrders };
+  const cancelOrder = async (orderId) => {
+    const data = await cancelOrderRequest(orderId);
+    setOrders((current) =>
+      current.map((o) => (o.id === orderId ? data.order : o))
+    );
+    return data.order;
+  };
+
+  return {
+    orders,
+    pagination,
+    loading,
+    placeOrder,
+    cancelOrder,
+    reload: loadOrders,
+  };
 }

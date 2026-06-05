@@ -20,10 +20,25 @@ export function useCart(token) {
       .then((data) => {
         const nextItems = data.items
           .filter((item) => item.product)
-          .map((item) => ({
-            ...item.product,
-            quantity: item.quantity,
-          }));
+          .map((item) => {
+            const prod = item.product;
+            let price = prod.price;
+            let originalPrice = prod.originalPrice;
+            if (item.variantName && prod.variants) {
+              const variant = prod.variants.find((v) => v.name === item.variantName);
+              if (variant) {
+                price = variant.price;
+                originalPrice = variant.originalPrice;
+              }
+            }
+            return {
+              ...prod,
+              price,
+              originalPrice,
+              variantName: item.variantName,
+              quantity: item.quantity,
+            };
+          });
 
         if (nextItems.length > 0) {
           setItems(nextItems);
@@ -41,6 +56,7 @@ export function useCart(token) {
       nextItems.map((item) => ({
         productId: item.id,
         quantity: item.quantity,
+        variantName: item.variantName,
       })),
     );
   };
@@ -55,10 +71,14 @@ export function useCart(token) {
 
   const addToCart = (product) => {
     updateItems((current) => {
-      const existing = current.find((item) => item.id === product.id);
+      const existing = current.find(
+        (item) => item.id === product.id && item.variantName === product.variantName,
+      );
       if (existing) {
         return current.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item,
+          item.id === product.id && item.variantName === product.variantName
+            ? { ...item, quantity: item.quantity + 1 }
+            : item,
         );
       }
 
@@ -66,16 +86,20 @@ export function useCart(token) {
     });
   };
 
-  const updateQuantity = (productId, quantity) => {
+  const updateQuantity = (productId, quantity, variantName) => {
     updateItems((current) =>
       current.map((item) =>
-        item.id === productId ? { ...item, quantity: Math.max(1, quantity) } : item,
+        item.id === productId && item.variantName === variantName
+          ? { ...item, quantity: Math.max(1, quantity) }
+          : item,
       ),
     );
   };
 
-  const removeFromCart = (productId) => {
-    updateItems((current) => current.filter((item) => item.id !== productId));
+  const removeFromCart = (productId, variantName) => {
+    updateItems((current) =>
+      current.filter((item) => !(item.id === productId && item.variantName === variantName)),
+    );
   };
 
   const clearCart = () => updateItems([]);

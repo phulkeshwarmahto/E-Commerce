@@ -305,6 +305,7 @@ export function CheckoutPage() {
         items: cart.items.map((item) => ({
           productId: item.id,
           quantity: item.quantity,
+          variantName: item.variantName,
         })),
         shippingAddress: form,
         paymentMethod,
@@ -566,10 +567,10 @@ export function CheckoutPage() {
         <aside className="mini-cart">
           <h4>Your Items ({cart.summary.itemCount})</h4>
           {cart.items.map((item) => (
-            <div key={item.id} className="mini-item">
+            <div key={`${item.id}-${item.variantName || ""}`} className="mini-item">
               <span className="me">{item.emoji || "📦"}</span>
               <span className="mn">
-                {item.name} ×{item.quantity}
+                {item.name} {item.variantName ? `(${item.variantName})` : ""} ×{item.quantity}
               </span>
               <span className="mp">{formatCurrency(item.price * item.quantity)}</span>
             </div>

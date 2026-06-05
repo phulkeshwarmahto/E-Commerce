@@ -167,8 +167,21 @@ export function ProductDetailPage() {
     );
   }
 
-  const discount = product.originalPrice
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+  const [selectedVariant, setSelectedVariant] = useState(null);
+
+  useEffect(() => {
+    if (product?.variants && product.variants.length > 0) {
+      setSelectedVariant(product.variants[0]);
+    } else {
+      setSelectedVariant(null);
+    }
+  }, [product]);
+
+  const displayPrice = selectedVariant ? selectedVariant.price : product.price;
+  const displayOriginalPrice = selectedVariant ? selectedVariant.originalPrice : product.originalPrice;
+  const displayInStock = selectedVariant ? (selectedVariant.stockCount > 0) : product.inStock;
+  const displayDiscount = displayOriginalPrice
+    ? Math.round(((displayOriginalPrice - displayPrice) / displayOriginalPrice) * 100)
     : 0;
 
   const ratingCounts = Array.from({ length: 5 }, (_, i) => {
@@ -254,6 +267,22 @@ export function ProductDetailPage() {
                 <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-snug">
                   {product.name}
                 </h1>
+                {product.seller && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Sold by:{" "}
+                    <button
+                      onClick={() => navigate(`/seller/${product.seller._id || product.seller}`)}
+                      className="font-bold text-[#c4622d] hover:underline cursor-pointer bg-transparent border-0 p-0 text-xs"
+                    >
+                      {product.seller.name || "GramBazaar Partner"}
+                    </button>
+                    {product.seller.certificationStatus === "Certified" && (
+                      <span className="ml-1.5 text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-semibold border border-emerald-100">
+                        ✓ Certified
+                      </span>
+                    )}
+                  </p>
+                )}
               </div>
               <div className="flex gap-2">
                 <button
@@ -288,32 +317,69 @@ export function ProductDetailPage() {
             {/* Price */}
             <div className="border-t border-dashed border-gray-200 pt-4">
               <div className="flex items-baseline gap-3 flex-wrap">
-                <span className="text-3xl font-bold text-gray-900">{formatCurrency(product.price)}</span>
-                {product.originalPrice && (
-                  <span className="text-base text-gray-400 line-through">{formatCurrency(product.originalPrice)}</span>
+                <span className="text-3xl font-bold text-gray-900">{formatCurrency(displayPrice)}</span>
+                {displayOriginalPrice && (
+                  <span className="text-base text-gray-400 line-through">{formatCurrency(displayOriginalPrice)}</span>
                 )}
-                {discount > 0 && (
-                  <span className="text-base font-bold text-emerald-600">{discount}% off</span>
+                {displayDiscount > 0 && (
+                  <span className="text-base font-bold text-emerald-600">{displayDiscount}% off</span>
                 )}
               </div>
-              {product.originalPrice && (
+              {displayOriginalPrice && (
                 <p className="text-emerald-600 font-semibold text-sm mt-1">
-                  You save {formatCurrency(product.originalPrice - product.price)}
+                  You save {formatCurrency(displayOriginalPrice - displayPrice)}
                 </p>
               )}
             </div>
 
             {/* Stock */}
-            <div>
+            <div className="flex gap-2 items-center flex-wrap">
               <span className={`inline-flex items-center gap-1.5 text-sm font-semibold px-3 py-1 rounded-full
-                ${product.inStock
+                ${displayInStock
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-red-50 text-red-600 border border-red-200"}`}>
                 <span className="w-2 h-2 rounded-full inline-block"
-                  style={{ background: product.inStock ? "#16a34a" : "#dc2626" }} />
-                {product.inStock ? "In Stock" : "Out of Stock"}
+                  style={{ background: displayInStock ? "#16a34a" : "#dc2626" }} />
+                {displayInStock ? "In Stock" : "Out of Stock"}
               </span>
+
+              {displayInStock && selectedVariant && selectedVariant.stockCount < 5 && (
+                <span className="bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-3 py-1 text-xs font-semibold">
+                  ⚠️ Low Stock (Only {selectedVariant.stockCount} left!)
+                </span>
+              )}
+              {displayInStock && !selectedVariant && product.stockCount < 5 && (
+                <span className="bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-3 py-1 text-xs font-semibold">
+                  ⚠️ Low Stock (Only {product.stockCount} left!)
+                </span>
+              )}
             </div>
+
+            {/* Product Variants Selector */}
+            {product.variants && product.variants.length > 0 && (
+              <div className="space-y-2.5">
+                <p className="text-[0.78rem] font-bold text-gray-700 uppercase tracking-wider">
+                  Select Option:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {product.variants.map((v) => {
+                    const isSelected = selectedVariant?.name === v.name;
+                    return (
+                      <button
+                        key={v.name}
+                        onClick={() => setSelectedVariant(v)}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border-2
+                          ${isSelected
+                            ? "bg-[#c4622d] border-[#c4622d] text-white shadow-sm"
+                            : "bg-white border-gray-200 hover:border-gray-300 text-gray-700"}`}
+                      >
+                        {v.name} (₹{v.price})
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Description */}
             <p className="text-gray-600 text-[0.88rem] leading-relaxed">{product.description}</p>
@@ -378,15 +444,15 @@ export function ProductDetailPage() {
             <div className="sticky top-24 bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-4">
               {/* Price */}
               <div>
-                <span className="text-2xl font-bold text-gray-900">{formatCurrency(product.price)}</span>
-                {product.originalPrice && (
-                  <span className="text-sm text-gray-400 line-through ml-2">{formatCurrency(product.originalPrice)}</span>
+                <span className="text-2xl font-bold text-gray-900">{formatCurrency(displayPrice)}</span>
+                {displayOriginalPrice && (
+                  <span className="text-sm text-gray-400 line-through ml-2">{formatCurrency(displayOriginalPrice)}</span>
                 )}
               </div>
 
               {/* Stock pill */}
-              <div className={`text-sm font-semibold ${product.inStock ? "text-emerald-600" : "text-red-500"}`}>
-                {product.inStock ? "✓ In Stock" : "✗ Currently Unavailable"}
+              <div className={`text-sm font-semibold ${displayInStock ? "text-emerald-600" : "text-red-500"}`}>
+                {displayInStock ? "✓ In Stock" : "✗ Currently Unavailable"}
               </div>
 
               {/* Delivery info */}
@@ -440,20 +506,38 @@ export function ProductDetailPage() {
               ) : (
                 <div className="space-y-2.5 pt-1">
                   <button
-                    disabled={!product.inStock}
-                    onClick={() => { cart.addToCart(product); notify(`${product.name} added to cart.`); }}
+                    disabled={!displayInStock}
+                    onClick={() => {
+                      const itemToCart = {
+                        ...product,
+                        price: displayPrice,
+                        originalPrice: displayOriginalPrice,
+                        variantName: selectedVariant ? selectedVariant.name : undefined,
+                      };
+                      cart.addToCart(itemToCart);
+                      notify(`${product.name}${selectedVariant ? ` (${selectedVariant.name})` : ""} added to cart.`);
+                    }}
                     className={`w-full py-3 rounded-xl font-bold text-sm border-2 transition-all
-                      ${product.inStock
+                      ${displayInStock
                         ? "border-[#c4622d] text-[#c4622d] hover:bg-[#c4622d] hover:text-white"
                         : "border-gray-300 text-gray-400 cursor-not-allowed opacity-50"}`}
                   >
                     🛒 Add to Cart
                   </button>
                   <button
-                    disabled={!product.inStock}
-                    onClick={() => { cart.addToCart(product); navigate("/cart"); }}
+                    disabled={!displayInStock}
+                    onClick={() => {
+                      const itemToCart = {
+                        ...product,
+                        price: displayPrice,
+                        originalPrice: displayOriginalPrice,
+                        variantName: selectedVariant ? selectedVariant.name : undefined,
+                      };
+                      cart.addToCart(itemToCart);
+                      navigate("/cart");
+                    }}
                     className={`w-full py-3 rounded-xl font-bold text-sm transition-all
-                      ${product.inStock
+                      ${displayInStock
                         ? "bg-[#c4622d] hover:bg-[#e07a4a] text-white shadow-sm"
                         : "bg-gray-300 text-gray-400 cursor-not-allowed opacity-50"}`}
                   >

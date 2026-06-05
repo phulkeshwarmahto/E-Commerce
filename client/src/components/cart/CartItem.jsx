@@ -2,7 +2,7 @@ import { formatCurrency } from "../../utils/formatCurrency";
 
 export function CartItem({ item, onQuantityChange, onRemove }) {
   const handleDecrement = () => {
-    if (item.quantity > 1) onQuantityChange(item.id, item.quantity - 1);
+    if (item.quantity > 1) onQuantityChange(item.id, item.quantity - 1, item.variantName);
   };
 
   return (
@@ -30,6 +30,13 @@ export function CartItem({ item, onQuantityChange, onRemove }) {
         <p className="text-sm md:text-[0.95rem] font-semibold text-gray-800 leading-snug mb-1 line-clamp-2">
           {item.name}
         </p>
+        {item.variantName && (
+          <div className="mb-2">
+            <span className="inline-block bg-[#c4622d]/10 text-[#c4622d] border border-[#c4622d]/20 rounded-full px-2 py-0.5 text-[0.68rem] font-bold">
+              Option: {item.variantName}
+            </span>
+          </div>
+        )}
         <p className={`text-[0.72rem] font-semibold mb-3 ${item.inStock ? "text-emerald-600" : "text-red-500"}`}>
           {item.inStock ? "✓ In Stock" : "Out of Stock"}
         </p>
@@ -50,7 +57,7 @@ export function CartItem({ item, onQuantityChange, onRemove }) {
               {item.quantity}
             </span>
             <button
-              onClick={() => onQuantityChange(item.id, item.quantity + 1)}
+              onClick={() => onQuantityChange(item.id, item.quantity + 1, item.variantName)}
               className="w-8 h-8 flex items-center justify-center font-bold text-gray-600
                          hover:bg-gray-100 transition-colors"
             >
@@ -61,7 +68,7 @@ export function CartItem({ item, onQuantityChange, onRemove }) {
           <span className="text-gray-300 hidden md:block">|</span>
 
           <button
-            onClick={() => onRemove(item.id)}
+            onClick={() => onRemove(item.id, item.variantName)}
             className="text-[0.78rem] font-semibold text-red-500 hover:text-red-700
                        hover:underline transition-colors"
           >

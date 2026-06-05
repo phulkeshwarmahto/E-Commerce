@@ -6,6 +6,12 @@ export function useProducts(filters) {
   const [state, setState] = useState({
     products: [],
     featured: [],
+    pagination: {
+      totalItems: 0,
+      totalPages: 1,
+      currentPage: 1,
+      limit: 12,
+    },
     loading: true,
     error: "",
   });
@@ -24,6 +30,12 @@ export function useProducts(filters) {
         setState({
           products: data.products,
           featured: data.featured,
+          pagination: data.pagination || {
+            totalItems: data.products.length,
+            totalPages: 1,
+            currentPage: 1,
+            limit: 12,
+          },
           loading: false,
           error: "",
         });
@@ -36,6 +48,12 @@ export function useProducts(filters) {
         setState({
           products: [],
           featured: [],
+          pagination: {
+            totalItems: 0,
+            totalPages: 1,
+            currentPage: 1,
+            limit: 12,
+          },
           loading: false,
           error: error.message,
         });

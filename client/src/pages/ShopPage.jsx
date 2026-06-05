@@ -6,6 +6,7 @@ import { categories } from "../constants/categories";
 import { useDebounce } from "../hooks/useDebounce";
 import { useProducts } from "../hooks/useProducts";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
+import { Pagination } from "../components/ui/Pagination";
 
 const sortOptions = [
   { value: "relevance",  label: "Relevance" },
@@ -60,13 +61,14 @@ export function ShopPage() {
   const category = searchParams.get("category") || "All";
   const badge    = searchParams.get("badge") || "";
   const sort     = searchParams.get("sort") || "relevance";
+  const page     = Math.max(1, Number(searchParams.get("page") || 1));
 
   const debouncedSearch = useDebounce(search);
   const filters = useMemo(
-    () => ({ search: debouncedSearch, category, badge }),
-    [badge, category, debouncedSearch]
+    () => ({ search: debouncedSearch, category, badge, page, limit: 12 }),
+    [badge, category, debouncedSearch, page]
   );
-  const { products, loading, error } = useProducts(filters);
+  const { products, loading, error, pagination } = useProducts(filters);
 
   const sortedProducts = useMemo(() => {
     let list = [...products];
@@ -84,6 +86,7 @@ export function ShopPage() {
     const next = new URLSearchParams(searchParams);
     if (!value || value === "All" || value === "relevance") next.delete(key);
     else next.set(key, value);
+    if (key !== "page") next.delete("page");
     setSearchParams(next);
   };
 
@@ -330,7 +333,16 @@ export function ShopPage() {
               </div>
             )}
             {!loading && !error && sortedProducts.length > 0 && (
-              <ProductGrid products={sortedProducts} />
+              <>
+                <ProductGrid products={sortedProducts} />
+                {pagination && (
+                  <Pagination
+                    currentPage={pagination.currentPage}
+                    totalPages={pagination.totalPages}
+                    onPageChange={(p) => setParam("page", p)}
+                  />
+                )}
+              </>
             )}
           </div>
         </div>
