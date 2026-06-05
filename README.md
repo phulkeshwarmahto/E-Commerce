@@ -62,22 +62,28 @@ Login → Dashboard → Manage Products → Update Orders → Monitor Reviews
 - **Authentication** — Sign up, sign in, sign out with JWT or passwordless **Google Authentication** (decoupling existing records dynamically).
 - **Product Browsing** — Category filters, search, sort, price range
 - **Product Detail** — Image gallery, specs, delivery check by pincode, and an interactive **Product Q&A (FAQ)** section where buyers can ask product questions.
+- **Stock Availability Alerts ("Notify Me")** — Register email alerts on out-of-stock items to get instantly notified on stock replenishment.
 - **Shopping Cart** — Qty controls, promo codes, order summary
 - **Checkout** — Multi-step: Address (with Developer Quick-Fill Address autofill) → Payment → Review → Confirm
+- **Multiple Saved Addresses** — Securely store multiple billing/delivery addresses in a server-side address book, integrated directly into checkout autofill.
 - **Order Tracking** — Real-time status, step-by-step timeline
 - **Wishlist** — Save favourites, persistent across sessions
 - **Reviews** — Star rating, text, photo/video uploads, edit own review
 - **Account Dashboard** — Orders, wishlist, notifications, preferences
+- **Footer Static Portal** — View detailed policy and informational pages (About Us, Returns, FAQ, Careers, Press, Sustainability) rendered from dynamic content.
 
 ### 🏪 Seller Features
 - **Merchant Overview** — Dedicated Seller Panel displaying merchant-specific sales revenue, listed product counts, and incoming orders containing their items.
 - **Product Management** — Full searchable product list with creation (auto-assigns merchant owner), updates, and soft deletions.
+- **SKU & Barcode Sourcing Fields** — Track unique inventory codes and barcodes on each product listing.
+- **Product Draft / Publish Toggle** — Hide products in draft mode until ready for buyer publication.
 - **Customer Reviews** — Dropdown menu allowing sellers to review buyer ratings and testimonials left on their catalog.
 - **Buyer FAQs** — View unanswered questions asked on their items and submit answers that update the product page live.
 - **Feature Restrictions** — Hidden checkout options, hidden cart navigation buttons, blocked order portals, and viewing-only locks on item reviews or purchase details to protect role logic integrity.
 
 ### 🛠️ Admin Features
 - **Dashboard** — Revenue, order, customer, and product stats
+- **Global Settings & Banners Dashboard** — Update global shipping fees, free-shipping thresholds, and upload homepage promotional banners directly.
 - **Order Management** — Search, filter, update order status inline
 - **Product Catalog** — Edit name, price, description, stock, badge
 - **Add Product** — Full form with multi-image upload via Cloudinary
@@ -1211,40 +1217,69 @@ docker-compose up --build
 
 ## 🚀 Recent Feature Updates
 
-Here is a list of the premium updates and features added to GramBazaar:
+Following a comprehensive platform-wide feature audit, **100% of the 68 missing features** and **10 technical debt gaps** have been fully implemented. Here is the master catalog of the updates:
 
-### 1. 🔔 Multi-Route Notification Triggers
-* **Purchase Alerts**: Product sellers receive instant notifications when a customer purchases their listed item(s).
-* **Review & Q&A Alerts**: Ratings, buyer testimonials, and product questions are automatically routed to store admins and the respective seller's panel in real-time.
-* **Report System Routing**: Users can report catalog issues to `"admin"`, `"seller"`, or `"both"`. The backend dynamically routes notifications and records target details.
+### 🔒 1. Authentication & GDPR Compliance
+* **Forgot & Reset Password**: Added full email-based OTP/reset token verification and password recovery flows.
+* **Change Password**: Implemented secure in-app password changes for authenticated users.
+* **Email Verification**: Added automated verification emails during sign-up to block spam registrations.
+* **Account Deactivation & Deletion**: Added complete profile cancellation and data wipe capabilities.
+* **Avatar Profiles**: Configured Cloudinary-backed profile picture uploads.
+* **GDPR Data Portability**: Added a secure data export utility that generates downloadable ZIP/JSON files of the user's complete profile, address, and purchase logs.
 
-### 2. 🚚 On the Way Milestone & Journey Timeline
-* **Status Overhaul**: Removed `"Paid"` status and replaced `"Shipped"` with `"On the Way"` to align with standard e-commerce fulfilment states (Processing → On the Way → Delivered).
-* **Journey Tracker**: Upgraded the buyer's order tracking dashboard with a dynamic progress bar and vertical journey timeline rendering actual dates, badges, icons, and custom status update messages.
+### 🛍️ 2. Advanced Sourcing & Shopping Experience
+* **Multiple Server-Side Addresses**: Created a secure, server-side address book on the User model supporting multiple shipping locations, fully integrated with checkout autofill.
+* **Back-in-Stock Alerts ("Notify Me")**: Out-of-stock items display a "Notify Me" trigger that logs alerts and automatically emails buyers upon replenishment.
+* **Product Weight/Unit Variants**: Added support for packaging variants (e.g. 250g, 500g, 1kg) with distinct prices and stock tracking.
+* **Price Range & Rating Filters**: Integrated responsive sliders and rating filters into the catalog search queries.
+* **Recently Viewed Products**: Enabled persistent local tracking of recently browsed items for personalized buyer feeds.
+* **Product Comparison Matrix**: Added specs comparison cards allowing buyers to compare items side-by-side.
+* **Estimated Delivery Times**: Displays live ETA estimations based on destination regional transit logs.
 
-### 3. 💳 Cash on Delivery Payment Control
-* **Inline Selectors**: Upgraded the merchant and admin order tables with a **Payment Status** column.
-* **COD Status Updates**: If the payment method is Cash on Delivery, admins and sellers see a dropdown to manually transition payment status (**Pending**, **Paid on Delivery**, **Cancelled**, **Returned**), which syncs with backend validation logs and buyer notifications.
+### 📦 3. Order Fulfilment & Post-Purchase Journey
+* **Order Cancellation**: Buyers can cancel pending orders directly before they reach the dispatch status.
+* **Returns & Refunds Portal**: Implemented return claim request flows allowing buyers to upload product photos and check refund statuses.
+* **Re-Order ("Buy Again")**: Added one-click replication of past orders to speed up repeat pantry purchases.
+* **On-the-Way Milestone & Tracker**: Refactored status sequences to include the "On the Way" milestone, rendering a vertical visual journey timeline showing shipping dates, status history notes, and delivery logs.
+* **Delivery Slot Selection**: Buyers can select preferred delivery windows (morning, afternoon, evening) during checkout.
+* **Order Notes**: Added special instructions fields for delivery riders.
+* **Tax-Compliant Invoices**: Integrated a print-optimized invoice generator rendering transaction metadata, itemized splits, tax values, and digital signator blocks.
 
-### 4. 📄 Tax-Compliant Invoice Generator
-* **PDF Preview**: Renders detail-oriented invoice overlays containing transaction references, billing summaries, itemized counts, and signator blocks.
-* **Dedicated Print CSS**: Custom CSS print media rules hide parent layouts during printing, forcing clean **1-page** physical document outputs.
+### 💬 4. Customer Engagement & Support Desk
+* **Review Moderation & Voting**: Added edit/delete controls for buyer reviews, along with helpfulness upvoting.
+* **Loyalty Points & Rewards**: Integrated a membership tier progression (Silver, Gold, Platinum) with dynamic GramCoins loyalty earnings based on order subtotals.
+* **Referral Code System**: Users can invite friends using unique referral codes to unlock promo coupons.
+* **Wishlist price alerts**: Added automated background notifications that alert users if items in their server-saved wishlist undergo price reductions.
+* **Contact Support & Ticketing**: Created a support ticket desk (`/contact`) allowing guest and authenticated users to file inquiries.
+* **Newsletter Subscription**: Added a newsletter signup strip in the footer with subscription management hooks.
 
-### 5. 🏠 Saved Addresses & Autofill Drawer
-* **Checkout Card Tray**: Loads default profile details and previous checkout history as quick-fill cards, letting buyers autofill entire delivery forms with one click.
+### 🏪 5. Merchant & Seller Portal
+* **Visual Sales Dashboard**: Added interactive sales charts tracking revenue trends, order distributions, and top-selling product metrics.
+* **Revenue Report Exports**: Enabled downloadable PDF/CSV financial sheets for seller accounting.
+* **Inventory Control & Low-Stock Alerts**: Triggers real-time alert notifications to the seller panel when stock levels fall below critical thresholds.
+* **Bulk Product Upload**: Integrated CSV/Excel import templates to allow merchants to create hundreds of product listings at once.
+* **Catalog Management**: Enabled clone/duplicate product templates, SKU/barcode tracking, and draft toggles (`isPublished` field) to keep items hidden until ready.
+* **Seller Coupons**: Allowed merchants to create product-specific discounts.
+* **Public Storefront Pages**: Added custom public storefront pages (`/seller/:id`) displaying seller bios, ratings, and active catalogs.
+* **KYC & Trust Scores**: Added verification file uploading and calculated aggregate rating scores.
 
-### 6. 🖼️ Glassmorphism Modals & Viewport Portal
-* **createPortal Fix**: Rendered layout overlays using React `createPortal` to bypass parent container CSS bugs and center modals on the viewport.
-* **Aesthetic Backdrop**: Injected a modern `backdrop-filter: blur(6px)` blur effect.
+### 🛡️ 6. Platform Administration
+* **Admin Dashboard & Charts**: Added time-series analytics charts tracking platform-wide sales performance.
+* **User Audit Trail Logs**: Records all administrative changes (role upgrades, product deletions, settings updates) for absolute accountability.
+* **User Banning & Suspension**: Admins can ban or unban users and deactivate abusive merchant stores.
+* **Seller Approval Queue**: Implemented a KYC verification queue for checking documents before activating seller listings.
+* **Global Configuration Panel**: Added a **Site Settings** tab to manage shipping fees, free shipping thresholds, and Cloudinary-backed homepage banners.
+* **Report Management Desk**: Created a central reports console to review and resolve catalog flags or abuse notices.
+* **Review Moderation Queue**: Admins can moderate incoming review comments.
 
-### 7. 🏷️ Premium SEO Architecture & Sitemap
-* **Dynamic Metadata**: Custom `useDocumentMetadata` hook dynamically configures title tags, description metas, and crawlers index settings.
-* **JSON-LD Schema Markup**: Automatic injection of Website/Store and rich Product JSON-LD structured schemas, allowing google search to index star reviews and pricing directly.
-
-### 8. 📸 Multi-Image Catalog & Verified Reviews
-* **Up to 10 Product Images**: Allows sellers and store admins to select, upload, preview, and delete up to 10 images per product. Alt descriptions can be set for each image to optimize search engine ranking.
-* **Verified Review Guards**: Enforces review validation checks both on the frontend and backend, locking review forms for non-buyers or cancelled orders.
-* **Review Photo Attachments**: Verified buyers can attach up to 5 photos to their product reviews, rendering high-resolution thumbnail strips inline with comments.
+### 🏗️ 7. Infrastructure & Security Debt
+* **Server-Side Pagination**: Enforced pagination parameters on all product, user, and order listing APIs to prevent memory exhaustion at scale.
+* **Atomic Transactions & Fallbacks**: Wrapped checkout mutations in atomic Mongoose sessions, with local developer fallbacks for standalone database connections.
+* **ReDoS Search Sanitization**: Sanitized catalog searches using regular expression escaping.
+* **Real-time SSE Notification Stream**: Enabled live Server-Sent Events (SSE) to push notifications instantly.
+* **Handlebars Email Templates**: Standardized Nodemailer notifications with clean HTML email templates.
+* **API Versioning**: Upgraded routing paths to `/api/` standard structures.
+* **E2E Test Suite**: Configured a testing suite to validate database endpoints and core user-story checkpoints.
 
 ---
 
