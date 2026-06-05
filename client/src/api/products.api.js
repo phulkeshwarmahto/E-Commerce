@@ -14,3 +14,9 @@ export const getProductsRequest = (params = {}) => {
 };
 
 export const getProductRequest = (id) => apiRequest(`/products/${id}`);
+
+export const notifyMeStockRequest = (id, variantName) =>
+  apiRequest(`/products/${id}/notify-me`, {
+    method: "POST",
+    body: { variantName },
+  });

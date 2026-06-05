@@ -38,6 +38,7 @@ const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage").then(m 
 const SellerStorePage = lazy(() => import("./pages/SellerStorePage").then(m => ({ default: m.SellerStorePage })));
 const VerifyEmailPage = lazy(() => import("./pages/VerifyEmailPage").then(m => ({ default: m.VerifyEmailPage })));
 const ContactPage = lazy(() => import("./pages/ContactPage").then(m => ({ default: m.ContactPage })));
+const StaticContentPage = lazy(() => import("./pages/StaticContentPage").then(m => ({ default: m.StaticContentPage })));
 
 function ScrollToTop() {
 

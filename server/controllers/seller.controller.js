@@ -6,6 +6,7 @@ import { Notification } from "../models/Notification.model.js";
 import { slugify } from "../utils/slugify.js";
 import { Wishlist } from "../models/Wishlist.model.js";
 import { Coupon } from "../models/Coupon.model.js";
+import { processStockAlerts } from "../utils/stockAlertHelper.js";
 
 export const getSellerDashboard = async (req, res) => {
   const sellerId = req.user._id;
@@ -76,6 +77,9 @@ export const createSellerProduct = async (req, res) => {
     seller: sellerId,
     deliveryFee: req.body.deliveryFee !== undefined ? Number(req.body.deliveryFee) : 0,
     variants: req.body.variants || [],
+    sku: req.body.sku || "",
+    barcode: req.body.barcode || "",
+    isPublished: req.body.isPublished ?? true,
   });
 
   return res.status(201).json(new ApiResponse(true, "Product created.", { product: product.toClient() }));
@@ -96,7 +100,7 @@ export const updateSellerProduct = async (req, res) => {
 
   const oldPrice = product.price;
 
-  const { name, category, description, badge, emoji, images, tags, isFeatured, inStock, variants } = req.body;
+  const { name, category, description, badge, emoji, images, tags, isFeatured, inStock, variants, sku, barcode, isPublished } = req.body;
 
   if (name !== undefined) product.name = name;
   if (category !== undefined) product.category = category;
@@ -108,6 +112,9 @@ export const updateSellerProduct = async (req, res) => {
   if (isFeatured !== undefined) product.isFeatured = Boolean(isFeatured);
   if (inStock !== undefined) product.inStock = Boolean(inStock);
   if (variants !== undefined) product.variants = variants;
+  if (sku !== undefined) product.sku = sku;
+  if (barcode !== undefined) product.barcode = barcode;
+  if (isPublished !== undefined) product.isPublished = Boolean(isPublished);
 
   if (req.body.slug) product.slug = req.body.slug;
   product.price = Number(req.body.price ?? product.price);
@@ -120,6 +127,11 @@ export const updateSellerProduct = async (req, res) => {
 
   const newPrice = product.price;
   await product.save();
+
+  // Trigger stock alerts if product became in-stock or variant stock > 0
+  if (product.inStock && (product.stockCount > 0 || (product.variants && product.variants.some(v => v.stockCount > 0)))) {
+    processStockAlerts(product._id).catch((err) => console.error("Error triggering stock alerts:", err));
+  }
 
   if (newPrice < oldPrice) {
     try {

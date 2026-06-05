@@ -1,7 +1,13 @@
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Product } from "../models/Product.model.js";
+import { StockAlert } from "../models/StockAlert.model.js";
 
-const buildMongoQuery = (query = {}) => {
+function escapeRegex(string) {
+  return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+}
+
+const buildMongoQuery = (req) => {
+  const query = req.query || {};
   const search = (query.search || "").trim();
   const category = query.category || "All";
   const featured = query.featured === "true";
@@ -10,10 +16,11 @@ const buildMongoQuery = (query = {}) => {
   const filters = {};
 
   if (search) {
+    const escapedSearch = escapeRegex(search);
     filters.$or = [
-      { name: { $regex: search, $options: "i" } },
-      { description: { $regex: search, $options: "i" } },
-      { tags: { $regex: search, $options: "i" } },
+      { name: { $regex: escapedSearch, $options: "i" } },
+      { description: { $regex: escapedSearch, $options: "i" } },
+      { tags: { $regex: escapedSearch, $options: "i" } },
     ];
   }
 
@@ -45,6 +52,16 @@ const buildMongoQuery = (query = {}) => {
     }
   }
 
+  // Draft vs Published logic
+  if (!req.user || req.user.role === "user") {
+    filters.isPublished = true;
+  } else if (req.user.role === "seller") {
+    filters.$or = [
+      { isPublished: true },
+      { seller: req.user._id }
+    ];
+  }
+
   return filters;
 };
 
@@ -53,12 +70,12 @@ export const getProducts = async (req, res) => {
   const limit = Math.max(1, Number(req.query.limit || 12));
   const skip = (page - 1) * limit;
 
-  const mongoQuery = buildMongoQuery(req.query);
+  const mongoQuery = buildMongoQuery(req);
 
   const [products, totalItems, featured] = await Promise.all([
     Product.find(mongoQuery).sort({ createdAt: -1 }).skip(skip).limit(limit),
     Product.countDocuments(mongoQuery),
-    Product.find({ isFeatured: true }).sort({ rating: -1 }).limit(12),
+    Product.find({ isFeatured: true, isPublished: true }).sort({ rating: -1 }).limit(12),
   ]);
 
   const totalPages = Math.ceil(totalItems / limit);
@@ -88,8 +105,18 @@ export const getProductById = async (req, res) => {
     return res.status(404).json(new ApiResponse(false, "Product not found."));
   }
 
+  // Draft check
+  if (!product.isPublished) {
+    const isOwner = req.user && product.seller && req.user._id.toString() === product.seller._id.toString();
+    const isAdmin = req.user && req.user.role === "admin";
+    if (!isOwner && !isAdmin) {
+      return res.status(404).json(new ApiResponse(false, "Product not found."));
+    }
+  }
+
   const relatedProducts = await Product.find({
     category: product.category,
+    isPublished: true,
     _id: { $ne: product._id },
   })
     .sort({ rating: -1 })
@@ -102,4 +129,33 @@ export const getProductById = async (req, res) => {
       relatedProducts: relatedProducts.map((entry) => entry.toClient()),
     }),
   );
+};
+
+export const notifyMeStock = async (req, res) => {
+  const { id } = req.params;
+  const { variantName } = req.body;
+
+  const product = await Product.findById(id);
+  if (!product) {
+    return res.status(404).json(new ApiResponse(false, "Product not found."));
+  }
+
+  const existingAlert = await StockAlert.findOne({
+    productId: product._id,
+    userId: req.user._id,
+    variantName: variantName || "",
+    notified: false,
+  });
+
+  if (existingAlert) {
+    return res.json(new ApiResponse(true, "You are already registered for a notification when this item is back in stock."));
+  }
+
+  await StockAlert.create({
+    productId: product._id,
+    userId: req.user._id,
+    variantName: variantName || "",
+  });
+
+  return res.status(201).json(new ApiResponse(true, "You will be notified when this item is back in stock!"));
 };

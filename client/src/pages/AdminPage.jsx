@@ -25,6 +25,8 @@ import {
   approveReviewRequest,
   rejectReviewRequest,
   getAdminGeoAnalyticsRequest,
+  getAdminSettingsRequest,
+  updateAdminSettingsRequest,
 } from "../api/admin.api";
 import { getReturnRequests, updateReturnRequestStatus } from "../api/return.api";
 import { getNewsletterSubscribersRequest } from "../api/newsletter.api";
@@ -173,6 +175,20 @@ export function AdminPage() {
   const [loadingGeo, setLoadingGeo] = useState(false);
   const [subscribersList, setSubscribersList] = useState([]);
   const [loadingSubscribers, setLoadingSubscribers] = useState(false);
+
+  // Site Settings state
+  const [siteSettings, setSiteSettings] = useState({
+    shippingFee: 49,
+    shippingFreeThreshold: 500,
+    homepageBanners: []
+  });
+  const [loadingSettings, setLoadingSettings] = useState(false);
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [newBanner, setNewBanner] = useState({
+    imageUrl: "",
+    linkUrl: "/shop",
+    title: ""
+  });
 
   const loadDashboard = useCallback(async () => {
     const data = await getDashboardRequest();
@@ -603,6 +619,68 @@ export function AdminPage() {
       loadPendingReviews(pendingReviewsPage).catch(() => {});
     }
   }, [section, loadPendingReviews, user, pendingReviewsPage]);
+
+  const loadSiteSettings = useCallback(async () => {
+    setLoadingSettings(true);
+    try {
+      const data = await getAdminSettingsRequest();
+      if (data) {
+        setSiteSettings({
+          shippingFee: data.shippingFee ?? 49,
+          shippingFreeThreshold: data.shippingFreeThreshold ?? 500,
+          homepageBanners: data.homepageBanners || []
+        });
+      }
+    } catch (err) {
+      notify(err.message || "Failed to load site settings.");
+    } finally {
+      setLoadingSettings(false);
+    }
+  }, [notify]);
+
+  const handleUpdateSettings = async (e) => {
+    if (e) e.preventDefault();
+    setSavingSettings(true);
+    try {
+      await updateAdminSettingsRequest({
+        shippingFee: Number(siteSettings.shippingFee),
+        shippingFreeThreshold: Number(siteSettings.shippingFreeThreshold),
+        homepageBanners: siteSettings.homepageBanners
+      });
+      notify("Site settings updated successfully! ⚙️");
+      await loadSiteSettings();
+    } catch (err) {
+      notify(err.message || "Failed to update site settings.");
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
+  const handleAddBanner = (e) => {
+    e.preventDefault();
+    if (!newBanner.imageUrl) {
+      notify("Please provide a banner image URL.");
+      return;
+    }
+    setSiteSettings((prev) => ({
+      ...prev,
+      homepageBanners: [...prev.homepageBanners, newBanner]
+    }));
+    setNewBanner({ imageUrl: "", linkUrl: "/shop", title: "" });
+  };
+
+  const handleRemoveBanner = (indexToRemove) => {
+    setSiteSettings((prev) => ({
+      ...prev,
+      homepageBanners: prev.homepageBanners.filter((_, idx) => idx !== indexToRemove)
+    }));
+  };
+
+  useEffect(() => {
+    if (user?.role === "admin" && section === "settings") {
+      loadSiteSettings().catch(() => {});
+    }
+  }, [section, loadSiteSettings, user]);
 
   if (!user || user.role !== "admin") {
     return (
@@ -1944,6 +2022,159 @@ export function AdminPage() {
 
           {section === "support-tickets" ? (
             <AdminSupportTicketsSection notify={notify} />
+          ) : null}
+
+          {section === "settings" ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 stack">
+              <div className="section-head mb-6">
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900">⚙️ Site Configuration Settings</h2>
+                  <p className="text-xs text-gray-500">Configure global platform shipping variables and manage homepage promo banners.</p>
+                </div>
+              </div>
+
+              {loadingSettings ? (
+                <p className="text-sm text-gray-500 py-10 text-center animate-pulse">Loading settings...</p>
+              ) : (
+                <div className="space-y-8">
+                  {/* Shipping variables */}
+                  <form onSubmit={handleUpdateSettings} className="space-y-6 text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="field">
+                        <label className="label text-xs font-bold text-gray-700">Base Shipping Fee (₹)</label>
+                        <input
+                          type="number"
+                          className="input py-2.5"
+                          required
+                          min="0"
+                          value={siteSettings.shippingFee}
+                          onChange={(e) => setSiteSettings({ ...siteSettings, shippingFee: e.target.value })}
+                        />
+                        <span className="text-[10px] text-gray-400 mt-1 block">Default fee applied to orders below the free delivery threshold.</span>
+                      </div>
+                      <div className="field">
+                        <label className="label text-xs font-bold text-gray-700">Free Delivery Threshold (₹)</label>
+                        <input
+                          type="number"
+                          className="input py-2.5"
+                          required
+                          min="0"
+                          value={siteSettings.shippingFreeThreshold}
+                          onChange={(e) => setSiteSettings({ ...siteSettings, shippingFreeThreshold: e.target.value })}
+                        />
+                        <span className="text-[10px] text-gray-400 mt-1 block">Subtotal threshold above which delivery becomes free.</span>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={savingSettings}
+                        className="px-5 py-2.5 bg-[#c4622d] text-white hover:bg-[#e07a4a] rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer border-0"
+                      >
+                        {savingSettings ? "Saving Settings..." : "Save Shipping Configuration"}
+                      </button>
+                    </div>
+                  </form>
+
+                  <hr className="border-gray-100" />
+
+                  {/* Promo Banners */}
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-sm font-black uppercase tracking-wider text-[#9b6b3a] mb-1">🖼_ Homepage Carousel Banners</h3>
+                      <p className="text-xs text-gray-500">Add or remove promotional slider banners displayed on the homepage hero section.</p>
+                    </div>
+
+                    {/* Add Banner Form */}
+                    <form onSubmit={handleAddBanner} className="bg-gray-50 rounded-xl border border-gray-150 p-5 space-y-4 text-xs text-left">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="field">
+                          <label className="label text-xs font-semibold text-gray-700">Banner Title / Caption</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Up to 30% Off Organic Honey"
+                            className="input py-2"
+                            value={newBanner.title}
+                            onChange={(e) => setNewBanner({ ...newBanner, title: e.target.value })}
+                          />
+                        </div>
+                        <div className="field">
+                          <label className="label text-xs font-semibold text-gray-700">Target Redirect Link</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. /shop?category=Pantry"
+                            className="input py-2"
+                            value={newBanner.linkUrl}
+                            onChange={(e) => setNewBanner({ ...newBanner, linkUrl: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="field text-left">
+                        <ImageUploadZone
+                          label="Banner Image (16:9 recommended)"
+                          value={newBanner.imageUrl}
+                          onChange={(url) => setNewBanner({ ...newBanner, imageUrl: url })}
+                        />
+                      </div>
+
+                      <div className="flex justify-end">
+                        <button
+                          type="submit"
+                          className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-gray-900 rounded-lg text-xs font-bold transition-all shadow-md cursor-pointer border-0"
+                        >
+                          ➕ Add Banner to Queue
+                        </button>
+                      </div>
+                    </form>
+
+                    {/* Banner list */}
+                    <div className="space-y-3">
+                      <span className="block text-xs font-bold text-gray-700">Current Homepage Banners ({siteSettings.homepageBanners.length})</span>
+                      {siteSettings.homepageBanners.length === 0 ? (
+                        <p className="text-xs text-gray-400 italic bg-gray-50 rounded-xl border border-dashed border-gray-250 p-6 text-center">
+                          No promotional banners configured. Default hero section will be displayed.
+                        </p>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {siteSettings.homepageBanners.map((banner, idx) => (
+                            <div key={idx} className="relative rounded-xl overflow-hidden border border-gray-200 bg-white flex flex-col group shadow-sm">
+                              <img src={banner.imageUrl} alt={banner.title} className="w-full h-32 object-cover" />
+                              <div className="p-3 text-left">
+                                <p className="font-bold text-gray-900 text-xs truncate">{banner.title || "(Untitled Banner)"}</p>
+                                <p className="text-[10px] text-gray-400 truncate mt-0.5">Link: {banner.linkUrl}</p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveBanner(idx)}
+                                className="absolute top-2 right-2 p-1.5 bg-red-650 hover:bg-red-750 text-white rounded-full transition-colors opacity-90 group-hover:opacity-100 border-0 shadow-sm cursor-pointer"
+                                title="Remove banner"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {siteSettings.homepageBanners.length > 0 && (
+                      <div className="flex justify-end pt-4">
+                        <button
+                          type="button"
+                          onClick={handleUpdateSettings}
+                          disabled={savingSettings}
+                          className="px-5 py-2.5 bg-[#c4622d] text-white hover:bg-[#e07a4a] rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer border-0"
+                        >
+                          {savingSettings ? "Saving Settings..." : "Save Banner Changes"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           ) : null}
         </div>
       </div>

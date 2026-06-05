@@ -12,7 +12,11 @@ import {
   verifyEmail,
   deleteAccount,
   uploadAvatar,
-  exportUserData
+  exportUserData,
+  getAddresses,
+  addAddress,
+  updateAddress,
+  deleteAddress
 } from "../controllers/auth.controller.js";
 import { validate } from "../middleware/validate.middleware.js";
 import { requireAuth } from "../middleware/auth.middleware.js";
@@ -40,5 +44,11 @@ router.delete("/delete-account", asyncHandler(requireAuth), asyncHandler(deleteA
 // New Phase 3 routes
 router.post("/avatar", asyncHandler(requireAuth), upload, asyncHandler(uploadAvatar));
 router.get("/me/export", asyncHandler(requireAuth), asyncHandler(exportUserData));
+
+// Saved Addresses routes
+router.get("/addresses", asyncHandler(requireAuth), asyncHandler(getAddresses));
+router.post("/addresses", asyncHandler(requireAuth), asyncHandler(addAddress));
+router.put("/addresses/:addressId", asyncHandler(requireAuth), asyncHandler(updateAddress));
+router.delete("/addresses/:addressId", asyncHandler(requireAuth), asyncHandler(deleteAddress));
 
 export default router;

@@ -10,6 +10,8 @@ import { sendEmail } from "../utils/sendEmail.js";
 import { slugify } from "../utils/slugify.js";
 import { Report } from "../models/Report.model.js";
 import { Wishlist } from "../models/Wishlist.model.js";
+import { processStockAlerts } from "../utils/stockAlertHelper.js";
+import { Settings } from "../models/Settings.model.js";
 
 export const getDashboard = async (_req, res) => {
   const [revenueResult, orders, productCount, userCount, products, recentOrders, topProducts, reviews] =
@@ -130,6 +132,10 @@ export const createProduct = async (req, res) => {
     tags: req.body.tags || [],
     isFeatured: Boolean(req.body.isFeatured),
     deliveryFee: req.body.deliveryFee !== undefined ? Number(req.body.deliveryFee) : 0,
+    variants: req.body.variants || [],
+    sku: req.body.sku || "",
+    barcode: req.body.barcode || "",
+    isPublished: req.body.isPublished ?? true,
   });
 
   res.status(201).json(new ApiResponse(true, "Product created.", { product: product.toClient() }));
@@ -145,7 +151,7 @@ export const updateProduct = async (req, res) => {
   const oldPrice = product.price;
 
   // Only pick mutable fields — never assign _id, __v, seller (populated), etc.
-  const { name, category, description, badge, emoji, images, tags, isFeatured, inStock } = req.body;
+  const { name, category, description, badge, emoji, images, tags, isFeatured, inStock, variants, sku, barcode, isPublished } = req.body;
 
   if (name !== undefined) product.name = name;
   if (category !== undefined) product.category = category;
@@ -156,6 +162,10 @@ export const updateProduct = async (req, res) => {
   if (tags !== undefined) product.tags = tags;
   if (isFeatured !== undefined) product.isFeatured = Boolean(isFeatured);
   if (inStock !== undefined) product.inStock = Boolean(inStock);
+  if (variants !== undefined) product.variants = variants;
+  if (sku !== undefined) product.sku = sku;
+  if (barcode !== undefined) product.barcode = barcode;
+  if (isPublished !== undefined) product.isPublished = Boolean(isPublished);
 
   if (req.body.slug) product.slug = req.body.slug;
   product.price = Number(req.body.price ?? product.price);
@@ -168,6 +178,11 @@ export const updateProduct = async (req, res) => {
 
   const newPrice = product.price;
   await product.save();
+
+  // Trigger stock alerts if product became in-stock or variant stock > 0
+  if (product.inStock && (product.stockCount > 0 || (product.variants && product.variants.some(v => v.stockCount > 0)))) {
+    processStockAlerts(product._id).catch((err) => console.error("Error triggering stock alerts (admin):", err));
+  }
 
   if (newPrice < oldPrice) {
     try {
@@ -730,5 +745,36 @@ export const getGeoAnalytics = async (req, res) => {
   return res.json(
     new ApiResponse(true, "Geographic analytics fetched.", { geoStats })
   );
+};
+
+export const deleteProductAdmin = async (req, res) => {
+  const product = await Product.findByIdAndDelete(req.params.id);
+  if (!product) {
+    return res.status(404).json(new ApiResponse(false, "Product not found."));
+  }
+  return res.json(new ApiResponse(true, "Product deleted successfully."));
+};
+
+export const getSettingsAdmin = async (req, res) => {
+  let settings = await Settings.findOne();
+  if (!settings) {
+    settings = await Settings.create({});
+  }
+  return res.json(new ApiResponse(true, "Settings retrieved.", { settings: settings.toClient() }));
+};
+
+export const updateSettingsAdmin = async (req, res) => {
+  const { shippingFee, shippingFreeThreshold, homepageBanners } = req.body;
+  let settings = await Settings.findOne();
+  if (!settings) {
+    settings = await Settings.create({});
+  }
+
+  if (shippingFee !== undefined) settings.shippingFee = Number(shippingFee);
+  if (shippingFreeThreshold !== undefined) settings.shippingFreeThreshold = Number(shippingFreeThreshold);
+  if (homepageBanners !== undefined) settings.homepageBanners = homepageBanners;
+
+  await settings.save();
+  return res.json(new ApiResponse(true, "Settings updated successfully.", { settings: settings.toClient() }));
 };
 

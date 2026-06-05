@@ -4,6 +4,8 @@ import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Modal } from "../components/ui/Modal";
 import { createPaymentOrderRequest, verifyPaymentRequest, verifyUpiPaymentRequest } from "../api/payment.api";
+import { getAddressesRequest, addAddressRequest } from "../api/auth.api";
+import { getSettingsRequest } from "../api/settings.api";
 import { useAppContext } from "../hooks/useAppContext";
 import { formatCurrency } from "../utils/formatCurrency";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
@@ -98,12 +100,30 @@ export function CheckoutPage() {
   });
 
   const [savedAddresses, setSavedAddresses] = useState([]);
+  const [settings, setSettings] = useState({
+    shippingFee: 49,
+    shippingFreeThreshold: 500,
+  });
 
   useEffect(() => {
-    const loadSavedAddresses = () => {
-      const local = localStorage.getItem("grambazaar_saved_addresses");
-      const parsed = local ? JSON.parse(local) : [];
-      
+    const fetchSettings = async () => {
+      try {
+        const res = await getSettingsRequest();
+        if (res) {
+          setSettings({
+            shippingFee: res.shippingFee ?? 49,
+            shippingFreeThreshold: res.shippingFreeThreshold ?? 500,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch settings:", err);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  useEffect(() => {
+    const loadSavedAddresses = async () => {
       const list = [];
       if (user && user.address?.line1 && user.address?.city) {
         list.push({
@@ -117,14 +137,26 @@ export function CheckoutPage() {
           label: "📍 Profile Default"
         });
       }
-      
-      parsed.forEach((addr, idx) => {
-        list.push({
-          id: `local-${idx}`,
-          ...addr,
-          label: addr.label || `🏠 Saved Address ${idx + 1}`
-        });
-      });
+
+      try {
+        const serverAddrs = await getAddressesRequest();
+        if (serverAddrs && Array.isArray(serverAddrs)) {
+          serverAddrs.forEach((addr) => {
+            list.push({
+              id: addr._id || addr.id,
+              name: addr.name,
+              phone: addr.phone,
+              line1: addr.line1,
+              city: addr.city,
+              state: addr.state,
+              pincode: addr.pincode,
+              label: addr.label || "🏠 Saved Address"
+            });
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load server addresses:", err);
+      }
       
       setSavedAddresses(list);
     };
@@ -215,33 +247,19 @@ export function CheckoutPage() {
           },
         });
         
-        // Save to local storage list
-        const localAddresses = localStorage.getItem("grambazaar_saved_addresses");
-        const parsed = localAddresses ? JSON.parse(localAddresses) : [];
+        await addAddressRequest({
+          label: "Saved Address",
+          name: form.name.trim(),
+          phone: form.phone.trim(),
+          line1: form.line1.trim(),
+          city: form.city.trim(),
+          state: form.state.trim(),
+          pincode: form.pincode.trim(),
+        });
         
-        const isDuplicate = parsed.some(
-          (addr) =>
-            addr.line1.toLowerCase() === form.line1.trim().toLowerCase() &&
-            addr.city.toLowerCase() === form.city.trim().toLowerCase() &&
-            addr.pincode === form.pincode.trim()
-        );
-        
-        if (!isDuplicate) {
-          const newAddr = {
-            name: form.name.trim(),
-            phone: form.phone.trim(),
-            line1: form.line1.trim(),
-            city: form.city.trim(),
-            state: form.state.trim(),
-            pincode: form.pincode.trim(),
-            label: `🏠 Saved Address ${parsed.length + 1}`
-          };
-          const nextList = [newAddr, ...parsed];
-          localStorage.setItem("grambazaar_saved_addresses", JSON.stringify(nextList));
-        }
         notify("📍 Delivery details saved to your profile and addresses list!");
       } catch (err) {
-        console.error("Failed to save address to profile:", err);
+        console.error("Failed to save address to profile/server:", err);
       }
     }
 
@@ -350,7 +368,16 @@ export function CheckoutPage() {
   }
   const loyaltyDiscount = Math.round((itemsSubtotal * loyaltyDiscountPercent) / 100);
 
-  const shippingFee = cart.items.reduce((sum, item) => sum + (item.deliveryFee || 0) * item.quantity, 0);
+  const shippingFee = useMemo(() => {
+    let fee = cart.items.reduce((sum, item) => sum + (item.deliveryFee || 0) * item.quantity, 0);
+    if (fee === 0 && itemsSubtotal < settings.shippingFreeThreshold) {
+      fee = settings.shippingFee;
+    } else if (itemsSubtotal >= settings.shippingFreeThreshold) {
+      fee = 0;
+    }
+    return fee;
+  }, [cart.items, itemsSubtotal, settings]);
+
   const orderTotal = Math.max(itemsSubtotal + shippingFee - promo.discount - loyaltyDiscount, 0);
 
   if (!isAuthenticated) {

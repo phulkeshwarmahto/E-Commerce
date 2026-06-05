@@ -57,3 +57,7 @@ export const rejectReviewRequest = (id) =>
 
 export const getAdminGeoAnalyticsRequest = () =>
   apiRequest("/admin/analytics/geo");
+
+export const getAdminSettingsRequest = () => apiRequest("/admin/settings");
+export const updateAdminSettingsRequest = (payload) => apiRequest("/admin/settings", { method: "PUT", body: payload });
+export const deleteProductAdminRequest = (id) => apiRequest(`/admin/products/${id}`, { method: "DELETE" });

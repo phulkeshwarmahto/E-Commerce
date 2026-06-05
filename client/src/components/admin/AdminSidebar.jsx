@@ -15,6 +15,7 @@ export function AdminSidebar({ section, onChange }) {
     { id: "seller-verifications", label: "🏪 Seller Verify" },
     { id: "review-moderations", label: "🛡️ Review Mod" },
     { id: "support-tickets", label: "🎟️ Support Tickets" },
+    { id: "settings", label: "⚙️ Site Settings" },
   ];
 
   return (

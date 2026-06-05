@@ -25,6 +25,7 @@ import categoryRoutes from "./routes/category.routes.js";
 import supportRoutes from "./routes/support.routes.js";
 import newsletterRoutes from "./routes/newsletter.routes.js";
 import messageRoutes from "./routes/message.routes.js";
+import settingsRoutes from "./routes/settings.routes.js";
 import { apiRateLimiter } from "./middleware/rateLimit.middleware.js";
 import { errorHandler } from "./middleware/errorHandler.middleware.js";
 
@@ -85,6 +86,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/support", supportRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/settings", settingsRoutes);
 
 app.use(errorHandler);
 

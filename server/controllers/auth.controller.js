@@ -470,3 +470,67 @@ export const exportUserData = async (req, res) => {
   res.setHeader("Content-Type", "application/json");
   return res.send(JSON.stringify(exportData, null, 2));
 };
+
+export const getAddresses = async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return res.status(404).json(new ApiResponse(false, "User not found."));
+  }
+  return res.json(new ApiResponse(true, "Saved addresses retrieved.", { savedAddresses: user.savedAddresses || [] }));
+};
+
+export const addAddress = async (req, res) => {
+  const { label, name, phone, line1, city, state, pincode } = req.body;
+  if (!name || !phone || !line1 || !city || !state || !pincode) {
+    return res.status(400).json(new ApiResponse(false, "All address fields (name, phone, line1, city, state, pincode) are required."));
+  }
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return res.status(404).json(new ApiResponse(false, "User not found."));
+  }
+  const newAddr = {
+    label: label || "Home",
+    name,
+    phone,
+    line1,
+    city,
+    state,
+    pincode
+  };
+  user.savedAddresses.push(newAddr);
+  await user.save();
+  return res.status(201).json(new ApiResponse(true, "Address added successfully.", { savedAddresses: user.savedAddresses, address: user.savedAddresses[user.savedAddresses.length - 1] }));
+};
+
+export const updateAddress = async (req, res) => {
+  const { addressId } = req.params;
+  const { label, name, phone, line1, city, state, pincode } = req.body;
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return res.status(404).json(new ApiResponse(false, "User not found."));
+  }
+  const addr = user.savedAddresses.id(addressId);
+  if (!addr) {
+    return res.status(404).json(new ApiResponse(false, "Address not found."));
+  }
+  if (label !== undefined) addr.label = label;
+  if (name !== undefined) addr.name = name;
+  if (phone !== undefined) addr.phone = phone;
+  if (line1 !== undefined) addr.line1 = line1;
+  if (city !== undefined) addr.city = city;
+  if (state !== undefined) addr.state = state;
+  if (pincode !== undefined) addr.pincode = pincode;
+  await user.save();
+  return res.json(new ApiResponse(true, "Address updated successfully.", { savedAddresses: user.savedAddresses, address: addr }));
+};
+
+export const deleteAddress = async (req, res) => {
+  const { addressId } = req.params;
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return res.status(404).json(new ApiResponse(false, "User not found."));
+  }
+  user.savedAddresses = user.savedAddresses.filter(addr => addr._id.toString() !== addressId.toString());
+  await user.save();
+  return res.json(new ApiResponse(true, "Address deleted successfully.", { savedAddresses: user.savedAddresses }));
+};

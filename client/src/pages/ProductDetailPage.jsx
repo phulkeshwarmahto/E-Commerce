@@ -10,6 +10,7 @@ import { useReviews } from "../hooks/useReviews";
 import { formatCurrency } from "../utils/formatCurrency";
 import { validatePincode } from "../utils/validatePincode";
 import { getProductFAQsRequest, createQuestionRequest } from "../api/faq.api";
+import { notifyMeStockRequest } from "../api/products.api";
 import { ReportModal } from "../components/ui/ReportModal";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 import { optimizeCloudinaryUrl } from "../utils/optimizeImage";
@@ -242,6 +243,20 @@ export function ProductDetailPage() {
       notify(err.message || "Failed to submit question.");
     } finally {
       setSubmittingQuestion(false);
+    }
+  };
+
+  const handleNotifyMe = async () => {
+    if (!isAuthenticated) {
+      notify("Please sign in to register for stock alerts.");
+      navigate("/auth");
+      return;
+    }
+    try {
+      await notifyMeStockRequest(product.id, selectedVariant?.name);
+      notify("You will be notified when this item is back in stock! 🔔");
+    } catch (err) {
+      notify(err.message || "Failed to register stock alert.");
     }
   };
 
@@ -612,44 +627,47 @@ export function ProductDetailPage() {
                 </div>
               ) : (
                 <div className="space-y-2.5 pt-1">
-                  <button
-                    disabled={!displayInStock}
-                    onClick={() => {
-                      const itemToCart = {
-                        ...product,
-                        price: displayPrice,
-                        originalPrice: displayOriginalPrice,
-                        variantName: selectedVariant ? selectedVariant.name : undefined,
-                      };
-                      cart.addToCart(itemToCart);
-                      notify(`${product.name}${selectedVariant ? ` (${selectedVariant.name})` : ""} added to cart.`);
-                    }}
-                    className={`w-full py-3 rounded-xl font-bold text-sm border-2 transition-all
-                      ${displayInStock
-                        ? "border-[#c4622d] text-[#c4622d] hover:bg-[#c4622d] hover:text-white"
-                        : "border-gray-300 text-gray-400 cursor-not-allowed opacity-50"}`}
-                  >
-                    🛒 Add to Cart
-                  </button>
-                  <button
-                    disabled={!displayInStock}
-                    onClick={() => {
-                      const itemToCart = {
-                        ...product,
-                        price: displayPrice,
-                        originalPrice: displayOriginalPrice,
-                        variantName: selectedVariant ? selectedVariant.name : undefined,
-                      };
-                      cart.addToCart(itemToCart);
-                      navigate("/cart");
-                    }}
-                    className={`w-full py-3 rounded-xl font-bold text-sm transition-all
-                      ${displayInStock
-                        ? "bg-[#c4622d] hover:bg-[#e07a4a] text-white shadow-sm"
-                        : "bg-gray-300 text-gray-400 cursor-not-allowed opacity-50"}`}
-                  >
-                    ⚡ Buy Now
-                  </button>
+                  {!displayInStock ? (
+                    <button
+                      onClick={handleNotifyMe}
+                      className="w-full py-3 bg-[#c4622d] hover:bg-[#e07a4a] text-white rounded-xl font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      🔔 Notify Me when Back in Stock
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => {
+                          const itemToCart = {
+                            ...product,
+                            price: displayPrice,
+                            originalPrice: displayOriginalPrice,
+                            variantName: selectedVariant ? selectedVariant.name : undefined,
+                          };
+                          cart.addToCart(itemToCart);
+                          notify(`${product.name}${selectedVariant ? ` (${selectedVariant.name})` : ""} added to cart.`);
+                        }}
+                        className="w-full py-3 rounded-xl font-bold text-sm border-2 transition-all border-[#c4622d] text-[#c4622d] hover:bg-[#c4622d] hover:text-white cursor-pointer"
+                      >
+                        🛒 Add to Cart
+                      </button>
+                      <button
+                        onClick={() => {
+                          const itemToCart = {
+                            ...product,
+                            price: displayPrice,
+                            originalPrice: displayOriginalPrice,
+                            variantName: selectedVariant ? selectedVariant.name : undefined,
+                          };
+                          cart.addToCart(itemToCart);
+                          navigate("/cart");
+                        }}
+                        className="w-full py-3 rounded-xl font-bold text-sm transition-all bg-[#c4622d] hover:bg-[#e07a4a] text-white shadow-sm cursor-pointer"
+                      >
+                        ⚡ Buy Now
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
 

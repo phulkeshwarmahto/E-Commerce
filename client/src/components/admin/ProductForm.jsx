@@ -15,6 +15,9 @@ const baseState = {
   deliveryFee: "",
   variants: [],
   quantityDiscounts: [],
+  sku: "",
+  barcode: "",
+  isPublished: true,
 };
 
 export function ProductForm({ product, onSubmit, onClose }) {
@@ -47,6 +50,9 @@ export function ProductForm({ product, onSubmit, onClose }) {
       deliveryFee: product.deliveryFee !== undefined ? product.deliveryFee : "",
       variants: product.variants || [],
       quantityDiscounts: product.quantityDiscounts || [],
+      sku: product.sku || "",
+      barcode: product.barcode || "",
+      isPublished: product.isPublished !== undefined ? product.isPublished : true,
     });
   }, [product]);
 
@@ -222,6 +228,41 @@ export function ProductForm({ product, onSubmit, onClose }) {
               setForm((current) => ({ ...current, deliveryFee: event.target.value }))
             }
           />
+        </label>
+      </div>
+      <div className="form-row">
+        <label className="field">
+          <span className="field-label">SKU</span>
+          <input
+            className="input"
+            value={form.sku || ""}
+            onChange={(event) =>
+              setForm((current) => ({ ...current, sku: event.target.value }))
+            }
+            placeholder="Stock keeping unit code"
+          />
+        </label>
+        <label className="field">
+          <span className="field-label">Barcode</span>
+          <input
+            className="input"
+            value={form.barcode || ""}
+            onChange={(event) =>
+              setForm((current) => ({ ...current, barcode: event.target.value }))
+            }
+            placeholder="EAN, UPC, etc."
+          />
+        </label>
+        <label className="field flex items-center gap-2 cursor-pointer mt-6 select-none">
+          <input
+            type="checkbox"
+            className="w-4 h-4 rounded border-gray-300 text-orange focus:ring-orange"
+            checked={!!form.isPublished}
+            onChange={(event) =>
+              setForm((current) => ({ ...current, isPublished: event.target.checked }))
+            }
+          />
+          <span className="field-label mb-0 font-medium">Published / Visible to Buyers</span>
         </label>
       </div>
 

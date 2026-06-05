@@ -22,3 +22,8 @@ export const verifyEmailRequest = (payload) =>
 export const deleteAccountRequest = () =>
   apiRequest("/auth/delete-account", { method: "DELETE" });
 
+export const getAddressesRequest = () => apiRequest("/auth/addresses");
+export const addAddressRequest = (payload) => apiRequest("/auth/addresses", { method: "POST", body: payload });
+export const updateAddressRequest = (addressId, payload) => apiRequest(`/auth/addresses/${addressId}`, { method: "PUT", body: payload });
+export const deleteAddressRequest = (addressId) => apiRequest(`/auth/addresses/${addressId}`, { method: "DELETE" });
+

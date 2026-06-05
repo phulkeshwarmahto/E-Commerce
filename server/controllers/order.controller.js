@@ -7,6 +7,7 @@ import { Product } from "../models/Product.model.js";
 import { User } from "../models/User.model.js";
 import { Notification } from "../models/Notification.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
+import { Settings } from "../models/Settings.model.js";
 
 const SHIPPING_FREE_THRESHOLD = Number(process.env.SHIPPING_FREE_THRESHOLD || 500);
 const SHIPPING_FEE = Number(process.env.SHIPPING_FEE || 49);
@@ -150,7 +151,27 @@ export const getOrders = async (req, res) => {
 export const createOrder = async (req, res) => {
   const orderItems = await buildOrderItems(req.body.items);
   const subtotal = orderItems.reduce((sum, item) => sum + item.subtotal, 0);
-  const shippingFee = orderItems.reduce((sum, item) => sum + (item.product.deliveryFee || 0) * item.quantity, 0);
+
+  // Retrieve shipping settings dynamically from Settings collection
+  let activeShippingFee = Number(process.env.SHIPPING_FEE || 49);
+  let activeFreeThreshold = Number(process.env.SHIPPING_FREE_THRESHOLD || 500);
+  try {
+    const settings = await Settings.findOne();
+    if (settings) {
+      activeShippingFee = settings.shippingFee ?? activeShippingFee;
+      activeFreeThreshold = settings.shippingFreeThreshold ?? activeFreeThreshold;
+    }
+  } catch (err) {
+    console.error("Failed to load settings in createOrder:", err);
+  }
+
+  let shippingFee = orderItems.reduce((sum, item) => sum + (item.product.deliveryFee || 0) * item.quantity, 0);
+  if (shippingFee === 0 && subtotal < activeFreeThreshold) {
+    shippingFee = activeShippingFee;
+  } else if (subtotal >= activeFreeThreshold) {
+    shippingFee = 0;
+  }
+
   const { discount, couponCode } = await calculateDiscount(req.body.couponCode, orderItems);
 
   // Loyalty Discount Calculation
@@ -165,37 +186,150 @@ export const createOrder = async (req, res) => {
 
   const total = Math.max(subtotal + shippingFee - discount - loyaltyDiscount, 0);
   const paymentMethod = req.body.paymentMethod || "cod";
-  const orderNumber = `ORD-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
 
-  const order = await Order.create({
-    orderNumber,
-    userId: req.user._id,
-    items: orderItems.map(({ product, quantity, variantName, price }) => ({
-      productId: product._id,
-      name: product.name,
-      price,
-      quantity,
-      emoji: product.emoji,
-      image: product.images?.[0]?.url || "",
-      variantName,
-    })),
-    shippingAddress: req.body.shippingAddress,
-    payment: {
-      method: paymentMethod,
-      status: "pending",
-    },
-    subtotal,
-    shippingFee,
-    discount,
-    couponCode,
-    loyaltyDiscount,
-    specialInstructions: req.body.specialInstructions || "",
-    total,
-    status: "Processing",
-    statusHistory: [{ status: "Processing", note: "Order created" }],
-    deliverySlot: req.body.deliverySlot || "",
-    estimatedDeliveryDate: req.body.estimatedDeliveryDate ? new Date(req.body.estimatedDeliveryDate) : undefined,
-  });
+  // Prevent order number collisions with unique check loop
+  let orderNumber;
+  let isUnique = false;
+  while (!isUnique) {
+    orderNumber = `ORD-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
+    const existing = await Order.findOne({ orderNumber });
+    if (!existing) {
+      isUnique = true;
+    }
+  }
+
+  // Database Transaction Wrapper with Standalone Fallback
+  const session = await mongoose.startSession();
+  let order;
+
+  try {
+    await session.withTransaction(async () => {
+      // Create the order document inside transaction
+      const ordersCreated = await Order.create(
+        [
+          {
+            orderNumber,
+            userId: req.user._id,
+            items: orderItems.map(({ product, quantity, variantName, price }) => ({
+              productId: product._id,
+              name: product.name,
+              price,
+              quantity,
+              emoji: product.emoji,
+              image: product.images?.[0]?.url || "",
+              variantName,
+            })),
+            shippingAddress: req.body.shippingAddress,
+            payment: {
+              method: paymentMethod,
+              status: "pending",
+            },
+            subtotal,
+            shippingFee,
+            discount,
+            couponCode,
+            loyaltyDiscount,
+            specialInstructions: req.body.specialInstructions || "",
+            total,
+            status: "Processing",
+            statusHistory: [{ status: "Processing", note: "Order created" }],
+            deliverySlot: req.body.deliverySlot || "",
+            estimatedDeliveryDate: req.body.estimatedDeliveryDate ? new Date(req.body.estimatedDeliveryDate) : undefined,
+          },
+        ],
+        { session }
+      );
+      order = ordersCreated[0];
+
+      // Decrement stock levels inside transaction
+      for (const item of orderItems) {
+        if (item.variantName) {
+          await Product.updateOne(
+            { _id: item.product._id, "variants.name": item.variantName },
+            { $inc: { "variants.$.stockCount": -item.quantity } },
+            { session }
+          );
+        } else {
+          await Product.updateOne(
+            { _id: item.product._id },
+            {
+              $inc: { stockCount: -item.quantity },
+              $set: { inStock: item.product.stockCount - item.quantity > 0 },
+            },
+            { session }
+          );
+        }
+      }
+
+      // Clear cart inside transaction
+      await Cart.findOneAndUpdate({ userId: req.user._id }, { $set: { items: [] } }, { session });
+    });
+  } catch (txError) {
+    // Check if error is related to transactions not supported
+    const isUnsupported =
+      txError.message?.includes("ReplicaSetNoPrimary") ||
+      txError.codeName === "CommandNotSupportedOnReplicaSetMemberWithoutArbiter" ||
+      txError.message?.includes("transaction") ||
+      txError.code === 20;
+
+    if (isUnsupported) {
+      console.warn("Transactions not supported. Falling back to non-transactional order creation.");
+
+      // Fallback: Non-transactional execution
+      order = await Order.create({
+        orderNumber,
+        userId: req.user._id,
+        items: orderItems.map(({ product, quantity, variantName, price }) => ({
+          productId: product._id,
+          name: product.name,
+          price,
+          quantity,
+          emoji: product.emoji,
+          image: product.images?.[0]?.url || "",
+          variantName,
+        })),
+        shippingAddress: req.body.shippingAddress,
+        payment: {
+          method: paymentMethod,
+          status: "pending",
+        },
+        subtotal,
+        shippingFee,
+        discount,
+        couponCode,
+        loyaltyDiscount,
+        specialInstructions: req.body.specialInstructions || "",
+        total,
+        status: "Processing",
+        statusHistory: [{ status: "Processing", note: "Order created" }],
+        deliverySlot: req.body.deliverySlot || "",
+        estimatedDeliveryDate: req.body.estimatedDeliveryDate ? new Date(req.body.estimatedDeliveryDate) : undefined,
+      });
+
+      for (const item of orderItems) {
+        if (item.variantName) {
+          await Product.updateOne(
+            { _id: item.product._id, "variants.name": item.variantName },
+            { $inc: { "variants.$.stockCount": -item.quantity } }
+          );
+        } else {
+          await Product.updateOne(
+            { _id: item.product._id },
+            {
+              $inc: { stockCount: -item.quantity },
+              $set: { inStock: item.product.stockCount - item.quantity > 0 },
+            }
+          );
+        }
+      }
+
+      await Cart.findOneAndUpdate({ userId: req.user._id }, { $set: { items: [] } }, { upsert: true });
+    } else {
+      throw txError;
+    }
+  } finally {
+    session.endSession();
+  }
 
   // Check if it's the user's first order
   const isFirstOrder = (await Order.countDocuments({ userId: req.user._id })) === 1;

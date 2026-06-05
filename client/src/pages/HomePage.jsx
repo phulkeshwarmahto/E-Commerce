@@ -6,6 +6,7 @@ import { useAppContext } from "../hooks/useAppContext";
 import { useProducts } from "../hooks/useProducts";
 import { useTimer } from "../hooks/useTimer";
 import { getBrandsRequest } from "../api/brand.api";
+import { getSettingsRequest } from "../api/settings.api";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 
 const brandAds = [
@@ -134,6 +135,28 @@ export function HomePage() {
   const [activeAd, setActiveAd] = useState(0);
   const [brands, setBrands] = useState([]);
   const [loadingBrands, setLoadingBrands] = useState(true);
+  const [banners, setBanners] = useState([]);
+  const [activeBanner, setActiveBanner] = useState(0);
+
+  useEffect(() => {
+    getSettingsRequest()
+      .then((res) => {
+        if (res && res.homepageBanners && res.homepageBanners.length > 0) {
+          setBanners(res.homepageBanners);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load settings/banners:", err);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!banners.length) return;
+    const interval = window.setInterval(() => {
+      setActiveBanner((current) => (current + 1) % banners.length);
+    }, 5000);
+    return () => window.clearInterval(interval);
+  }, [banners.length]);
 
   const deal = [...products]
     .filter((p) => p.originalPrice)
@@ -179,54 +202,106 @@ export function HomePage() {
     <div className="min-h-screen bg-[#f5f0e8]">
 
       {/* ══════════════════════════════════
-          HERO SECTION
+          HERO SECTION (SETTINGS BANNER OR DEFAULT HERO)
       ══════════════════════════════════ */}
-      <section className="relative overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #2c1a0e 0%, #5a3a1a 55%, #7a3e1c 100%)" }}>
-        {/* decorative blob */}
-        <div className="absolute -right-24 -top-24 w-[500px] h-[500px] rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle, #c4622d, transparent 70%)" }} />
+      {banners.length > 0 ? (
+        <section className="relative h-[320px] md:h-[450px] overflow-hidden bg-gray-950">
+          <div className="absolute inset-0 flex transition-transform duration-500 ease-out"
+            style={{ transform: `translateX(-${activeBanner * 100}%)` }}>
+            {banners.map((banner, idx) => (
+              <div
+                key={idx}
+                className="min-w-full h-full relative flex items-center justify-center text-center px-4"
+              >
+                {/* Background Image */}
+                <img
+                  src={banner.imageUrl}
+                  alt={banner.title || "Promotional Banner"}
+                  className="absolute inset-0 w-full h-full object-cover opacity-60"
+                />
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-950/80 via-gray-950/40 to-transparent" />
+                
+                {/* Text Overlay */}
+                <div className="relative z-10 max-w-2xl text-white">
+                  <h2 className="text-xl md:text-3xl font-extrabold mb-4 drop-shadow-md text-white">
+                    {banner.title}
+                  </h2>
+                  <Link
+                    to={banner.linkUrl || "/shop"}
+                    className="inline-block bg-amber-400 hover:bg-amber-500 text-gray-950 font-bold px-6 py-2.5 rounded-xl text-xs transition-all hover:scale-105 shadow-md cursor-pointer"
+                  >
+                    Shop Offer →
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
 
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-10 md:py-16
-                        flex flex-col md:flex-row items-center gap-8 md:gap-12 relative z-10">
-          {/* Text */}
-          <div className="flex-1 text-center md:text-left">
-            <span className="inline-block bg-[#c4622d] text-white text-[0.68rem] font-bold
-                             uppercase tracking-widest px-3 py-1.5 rounded mb-4">
-              🌿 100% Natural & Organic
-            </span>
-            <h1 className="font-extrabold leading-[1.12] text-white mb-4"
-              style={{ fontSize: "clamp(1.8rem, 4.5vw, 3.4rem)" }}>
-              India's Finest<br />
-              <em className="not-italic text-amber-400">Everyday Essentials</em>
-            </h1>
-            <p className="text-white/65 text-[0.9rem] leading-[1.7] mb-6 max-w-[500px] mx-auto md:mx-0">
-              From Himalayan kitchens to your doorstep. Artisan products, pure ingredients,
-              honest prices — and a calmer shopping experience built for everyday life.
-            </p>
-            <div className="flex flex-wrap gap-3 justify-center md:justify-start">
-              <Link
-                to="/shop"
-                className="bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold
-                           px-6 py-3 rounded-lg text-sm transition-all hover:-translate-y-0.5 shadow-md"
-              >
-                Shop Now →
-              </Link>
-              <Link
-                to="/shop?badge=new"
-                className="border-2 border-white/40 text-white hover:bg-white/10 font-semibold
-                           px-6 py-3 rounded-lg text-sm transition-all hover:-translate-y-0.5"
-              >
-                New Arrivals
-              </Link>
+          {/* Dots Indicator */}
+          {banners.length > 1 && (
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20">
+              {banners.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveBanner(idx)}
+                  className={`w-2 h-2 rounded-full transition-all cursor-pointer ${
+                    idx === activeBanner ? "w-6 bg-[#c4622d]" : "bg-white/50 hover:bg-white/80"
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      ) : (
+        <section className="relative overflow-hidden"
+          style={{ background: "linear-gradient(135deg, #2c1a0e 0%, #5a3a1a 55%, #7a3e1c 100%)" }}>
+          {/* decorative blob */}
+          <div className="absolute -right-24 -top-24 w-[500px] h-[500px] rounded-full opacity-20"
+            style={{ background: "radial-gradient(circle, #c4622d, transparent 70%)" }} />
+
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-10 md:py-16
+                          flex flex-col md:flex-row items-center gap-8 md:gap-12 relative z-10">
+            {/* Text */}
+            <div className="flex-1 text-center md:text-left">
+              <span className="inline-block bg-[#c4622d] text-white text-[0.68rem] font-bold
+                               uppercase tracking-widest px-3 py-1.5 rounded mb-4">
+                🌿 100% Natural & Organic
+              </span>
+              <h1 className="font-extrabold leading-[1.12] text-white mb-4"
+                style={{ fontSize: "clamp(1.8rem, 4.5vw, 3.4rem)" }}>
+                India's Finest<br />
+                <em className="not-italic text-amber-400">Everyday Essentials</em>
+              </h1>
+              <p className="text-white/65 text-[0.9rem] leading-[1.7] mb-6 max-w-[500px] mx-auto md:mx-0">
+                From Himalayan kitchens to your doorstep. Artisan products, pure ingredients,
+                honest prices — and a calmer shopping experience built for everyday life.
+              </p>
+              <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                <Link
+                  to="/shop"
+                  className="bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold
+                             px-6 py-3 rounded-lg text-sm transition-all hover:-translate-y-0.5 shadow-md"
+                >
+                  Shop Now →
+                </Link>
+                <Link
+                  to="/shop?badge=new"
+                  className="border-2 border-white/40 text-white hover:bg-white/10 font-semibold
+                             px-6 py-3 rounded-lg text-sm transition-all hover:-translate-y-0.5"
+                >
+                  New Arrivals
+                </Link>
+              </div>
+            </div>
+            {/* Hero visual */}
+            <div className="text-[clamp(4rem,10vw,9rem)] filter drop-shadow-2xl select-none flex-shrink-0">
+              🛍️
             </div>
           </div>
-          {/* Hero visual */}
-          <div className="text-[clamp(4rem,10vw,9rem)] filter drop-shadow-2xl select-none flex-shrink-0">
-            🛍️
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ══════════════════════════════════
           TRUST BAR

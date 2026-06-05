@@ -28,6 +28,17 @@ const userSchema = new mongoose.Schema(
     loyaltyPoints: { type: Number, default: 0 },
     referralCode: { type: String, unique: true, sparse: true },
     referredBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+    savedAddresses: [
+      {
+        label: { type: String, default: "Home" },
+        name: { type: String, required: true },
+        phone: { type: String, required: true },
+        line1: { type: String, required: true },
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        pincode: { type: String, required: true },
+      }
+    ],
   },
   { timestamps: true },
 );
@@ -48,6 +59,7 @@ userSchema.methods.toClient = function toClient() {
     isActive: this.isActive,
     loyaltyPoints: this.loyaltyPoints || 0,
     referralCode: this.referralCode || "",
+    savedAddresses: this.savedAddresses || [],
   };
 };
 

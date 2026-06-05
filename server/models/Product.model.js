@@ -30,6 +30,9 @@ const productSchema = new mongoose.Schema(
     isFeatured: { type: Boolean, default: false },
     seller: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },
     deliveryFee: { type: Number, default: 0, min: 0 },
+    sku: { type: String, trim: true, default: "" },
+    barcode: { type: String, trim: true, default: "" },
+    isPublished: { type: Boolean, default: true },
     variants: [
       {
         name: { type: String, required: true },
