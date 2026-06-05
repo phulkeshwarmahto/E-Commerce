@@ -5,6 +5,7 @@ import { ProductFAQ } from "../models/ProductFAQ.model.js";
 import { Notification } from "../models/Notification.model.js";
 import { slugify } from "../utils/slugify.js";
 import { Wishlist } from "../models/Wishlist.model.js";
+import { Coupon } from "../models/Coupon.model.js";
 
 export const getSellerDashboard = async (req, res) => {
   const sellerId = req.user._id;
@@ -356,5 +357,155 @@ export const getSellerSalesAnalytics = async (req, res) => {
       orderData,
     })
   );
+};
+
+export const bulkUploadProducts = async (req, res) => {
+  const sellerId = req.user._id;
+  const { products } = req.body;
+
+  if (!products || !Array.isArray(products) || products.length === 0) {
+    return res.status(400).json(new ApiResponse(false, "Products array is required."));
+  }
+
+  const createdProducts = [];
+  for (const item of products) {
+    if (!item.name || !item.category || item.price === undefined) {
+      return res.status(400).json(new ApiResponse(false, `Product name, category, and price are required for all items.`));
+    }
+    const product = await Product.create({
+      slug: item.slug || slugify(item.name),
+      name: item.name,
+      category: item.category,
+      price: Number(item.price),
+      originalPrice: item.originalPrice ? Number(item.originalPrice) : null,
+      description: item.description || "",
+      specifications: item.specifications || {},
+      images: item.images || [],
+      emoji: item.emoji || "📦",
+      badge: item.badge || null,
+      inStock: item.inStock ?? true,
+      stockCount: Number(item.stockCount || 0),
+      rating: 0,
+      reviewCount: 0,
+      tags: item.tags || [],
+      isFeatured: Boolean(item.isFeatured),
+      seller: sellerId,
+      deliveryFee: item.deliveryFee !== undefined ? Number(item.deliveryFee) : 0,
+      variants: item.variants || [],
+    });
+    createdProducts.push(product.toClient());
+  }
+
+  return res.status(201).json(new ApiResponse(true, `Successfully uploaded ${createdProducts.length} products.`, { products: createdProducts }));
+};
+
+export const exportSellerSalesCSV = async (req, res) => {
+  const sellerId = req.user._id;
+
+  // 1. Find all products owned by this seller
+  const products = await Product.find({ seller: sellerId }, "_id");
+  const productIds = products.map((p) => p._id);
+
+  // 2. Find all orders containing any of the seller's products
+  const orders = await Order.find({ "items.productId": { $in: productIds } }).populate("userId", "name email").sort({ createdAt: -1 });
+
+  const csvEscape = (val) => {
+    if (val === null || val === undefined) return "";
+    let str = String(val);
+    if (str.includes(",") || str.includes("\"") || str.includes("\n") || str.includes("\r")) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  const headers = [
+    "Order Number",
+    "Date",
+    "Customer Name",
+    "Customer Email",
+    "Item Name",
+    "Price",
+    "Quantity",
+    "Item Total",
+    "Delivery Fee",
+    "Status",
+    "Payment Method",
+    "Payment Status"
+  ];
+
+  let csvContent = headers.join(",") + "\n";
+
+  orders.forEach((o) => {
+    o.items.forEach((item) => {
+      if (productIds.some((pId) => pId.toString() === item.productId.toString())) {
+        const row = [
+          o.orderNumber,
+          o.createdAt.toISOString(),
+          o.userId?.name || o.shippingAddress?.name || "N/A",
+          o.userId?.email || "N/A",
+          item.name + (item.variantName ? ` (${item.variantName})` : ""),
+          item.price,
+          item.quantity,
+          item.price * item.quantity,
+          o.shippingFee,
+          o.status,
+          o.payment?.method || "cod",
+          o.payment?.status || "pending"
+        ];
+        csvContent += row.map(csvEscape).join(",") + "\n";
+      }
+    });
+  });
+
+  res.setHeader("Content-Type", "text/csv");
+  res.setHeader("Content-Disposition", "attachment; filename=seller-sales-report.csv");
+  return res.status(200).send(csvContent);
+};
+
+export const getSellerCoupons = async (req, res) => {
+  const sellerId = req.user._id;
+  const coupons = await Coupon.find({ sellerId }).sort({ createdAt: -1 });
+  return res.json(new ApiResponse(true, "Seller coupons fetched.", { coupons }));
+};
+
+export const createSellerCoupon = async (req, res) => {
+  const sellerId = req.user._id;
+  const { code, discountType, discountValue, minOrderAmount, expiresAt } = req.body;
+
+  if (!code || !discountValue) {
+    return res.status(400).json(new ApiResponse(false, "Coupon code and discount value are required."));
+  }
+
+  const existing = await Coupon.findOne({ code: code.toUpperCase().trim() });
+  if (existing) {
+    return res.status(400).json(new ApiResponse(false, "A coupon with this code already exists."));
+  }
+
+  const coupon = await Coupon.create({
+    code: code.toUpperCase().trim(),
+    discountType,
+    discountValue: Number(discountValue),
+    minOrderAmount: Number(minOrderAmount || 0),
+    expiresAt: expiresAt || null,
+    sellerId,
+  });
+
+  return res.status(201).json(new ApiResponse(true, "Coupon created successfully.", coupon));
+};
+
+export const deleteSellerCoupon = async (req, res) => {
+  const sellerId = req.user._id;
+  const coupon = await Coupon.findById(req.params.id);
+
+  if (!coupon) {
+    return res.status(404).json(new ApiResponse(false, "Coupon not found."));
+  }
+
+  if (coupon.sellerId?.toString() !== sellerId.toString()) {
+    return res.status(403).json(new ApiResponse(false, "Not authorized to delete this coupon."));
+  }
+
+  await Coupon.findByIdAndDelete(req.params.id);
+  return res.json(new ApiResponse(true, "Coupon deleted successfully."));
 };
 

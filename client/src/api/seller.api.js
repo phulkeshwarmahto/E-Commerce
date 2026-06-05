@@ -28,4 +28,16 @@ export const getSellerSalesAnalyticsRequest = () =>
 export const getSellerPublicProfileRequest = (id) =>
   apiRequest(`/sellers/${id}`);
 
+export const bulkUploadProductsRequest = (products) =>
+  apiRequest("/seller/products/bulk", { method: "POST", body: { products } });
+
+export const getSellerCouponsRequest = () =>
+  apiRequest("/seller/coupons");
+
+export const createSellerCouponRequest = (payload) =>
+  apiRequest("/seller/coupons", { method: "POST", body: payload });
+
+export const deleteSellerCouponRequest = (id) =>
+  apiRequest(`/seller/coupons/${id}`, { method: "DELETE" });
+
 

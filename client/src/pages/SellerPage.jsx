@@ -10,6 +10,10 @@ import {
   getSellerProductsRequest,
   getSellerOrdersRequest,
   getSellerSalesAnalyticsRequest,
+  bulkUploadProductsRequest,
+  getSellerCouponsRequest,
+  createSellerCouponRequest,
+  deleteSellerCouponRequest,
 } from "../api/seller.api";
 import { getReviewsRequest } from "../api/reviews.api";
 import { answerQuestionRequest } from "../api/faq.api";
@@ -28,6 +32,20 @@ export function SellerPage() {
   const { user, notify } = useAppContext();
   const navigate = useNavigate();
   const [section, setSection] = useState("overview");
+
+  // Coupon states
+  const [couponsList, setCouponsList] = useState([]);
+  const [loadingCoupons, setLoadingCoupons] = useState(false);
+  const [newCoupon, setNewCoupon] = useState({
+    code: "",
+    discountType: "percent",
+    discountValue: "",
+    minOrderAmount: "",
+  });
+
+  // Bulk import states
+  const [bulkJson, setBulkJson] = useState("");
+  const [importing, setImporting] = useState(false);
 
   useDocumentMetadata({
     title: "Merchant Dashboard",
@@ -168,6 +186,24 @@ export function SellerPage() {
     }
   }, [notify]);
 
+  const loadCoupons = useCallback(async () => {
+    setLoadingCoupons(true);
+    try {
+      const res = await getSellerCouponsRequest();
+      setCouponsList(res.coupons || []);
+    } catch (err) {
+      notify(err.message || "Failed to load coupons.");
+    } finally {
+      setLoadingCoupons(false);
+    }
+  }, [notify]);
+
+  useEffect(() => {
+    if (section === "coupons") {
+      loadCoupons().catch(() => {});
+    }
+  }, [section, loadCoupons]);
+
   useEffect(() => {
     if (user?.role === "seller" || user?.role === "admin") {
       loadSellerData().catch(() => {});
@@ -214,6 +250,110 @@ export function SellerPage() {
         });
     }
   }, [selectedReviewProductId, section, notify]);
+
+  const handleExportCSV = async () => {
+    try {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:5001";
+      const session = JSON.parse(localStorage.getItem("grambazaar_session") || "{}");
+      const token = session?.token;
+      if (!token) throw new Error("Authentication required.");
+
+      const response = await fetch(`${backendUrl}/api/seller/analytics/export`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to export sales CSV report.");
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `seller-sales-report-${Date.now()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      notify("CSV report downloaded successfully!");
+    } catch (err) {
+      notify(err.message || "Failed to download CSV.");
+    }
+  };
+
+  const handleCreateCoupon = async (e) => {
+    e.preventDefault();
+    if (!newCoupon.code || !newCoupon.discountValue) {
+      notify("Code and value are required.");
+      return;
+    }
+    try {
+      await createSellerCouponRequest({
+        ...newCoupon,
+        discountValue: Number(newCoupon.discountValue),
+        minOrderAmount: Number(newCoupon.minOrderAmount || 0),
+      });
+      notify("Coupon created successfully.");
+      setNewCoupon({
+        code: "",
+        discountType: "percent",
+        discountValue: "",
+        minOrderAmount: "",
+      });
+      loadCoupons().catch(() => {});
+    } catch (err) {
+      notify(err.message || "Failed to create coupon.");
+    }
+  };
+
+  const handleDeleteCoupon = async (id) => {
+    if (!confirm("Are you sure you want to delete this coupon?")) return;
+    try {
+      await deleteSellerCouponRequest(id);
+      notify("Coupon deleted successfully.");
+      loadCoupons().catch(() => {});
+    } catch (err) {
+      notify(err.message || "Failed to delete coupon.");
+    }
+  };
+
+  const handleBulkImportSubmit = async (e) => {
+    e.preventDefault();
+    setImporting(true);
+    try {
+      let productsArray;
+      try {
+        productsArray = JSON.parse(bulkJson.trim());
+      } catch (parseErr) {
+        throw new Error("Invalid JSON syntax. Please check the JSON format.");
+      }
+
+      if (!Array.isArray(productsArray)) {
+        throw new Error("JSON must be a valid array of product objects.");
+      }
+
+      const res = await bulkUploadProductsRequest(productsArray);
+      notify(res.message || "Products uploaded successfully!");
+      setBulkJson("");
+      loadSellerProducts(productsPage).catch(() => {});
+      loadSellerData().catch(() => {});
+      setSection("products");
+    } catch (err) {
+      notify(err.message || "Failed to import products.");
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      setBulkJson(evt.target.result);
+    };
+    reader.readAsText(file);
+  };
 
   if (!user || (user.role !== "seller" && user.role !== "admin")) {
     return (
@@ -309,6 +449,8 @@ export function SellerPage() {
     { id: "returns", label: "Returns Management", icon: "🔄" },
     { id: "reviews", label: "Customer Reviews", icon: "⭐" },
     { id: "faqs", label: "Buyer Q&A (FAQs)", icon: "❓" },
+    { id: "coupons", label: "My Coupons", icon: "🎟️" },
+    { id: "bulk-import", label: "Bulk Product Import", icon: "📥" },
   ];
 
   return (
@@ -357,6 +499,16 @@ export function SellerPage() {
           {/* Overview Section */}
           {section === "overview" && dashboard ? (
             <>
+              <div className="flex justify-between items-center my-4 flex-wrap gap-2">
+                <h2 className="text-base font-bold text-gray-800 m-0">📊 Performance Overview</h2>
+                <button
+                  onClick={handleExportCSV}
+                  className="px-4 py-2 bg-gradient-to-r from-amber-600 to-[#c4622d] hover:from-amber-500 hover:to-[#a35225] text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer border-0 inline-flex items-center gap-1.5"
+                >
+                  📥 Export CSV Sales Report
+                </button>
+              </div>
+
               <div className="stats-grid">
                 <StatCard label="My Sales Revenue" value={dashboard.stats.revenue} currency />
                 <StatCard label="My Products" value={dashboard.stats.products} />
@@ -901,6 +1053,182 @@ export function SellerPage() {
               )}
             </div>
           )}
+
+          {section === "coupons" ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 stack">
+              <div className="section-head mb-4">
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900">🎟️ My Coupon Codes</h2>
+                  <p className="text-xs text-gray-500 font-semibold">Create and manage your merchant-specific discount coupons. These apply only to your store products.</p>
+                </div>
+              </div>
+
+              {/* Create Coupon Form */}
+              <form onSubmit={handleCreateCoupon} className="bg-gray-50 rounded-xl border border-gray-150 p-5 grid grid-cols-1 md:grid-cols-5 gap-4 items-end mb-6 text-sm">
+                <div className="field">
+                  <label className="label text-xs font-semibold text-gray-700">Code (uppercase)</label>
+                  <input
+                    type="text"
+                    className="input py-2"
+                    required
+                    placeholder="e.g. MYSTORE20"
+                    value={newCoupon.code}
+                    onChange={(e) => setNewCoupon({ ...newCoupon, code: e.target.value.toUpperCase().trim() })}
+                  />
+                </div>
+                <div className="field">
+                  <label className="label text-xs font-semibold text-gray-700">Discount Type</label>
+                  <select
+                    className="input py-2"
+                    value={newCoupon.discountType}
+                    onChange={(e) => setNewCoupon({ ...newCoupon, discountType: e.target.value })}
+                  >
+                    <option value="percent">Percentage (%)</option>
+                    <option value="flat">Flat Amount (₹)</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label className="label text-xs font-semibold text-gray-700">Value ({newCoupon.discountType === "percent" ? "%" : "₹"})</label>
+                  <input
+                    type="number"
+                    min="1"
+                    className="input py-2"
+                    required
+                    placeholder="e.g. 20"
+                    value={newCoupon.discountValue}
+                    onChange={(e) => setNewCoupon({ ...newCoupon, discountValue: e.target.value })}
+                  />
+                </div>
+                <div className="field">
+                  <label className="label text-xs font-semibold text-gray-700">Min Order (₹)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="input py-2"
+                    placeholder="e.g. 300"
+                    value={newCoupon.minOrderAmount}
+                    onChange={(e) => setNewCoupon({ ...newCoupon, minOrderAmount: e.target.value })}
+                  />
+                </div>
+                <div className="field flex justify-end">
+                  <button type="submit" className="button button-primary w-full py-2 font-semibold">
+                    Generate
+                  </button>
+                </div>
+              </form>
+
+              {/* Coupons List */}
+              {loadingCoupons ? (
+                <p className="text-sm text-gray-500 py-6 text-center animate-pulse">Loading coupons...</p>
+              ) : couponsList.length > 0 ? (
+                <div className="table-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-150">
+                        <th className="text-left !py-3 !px-4 text-xs font-bold text-gray-600 uppercase">Code</th>
+                        <th className="text-left !py-3 !px-4 text-xs font-bold text-gray-600 uppercase">Type</th>
+                        <th className="text-left !py-3 !px-4 text-xs font-bold text-gray-600 uppercase">Value</th>
+                        <th className="text-left !py-3 !px-4 text-xs font-bold text-gray-600 uppercase">Min Order</th>
+                        <th className="text-right !py-3 !px-4 text-xs font-bold text-gray-600 uppercase">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {couponsList.map((cpn) => (
+                        <tr key={cpn.id || cpn._id} className="hover:bg-amber-50/20 border-b border-gray-100 last:border-0 font-medium">
+                          <td className="font-bold text-[#c4622d] tracking-wider !py-3 !px-4">{cpn.code}</td>
+                          <td className="text-xs capitalize text-gray-600 !py-3 !px-4">{cpn.discountType}</td>
+                          <td className="font-semibold text-gray-900 !py-3 !px-4">
+                            {cpn.discountType === "percent" ? `${cpn.discountValue}%` : `₹${cpn.discountValue}`}
+                          </td>
+                          <td className="text-gray-600 !py-3 !px-4">₹{cpn.minOrderAmount || 0}</td>
+                          <td className="text-right !py-3 !px-4">
+                            <button
+                              type="button"
+                              className="text-red-500 hover:text-red-700 font-semibold text-xs transition-colors border-0 bg-transparent cursor-pointer"
+                              onClick={() => handleDeleteCoupon(cpn.id || cpn._id)}
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 py-10 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                  No merchant coupons generated yet. Create one above!
+                </p>
+              )}
+            </div>
+          ) : null}
+
+          {section === "bulk-import" ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 stack">
+              <h2 className="text-lg font-bold text-gray-900 mb-1">📥 Bulk Product Import</h2>
+              <p className="text-xs text-gray-500 mb-4 font-semibold">Upload a JSON file containing a list of products or paste a JSON array directly to list them in bulk.</p>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 stack gap-4">
+                  <form onSubmit={handleBulkImportSubmit} className="stack gap-4 text-sm">
+                    <div className="field">
+                      <label className="label text-xs font-semibold text-gray-700">Paste JSON Array</label>
+                      <textarea
+                        rows="12"
+                        className="input font-mono text-xs w-full p-3 bg-gray-50/40 border border-gray-300 rounded-xl"
+                        placeholder='[{"name": "Organic Rice", "category": "Pantry", "price": 99, "stockCount": 100}]'
+                        value={bulkJson}
+                        onChange={(e) => setBulkJson(e.target.value)}
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex justify-between items-center gap-4">
+                      <div>
+                        <label className="button button-secondary text-xs px-4 py-2 rounded-xl border border-gray-300 cursor-pointer hover:bg-gray-50 inline-flex items-center gap-1.5 font-bold">
+                          📁 Upload JSON File
+                          <input
+                            type="file"
+                            accept=".json"
+                            onChange={handleFileChange}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={importing || !bulkJson.trim()}
+                        className="button button-primary bg-[#c4622d] hover:bg-[#a95223] text-white font-bold py-2.5 px-6 rounded-xl text-xs transition-all border-0 shadow-sm disabled:opacity-50 cursor-pointer"
+                      >
+                        {importing ? "Importing Products..." : "🚀 Import Products"}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                <div className="bg-amber-50/40 border border-amber-200/50 rounded-2xl p-5 text-xs text-gray-750 stack gap-2">
+                  <h4 className="font-bold text-amber-800 text-sm mb-1">📋 Product JSON Schema</h4>
+                  <p>Each product object in the array should conform to this structure:</p>
+                  <pre className="bg-[#1e1109] text-amber-200 rounded-xl p-3 font-mono text-[10px] overflow-x-auto leading-relaxed">
+{`{
+  "name": "Required (String)",
+  "category": "Required (String)",
+  "price": "Required (Number)",
+  "originalPrice": "Optional (Number)",
+  "description": "Optional (String)",
+  "emoji": "Optional (String, default: 📦)",
+  "stockCount": "Optional (Number, default: 0)",
+  "inStock": "Optional (Boolean, default: true)",
+  "deliveryFee": "Optional (Number, default: 0)"
+}`}
+                  </pre>
+                  <p className="mt-1 font-semibold text-[10px] text-amber-900/70">
+                    💡 Hint: Save your catalog from Excel or database as a JSON array and import it here instantly.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
 

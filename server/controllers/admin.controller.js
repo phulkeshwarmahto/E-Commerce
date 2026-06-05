@@ -649,3 +649,57 @@ export const rejectReview = async (req, res) => {
   res.json(new ApiResponse(true, "Review rejected and deleted."));
 };
 
+export const exportAdminSalesCSV = async (req, res) => {
+  const orders = await Order.find().populate("userId", "name email").sort({ createdAt: -1 });
+
+  const csvEscape = (val) => {
+    if (val === null || val === undefined) return "";
+    let str = String(val);
+    if (str.includes(",") || str.includes("\"") || str.includes("\n") || str.includes("\r")) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  const headers = [
+    "Order Number",
+    "Date",
+    "Customer Name",
+    "Customer Email",
+    "Subtotal",
+    "Discount",
+    "Shipping Fee",
+    "Total",
+    "Status",
+    "Payment Method",
+    "Payment Status",
+    "Delivery Slot",
+    "Estimated Delivery Date"
+  ];
+
+  let csvContent = headers.join(",") + "\n";
+
+  orders.forEach((o) => {
+    const row = [
+      o.orderNumber,
+      o.createdAt.toISOString(),
+      o.userId?.name || o.shippingAddress?.name || "N/A",
+      o.userId?.email || "N/A",
+      o.subtotal,
+      o.discount,
+      o.shippingFee,
+      o.total,
+      o.status,
+      o.payment?.method || "cod",
+      o.payment?.status || "pending",
+      o.deliverySlot || "",
+      o.estimatedDeliveryDate ? o.estimatedDeliveryDate.toISOString().split("T")[0] : ""
+    ];
+    csvContent += row.map(csvEscape).join(",") + "\n";
+  });
+
+  res.setHeader("Content-Type", "text/csv");
+  res.setHeader("Content-Disposition", "attachment; filename=admin-sales-report.csv");
+  return res.status(200).send(csvContent);
+};
+

@@ -19,7 +19,7 @@ const resolveProductId = async (id) => {
   return product?._id;
 };
 
-const calculateDiscount = async (couponCode, subtotal) => {
+const calculateDiscount = async (couponCode, orderItems) => {
   if (!couponCode) {
     return { discount: 0, couponCode: "" };
   }
@@ -27,17 +27,36 @@ const calculateDiscount = async (couponCode, subtotal) => {
   const coupon = await Coupon.findOne({ code: couponCode.trim().toUpperCase(), active: true });
   const expired = coupon?.expiresAt && coupon.expiresAt.getTime() < Date.now();
 
-  if (!coupon || expired || subtotal < coupon.minOrderAmount) {
+  if (!coupon || expired) {
+    return { discount: 0, couponCode: "" };
+  }
+
+  // Calculate subtotal of items that are eligible for this coupon
+  let eligibleSubtotal = 0;
+  if (coupon.sellerId) {
+    // Seller-specific coupon: only sum subtotal of products from this seller
+    orderItems.forEach((item) => {
+      if (item.product.seller?.toString() === coupon.sellerId.toString()) {
+        eligibleSubtotal += item.subtotal;
+      }
+    });
+  } else {
+    // Platform-wide coupon: all products are eligible
+    eligibleSubtotal = orderItems.reduce((sum, item) => sum + item.subtotal, 0);
+  }
+
+  // Check minOrderAmount against eligible subtotal
+  if (eligibleSubtotal < coupon.minOrderAmount || eligibleSubtotal === 0) {
     return { discount: 0, couponCode: "" };
   }
 
   const discount =
     coupon.discountType === "percent"
-      ? Math.round((subtotal * coupon.discountValue) / 100)
+      ? Math.round((eligibleSubtotal * coupon.discountValue) / 100)
       : coupon.discountValue;
 
   return {
-    discount: Math.min(discount, subtotal),
+    discount: Math.min(discount, eligibleSubtotal),
     couponCode: coupon.code,
   };
 };
@@ -117,7 +136,7 @@ export const createOrder = async (req, res) => {
   const orderItems = await buildOrderItems(req.body.items);
   const subtotal = orderItems.reduce((sum, item) => sum + item.subtotal, 0);
   const shippingFee = orderItems.reduce((sum, item) => sum + (item.product.deliveryFee || 0) * item.quantity, 0);
-  const { discount, couponCode } = await calculateDiscount(req.body.couponCode, subtotal);
+  const { discount, couponCode } = await calculateDiscount(req.body.couponCode, orderItems);
   const total = Math.max(subtotal + shippingFee - discount, 0);
   const paymentMethod = req.body.paymentMethod || "cod";
   const orderNumber = `ORD-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
