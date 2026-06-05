@@ -8,6 +8,7 @@ import { Notification } from "../models/Notification.model.js";
 import { Brand } from "../models/Brand.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import { slugify } from "../utils/slugify.js";
+import { Report } from "../models/Report.model.js";
 
 export const getDashboard = async (_req, res) => {
   const [revenueResult, orders, productCount, userCount, products, recentOrders, topProducts, reviews] =
@@ -166,9 +167,29 @@ export const updateProduct = async (req, res) => {
   res.json(new ApiResponse(true, "Product updated.", { product: product.toClient() }));
 };
 
-export const getUsers = async (_req, res) => {
-  const users = await User.find().sort({ name: 1 });
-  res.json(new ApiResponse(true, "Users fetched.", { users: users.map((u) => u.toClient()) }));
+export const getUsers = async (req, res) => {
+  const page = Math.max(1, Number(req.query.page || 1));
+  const limit = Math.max(1, Number(req.query.limit || 10));
+  const skip = (page - 1) * limit;
+
+  const [users, totalItems] = await Promise.all([
+    User.find().sort({ name: 1 }).skip(skip).limit(limit),
+    User.countDocuments(),
+  ]);
+
+  const totalPages = Math.ceil(totalItems / limit);
+
+  res.json(
+    new ApiResponse(true, "Users fetched.", {
+      users: users.map((u) => u.toClient()),
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+    })
+  );
 };
 
 export const updateUserCreditScore = async (req, res) => {
@@ -406,5 +427,127 @@ export const deleteBrandAdmin = async (req, res) => {
     return res.status(404).json(new ApiResponse(false, "Brand spotlight not found."));
   }
   res.json(new ApiResponse(true, "Brand spotlight deleted successfully."));
+};
+
+export const banUser = async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findById(id);
+  if (!user) {
+    return res.status(404).json(new ApiResponse(false, "User not found."));
+  }
+  user.isBanned = true;
+  await user.save();
+  return res.json(new ApiResponse(true, "User has been banned successfully.", { user: user.toClient() }));
+};
+
+export const unbanUser = async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findById(id);
+  if (!user) {
+    return res.status(404).json(new ApiResponse(false, "User not found."));
+  }
+  user.isBanned = false;
+  await user.save();
+  return res.json(new ApiResponse(true, "User has been unbanned successfully.", { user: user.toClient() }));
+};
+
+export const getReports = async (req, res) => {
+  const page = Math.max(1, Number(req.query.page || 1));
+  const limit = Math.max(1, Number(req.query.limit || 10));
+  const skip = (page - 1) * limit;
+
+  const [reports, totalItems] = await Promise.all([
+    Report.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Report.countDocuments(),
+  ]);
+
+  const totalPages = Math.ceil(totalItems / limit);
+
+  return res.json(
+    new ApiResponse(true, "Reports fetched successfully.", {
+      reports: reports.map((r) => r.toClient()),
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+    })
+  );
+};
+
+export const resolveReport = async (req, res) => {
+  const { id } = req.params;
+  const { action } = req.body; // e.g. "resolve" or "delete_target"
+
+  const report = await Report.findById(id);
+  if (!report) {
+    return res.status(404).json(new ApiResponse(false, "Report not found."));
+  }
+
+  if (action === "delete_target") {
+    try {
+      if (report.reportType === "product") {
+        await Product.findByIdAndDelete(report.targetId);
+      } else if (report.reportType === "review") {
+        await Review.findByIdAndDelete(report.targetId);
+      } else if (report.reportType === "seller") {
+        // Instead of hard-deleting the user, ban them!
+        await User.findByIdAndUpdate(report.targetId, { isBanned: true });
+      }
+    } catch (err) {
+      console.error("Failed to delete target of report:", err);
+    }
+  }
+
+  // Delete the report after resolving
+  await Report.findByIdAndDelete(id);
+
+  return res.json(new ApiResponse(true, "Report resolved successfully."));
+};
+
+export const getSalesAnalytics = async (req, res) => {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const analytics = await Order.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: thirtyDaysAgo },
+        status: { $ne: "Cancelled" },
+      },
+    },
+    {
+      $group: {
+        _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+        revenue: { $sum: "$total" },
+        orders: { $sum: 1 },
+      },
+    },
+    { $sort: { _id: 1 } },
+  ]);
+
+  const labels = [];
+  const revenueData = [];
+  const orderData = [];
+
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dateString = d.toISOString().split("T")[0];
+    const match = analytics.find((entry) => entry._id === dateString);
+
+    labels.push(dateString.slice(5)); // MM-DD
+    revenueData.push(match ? match.revenue : 0);
+    orderData.push(match ? match.orders : 0);
+  }
+
+  return res.json(
+    new ApiResponse(true, "Sales analytics fetched.", {
+      labels,
+      revenueData,
+      orderData,
+    })
+  );
 };
 
