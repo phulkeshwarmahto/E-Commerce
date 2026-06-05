@@ -50,6 +50,92 @@ export function ProductDetailPage() {
   const [offersExpanded, setOffersExpanded] = useState(false);
   const [specsOpen, setSpecsOpen] = useState(true);
 
+  // Recently Viewed & Comparison States
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
+  const [isInCompare, setIsInCompare] = useState(false);
+  const [compareList, setCompareList] = useState([]);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+
+  // Track recently viewed
+  useEffect(() => {
+    if (product && product.id) {
+      const local = localStorage.getItem("grambazaar_recently_viewed");
+      let list = local ? JSON.parse(local) : [];
+      list = list.filter((p) => p.id !== product.id);
+      list.unshift({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        emoji: product.emoji,
+        badge: product.badge,
+        category: product.category,
+        rating: product.rating,
+        inStock: product.inStock,
+        bg: product.bg,
+        images: product.images,
+      });
+      localStorage.setItem("grambazaar_recently_viewed", JSON.stringify(list.slice(0, 6)));
+    }
+  }, [product]);
+
+  // Load recently viewed & comparison state
+  const loadCompareState = () => {
+    const localRV = localStorage.getItem("grambazaar_recently_viewed");
+    if (localRV && product?.id) {
+      const list = JSON.parse(localRV).filter((p) => p.id !== product.id);
+      setRecentlyViewed(list);
+    }
+    const localComp = localStorage.getItem("grambazaar_compare_list");
+    const listComp = localComp ? JSON.parse(localComp) : [];
+    setCompareList(listComp);
+    setIsInCompare(listComp.some((p) => p.id === product?.id));
+  };
+
+  useEffect(() => {
+    loadCompareState();
+    const handleCompareUpdate = () => {
+      loadCompareState();
+    };
+    window.addEventListener("compare-list-updated", handleCompareUpdate);
+    return () => {
+      window.removeEventListener("compare-list-updated", handleCompareUpdate);
+    };
+  }, [product?.id]);
+
+  const toggleCompare = () => {
+    if (!product) return;
+    const local = localStorage.getItem("grambazaar_compare_list");
+    let list = local ? JSON.parse(local) : [];
+    const exists = list.some((p) => p.id === product.id);
+    if (exists) {
+      list = list.filter((p) => p.id !== product.id);
+      setIsInCompare(false);
+      notify("Removed from comparison list.");
+    } else {
+      if (list.length >= 3) {
+        notify("You can compare up to 3 products at a time.");
+        return;
+      }
+      list.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        emoji: product.emoji,
+        category: product.category,
+        rating: product.rating,
+        inStock: product.inStock,
+        bg: product.bg,
+        specifications: product.specifications || {},
+      });
+      setIsInCompare(true);
+      notify("Added to comparison list.");
+    }
+    localStorage.setItem("grambazaar_compare_list", JSON.stringify(list));
+    window.dispatchEvent(new Event("compare-list-updated"));
+  };
+
   const orderList = orders?.orders || [];
   const hasPurchased = orderList.some(order => 
     order.status !== "Cancelled" && 
@@ -284,7 +370,11 @@ export function ProductDetailPage() {
                   </p>
                 )}
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center flex-wrap">
+                <label className="flex items-center gap-1.5 bg-white border border-gray-200 rounded-lg px-2.5 py-1 text-xs font-semibold text-gray-500 hover:border-[#ea580c] transition-colors cursor-pointer select-none">
+                  <input type="checkbox" checked={isInCompare} onChange={toggleCompare} className="cursor-pointer h-3.5 w-3.5 text-[#ea580c] border-gray-300 rounded focus:ring-[#ea580c]" />
+                  <span>⚖️ Compare</span>
+                </label>
                 <button
                   type="button"
                   onClick={handleShareProduct}
@@ -315,7 +405,7 @@ export function ProductDetailPage() {
             </div>
 
             {/* Price */}
-            <div className="border-t border-dashed border-gray-200 pt-4">
+            <div className="border-t border-dashed border-gray-200 pt-4 text-left">
               <div className="flex items-baseline gap-3 flex-wrap">
                 <span className="text-3xl font-bold text-gray-900">{formatCurrency(displayPrice)}</span>
                 {displayOriginalPrice && (
@@ -329,6 +419,23 @@ export function ProductDetailPage() {
                 <p className="text-emerald-600 font-semibold text-sm mt-1">
                   You save {formatCurrency(displayOriginalPrice - displayPrice)}
                 </p>
+              )}
+
+              {/* Quantity discounts chart */}
+              {product.quantityDiscounts && product.quantityDiscounts.length > 0 && (
+                <div className="bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 border border-emerald-200/60 rounded-2xl p-4 mt-3">
+                  <p className="text-[10px] font-black text-emerald-800 uppercase tracking-widest mb-2 flex items-center gap-1">
+                    <span>🎁 Bulk Quantity Discounts Available</span>
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {product.quantityDiscounts.map((qd, idx) => (
+                      <div key={idx} className="flex justify-between items-center bg-white border border-emerald-100 px-3 py-2 rounded-xl shadow-xs">
+                        <span className="text-xs font-semibold text-gray-700">Buy {qd.quantity}+ units</span>
+                        <span className="text-[#ea580c] font-black text-xs">Get {qd.discountPercent}% OFF!</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
 
@@ -756,6 +863,117 @@ export function ProductDetailPage() {
           targetId={reportTarget.id}
           targetName={reportTarget.name}
         />
+
+        {/* Recently Viewed Products */}
+        {recentlyViewed.length > 0 && (
+          <section className="mt-10">
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <p className="text-[0.68rem] font-bold uppercase tracking-widest text-[#9b6b3a] mb-0.5">
+                  Based on your activity
+                </p>
+                <h2 className="text-xl font-bold text-[#2c1a0e]">Recently Viewed Products</h2>
+              </div>
+            </div>
+            <ProductGrid products={recentlyViewed} />
+          </section>
+        )}
+
+        {/* Floating Compare Bar */}
+        {compareList.length > 0 && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-gray-950/85 backdrop-blur-md border border-white/10 rounded-2xl px-5 py-3.5 flex items-center gap-5 shadow-2xl animate-fade-in max-w-[90vw] md:max-w-lg">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">⚖️</span>
+              <div className="text-left">
+                <p className="text-xs font-bold text-white">Compare Products</p>
+                <p className="text-[10px] text-gray-400 font-semibold mt-0.5">{compareList.length} / 3 selected</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setShowCompareModal(true)}
+                disabled={compareList.length < 2}
+                className="bg-[#ea580c] hover:bg-[#ea580c]/90 disabled:opacity-50 text-white font-bold text-xs py-1.5 px-3.5 rounded-xl cursor-pointer border-0 shadow-sm transition-colors whitespace-nowrap"
+              >
+                Compare Now
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  localStorage.setItem("grambazaar_compare_list", JSON.stringify([]));
+                  window.dispatchEvent(new Event("compare-list-updated"));
+                }}
+                className="bg-transparent text-gray-400 hover:text-white font-bold text-xs py-1.5 px-2 rounded-xl cursor-pointer border-0 transition-colors"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Compare Modal */}
+        {showCompareModal && (
+          <Modal title="Side-by-Side Product Comparison" onClose={() => setShowCompareModal(false)}>
+            <div className="max-w-4xl mx-auto overflow-x-auto py-2">
+              <table className="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-150">
+                    <th className="p-3 font-bold text-gray-500 w-1/4">Specification</th>
+                    {compareList.map((p) => (
+                      <th key={p.id} className="p-3 w-1/4 align-top">
+                        <div className="flex flex-col items-center text-center gap-1.5">
+                          <span className="text-3xl">{p.emoji || "📦"}</span>
+                          <span className="font-bold text-gray-900 line-clamp-1">{p.name}</span>
+                          <span className="font-black text-[#ea580c]">{formatCurrency(p.price)}</span>
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-gray-100 bg-gray-50/50">
+                    <td className="p-3 font-bold text-gray-600">Category</td>
+                    {compareList.map((p) => (
+                      <td key={p.id} className="p-3 text-gray-800 font-semibold">{p.category}</td>
+                    ))}
+                  </tr>
+                  <tr className="border-b border-gray-100">
+                    <td className="p-3 font-bold text-gray-600">Availability</td>
+                    {compareList.map((p) => (
+                      <td key={p.id} className="p-3 text-gray-800 font-semibold">
+                        {p.inStock ? "✓ In Stock" : "✗ Out of Stock"}
+                      </td>
+                    ))}
+                  </tr>
+                  <tr className="border-b border-gray-100 bg-gray-50/50">
+                    <td className="p-3 font-bold text-gray-600">Rating</td>
+                    {compareList.map((p) => (
+                      <td key={p.id} className="p-3 text-gray-800 font-semibold">
+                        ⭐ {p.rating.toFixed(1)}
+                      </td>
+                    ))}
+                  </tr>
+                  {/* Collect all specs keys from all items to compare */}
+                  {Array.from(
+                    new Set(
+                      compareList.flatMap((p) => Object.keys(p.specifications || {}))
+                    )
+                  ).map((specKey, idx) => (
+                    <tr key={specKey} className={`border-b border-gray-100 ${idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"}`}>
+                      <td className="p-3 font-bold text-gray-600">{specKey}</td>
+                      {compareList.map((p) => (
+                        <td key={p.id} className="p-3 text-gray-700">
+                          {p.specifications?.[specKey] || "—"}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Modal>
+        )}
       </div>
     </div>
   );

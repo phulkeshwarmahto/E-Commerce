@@ -14,6 +14,7 @@ const baseState = {
   images: [],
   deliveryFee: "",
   variants: [],
+  quantityDiscounts: [],
 };
 
 export function ProductForm({ product, onSubmit, onClose }) {
@@ -25,6 +26,8 @@ export function ProductForm({ product, onSubmit, onClose }) {
     originalPrice: "",
     stockCount: "",
   });
+
+  const [newDiscount, setNewDiscount] = useState({ quantity: "", discountPercent: "" });
 
   useEffect(() => {
     if (!product) {
@@ -43,6 +46,7 @@ export function ProductForm({ product, onSubmit, onClose }) {
       images: product.images || [],
       deliveryFee: product.deliveryFee !== undefined ? product.deliveryFee : "",
       variants: product.variants || [],
+      quantityDiscounts: product.quantityDiscounts || [],
     });
   }, [product]);
 
@@ -76,6 +80,38 @@ export function ProductForm({ product, onSubmit, onClose }) {
     }));
   };
 
+  const handleAddDiscount = () => {
+    if (!newDiscount.quantity || !newDiscount.discountPercent) {
+      alert("Please enter quantity and discount percent.");
+      return;
+    }
+    const q = Number(newDiscount.quantity);
+    const d = Number(newDiscount.discountPercent);
+    if (q < 2) {
+      alert("Quantity must be at least 2.");
+      return;
+    }
+    if (d < 1 || d > 99) {
+      alert("Discount percent must be between 1 and 99.");
+      return;
+    }
+    setForm((current) => ({
+      ...current,
+      quantityDiscounts: [
+        ...(current.quantityDiscounts || []),
+        { quantity: q, discountPercent: d }
+      ].sort((a, b) => a.quantity - b.quantity)
+    }));
+    setNewDiscount({ quantity: "", discountPercent: "" });
+  };
+
+  const handleRemoveDiscount = (indexToRemove) => {
+    setForm((current) => ({
+      ...current,
+      quantityDiscounts: (current.quantityDiscounts || []).filter((_, index) => index !== indexToRemove),
+    }));
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     await onSubmit({
@@ -84,6 +120,7 @@ export function ProductForm({ product, onSubmit, onClose }) {
       deliveryFee: Number(form.deliveryFee || 0),
       images: form.images || [],
       variants: form.variants || [],
+      quantityDiscounts: form.quantityDiscounts || [],
     });
     setForm(baseState);
   };
@@ -268,6 +305,67 @@ export function ProductForm({ product, onSubmit, onClose }) {
               Add
             </Button>
           </div>
+        </div>
+      <div className="quantity-discounts-container border border-dashed border-bd/60 rounded-xl p-4 mb-6 bg-dk/5">
+        <h3 className="text-sm font-semibold text-orange mb-1">Quantity / Bulk Discounts</h3>
+        <p className="text-[0.75rem] text-dk/60 mb-4">
+          Add tiered discounts for purchasing multiple quantities (e.g. Buy 3+ get 10% off).
+        </p>
+
+        {form.quantityDiscounts && form.quantityDiscounts.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {form.quantityDiscounts.map((qd, idx) => (
+              <div
+                key={idx}
+                className="flex items-center gap-2 bg-orange/10 border border-orange/20 text-orange rounded-full px-3 py-1 text-xs"
+              >
+                <span className="font-bold">Buy {qd.quantity}+</span>
+                <span className="opacity-75">{qd.discountPercent}% Off</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveDiscount(idx)}
+                  className="hover:text-red-500 font-bold ml-1"
+                  title="Remove discount tier"
+                >
+                  &times;
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
+          <label className="field mb-0">
+            <span className="field-label text-[10px]">Minimum Quantity</span>
+            <input
+              className="input text-xs py-1"
+              type="number"
+              min="2"
+              placeholder="e.g. 3"
+              value={newDiscount.quantity}
+              onChange={(e) => setNewDiscount((c) => ({ ...c, quantity: e.target.value }))}
+            />
+          </label>
+          <label className="field mb-0">
+            <span className="field-label text-[10px]">Discount (%)</span>
+            <input
+              className="input text-xs py-1"
+              type="number"
+              min="1"
+              max="99"
+              placeholder="e.g. 10"
+              value={newDiscount.discountPercent}
+              onChange={(e) => setNewDiscount((c) => ({ ...c, discountPercent: e.target.value }))}
+            />
+          </label>
+          <Button
+            type="button"
+            variant="secondary"
+            className="h-[38px] px-3 text-xs shrink-0 w-full sm:w-auto"
+            onClick={handleAddDiscount}
+          >
+            Add Discount Tier
+          </Button>
         </div>
       </div>
 

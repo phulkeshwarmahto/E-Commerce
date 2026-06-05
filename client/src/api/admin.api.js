@@ -54,3 +54,6 @@ export const approveReviewRequest = (id) =>
   apiRequest(`/admin/reviews/${id}/approve`, { method: "PATCH" });
 export const rejectReviewRequest = (id) =>
   apiRequest(`/admin/reviews/${id}/reject`, { method: "DELETE" });
+
+export const getAdminGeoAnalyticsRequest = () =>
+  apiRequest("/admin/analytics/geo");

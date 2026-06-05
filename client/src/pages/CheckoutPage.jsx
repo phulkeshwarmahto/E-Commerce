@@ -87,6 +87,7 @@ export function CheckoutPage() {
   const [simulatingOrder, setSimulatingOrder] = useState(null);
   const [locatingUser, setLocatingUser] = useState(false);
   const [saveAddressForFuture, setSaveAddressForFuture] = useState(false);
+  const [specialInstructions, setSpecialInstructions] = useState("");
   const [form, setForm] = useState({
     name: user?.name || "",
     phone: user?.phone || "",
@@ -306,8 +307,51 @@ export function CheckoutPage() {
     );
   };
 
+  const calculatedItems = useMemo(() => {
+    return cart.items.map((item) => {
+      let price = item.price;
+      const qDiscounts = item.quantityDiscounts || [];
+      let applicableDiscountPercent = 0;
+      for (const qd of qDiscounts) {
+        if (item.quantity >= qd.quantity && qd.discountPercent > applicableDiscountPercent) {
+          applicableDiscountPercent = qd.discountPercent;
+        }
+      }
+      const originalPrice = price;
+      if (applicableDiscountPercent > 0) {
+        price = Math.round(price * (1 - applicableDiscountPercent / 100));
+      }
+      return {
+        ...item,
+        price,
+        originalPrice,
+        subtotal: price * item.quantity,
+        discountPercent: applicableDiscountPercent,
+      };
+    });
+  }, [cart.items]);
+
+  const itemsSubtotal = useMemo(() => {
+    return calculatedItems.reduce((sum, item) => sum + item.subtotal, 0);
+  }, [calculatedItems]);
+
+  const originalSubtotal = useMemo(() => {
+    return cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  }, [cart.items]);
+
+  const quantityDiscountsTotal = originalSubtotal - itemsSubtotal;
+
+  const loyaltyPoints = user?.loyaltyPoints || 0;
+  let loyaltyDiscountPercent = 0;
+  if (loyaltyPoints > 1500) {
+    loyaltyDiscountPercent = 10;
+  } else if (loyaltyPoints > 500) {
+    loyaltyDiscountPercent = 5;
+  }
+  const loyaltyDiscount = Math.round((itemsSubtotal * loyaltyDiscountPercent) / 100);
+
   const shippingFee = cart.items.reduce((sum, item) => sum + (item.deliveryFee || 0) * item.quantity, 0);
-  const orderTotal = Math.max(cart.summary.subtotal + shippingFee - promo.discount, 0);
+  const orderTotal = Math.max(itemsSubtotal + shippingFee - promo.discount - loyaltyDiscount, 0);
 
   if (!isAuthenticated) {
     return (
@@ -352,6 +396,8 @@ export function CheckoutPage() {
         shippingAddress: form,
         paymentMethod,
         couponCode: promo.code,
+        specialInstructions,
+        loyaltyDiscount,
         deliverySlot: selectedSlot ? `${selectedDate.toLocaleDateString(undefined, { month: "short", day: "numeric" })}: ${slotOptions.find(s => s.id === selectedSlot)?.time}` : "",
         estimatedDeliveryDate: selectedDate ? selectedDate.toISOString() : undefined,
       });
@@ -509,7 +555,7 @@ export function CheckoutPage() {
               <div className="form-row full">
                 <Input label="Pincode" value={form.pincode} onChange={(event) => setForm((current) => ({ ...current, pincode: event.target.value }))} required />
               </div>
-              <div className="flex items-center gap-2 mb-5 mt-3 select-none">
+              <div className="flex items-center gap-2 mb-4 mt-3 select-none">
                 <input
                   type="checkbox"
                   id="saveAddressCheck"
@@ -521,6 +567,21 @@ export function CheckoutPage() {
                   💾 Save this address and phone number for future use
                 </label>
               </div>
+
+              {/* Order Notes & Special Instructions */}
+              <div className="mb-5 text-left">
+                <label htmlFor="specialInstructionsInput" className="block text-xs font-bold text-[#2c1a0e] mb-1.5">
+                  📝 Delivery Notes / Special Instructions (Optional)
+                </label>
+                <textarea
+                  id="specialInstructionsInput"
+                  placeholder="e.g. Leave with security guard, knock loudly, deliver after 6 PM, etc."
+                  value={specialInstructions}
+                  onChange={(e) => setSpecialInstructions(e.target.value)}
+                  className="w-full bg-white border border-gray-200 rounded-xl p-3.5 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#ea580c] transition-all min-h-[80px] resize-y"
+                />
+              </div>
+
               <Button className="next-btn" type="button" onClick={handleContinueToPayment}>
                 Continue to Payment →
               </Button>
@@ -655,8 +716,20 @@ export function CheckoutPage() {
               <div className="space-y-1.5 border-b border-gray-100 pb-3 mb-3 text-xs text-gray-600">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>{formatCurrency(cart.summary.subtotal)}</span>
+                  <span>{formatCurrency(originalSubtotal)}</span>
                 </div>
+                {quantityDiscountsTotal > 0 && (
+                  <div className="flex justify-between text-emerald-600 font-semibold">
+                    <span>Quantity Bulk Discount</span>
+                    <span>−{formatCurrency(quantityDiscountsTotal)}</span>
+                  </div>
+                )}
+                {loyaltyDiscount > 0 && (
+                  <div className="flex justify-between text-emerald-600 font-semibold">
+                    <span>Loyalty Level Discount ({loyaltyDiscountPercent}%)</span>
+                    <span>−{formatCurrency(loyaltyDiscount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>Delivery Charges</span>
                   <span className={shippingFee === 0 ? "text-emerald-600 font-semibold" : ""}>
@@ -687,20 +760,66 @@ export function CheckoutPage() {
           ) : null}
         </form>
 
-        <aside className="mini-cart">
-          <h4>Your Items ({cart.summary.itemCount})</h4>
-          {cart.items.map((item) => (
-            <div key={`${item.id}-${item.variantName || ""}`} className="mini-item">
-              <span className="me">{item.emoji || "📦"}</span>
-              <span className="mn">
-                {item.name} {item.variantName ? `(${item.variantName})` : ""} ×{item.quantity}
-              </span>
-              <span className="mp">{formatCurrency(item.price * item.quantity)}</span>
+        <aside className="mini-cart text-left">
+          <h4 className="font-black text-sm text-[#2c1a0e] border-b border-gray-150 pb-2 mb-3">Your Items ({cart.summary.itemCount})</h4>
+          <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+            {calculatedItems.map((item) => (
+              <div key={`${item.id}-${item.variantName || ""}`} className="flex items-start justify-between gap-3 text-xs">
+                <span className="text-xl shrink-0">{item.emoji || "📦"}</span>
+                <div className="flex-1 min-w-0">
+                  <span className="block font-bold text-gray-800 truncate leading-tight">
+                    {item.name} {item.variantName ? `(${item.variantName})` : ""}
+                  </span>
+                  <span className="text-[10px] text-gray-500 font-medium">
+                    Qty: {item.quantity} @ {formatCurrency(item.price)}
+                    {item.discountPercent > 0 && (
+                      <span className="text-emerald-650 font-bold ml-1">({item.discountPercent}% off)</span>
+                    )}
+                  </span>
+                </div>
+                <div className="text-right shrink-0">
+                  {item.discountPercent > 0 && (
+                    <span className="block text-[9px] text-gray-400 line-through leading-tight">
+                      {formatCurrency(item.originalPrice * item.quantity)}
+                    </span>
+                  )}
+                  <span className="font-black text-gray-800">{formatCurrency(item.subtotal)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="border-t border-gray-150 mt-4 pt-3 space-y-1.5 text-xs text-gray-600">
+            <div className="flex justify-between">
+              <span>Subtotal</span>
+              <span>{formatCurrency(originalSubtotal)}</span>
             </div>
-          ))}
-          <div className="mini-total">
-            <span>Total</span>
-            <span className="font-bold">{formatCurrency(orderTotal)}</span>
+            {quantityDiscountsTotal > 0 && (
+              <div className="flex justify-between text-emerald-600 font-semibold">
+                <span>Bulk Discounts</span>
+                <span>−{formatCurrency(quantityDiscountsTotal)}</span>
+              </div>
+            )}
+            {loyaltyDiscount > 0 && (
+              <div className="flex justify-between text-emerald-600 font-semibold">
+                <span>Loyalty ({loyaltyDiscountPercent}%)</span>
+                <span>−{formatCurrency(loyaltyDiscount)}</span>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <span>Delivery</span>
+              <span>{shippingFee === 0 ? "FREE" : formatCurrency(shippingFee)}</span>
+            </div>
+            {promo.discount > 0 && (
+              <div className="flex justify-between text-emerald-600 font-semibold">
+                <span>Promo ({promo.code})</span>
+                <span>−{formatCurrency(promo.discount)}</span>
+              </div>
+            )}
+            <div className="flex justify-between items-baseline pt-2 border-t border-gray-150 text-sm font-black text-[#2c1a0e]">
+              <span>Total</span>
+              <span className="text-[#ea580c] text-base font-black">{formatCurrency(orderTotal)}</span>
+            </div>
           </div>
         </aside>
       </div>

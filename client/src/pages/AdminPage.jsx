@@ -24,8 +24,10 @@ import {
   getPendingReviewsRequest,
   approveReviewRequest,
   rejectReviewRequest,
+  getAdminGeoAnalyticsRequest,
 } from "../api/admin.api";
 import { getReturnRequests, updateReturnRequestStatus } from "../api/return.api";
+import { getNewsletterSubscribersRequest } from "../api/newsletter.api";
 import {
   createCategoryRequest,
   updateCategoryRequest,
@@ -166,6 +168,12 @@ export function AdminPage() {
   const [productCategoryFilter, setProductCategoryFilter] = useState("all");
   const [productSort, setProductSort] = useState("name-asc");
 
+  // Geo Analytics and Newsletter state
+  const [geoAnalytics, setGeoAnalytics] = useState([]);
+  const [loadingGeo, setLoadingGeo] = useState(false);
+  const [subscribersList, setSubscribersList] = useState([]);
+  const [loadingSubscribers, setLoadingSubscribers] = useState(false);
+
   const loadDashboard = useCallback(async () => {
     const data = await getDashboardRequest();
     setDashboard(data);
@@ -255,6 +263,30 @@ export function AdminPage() {
       notify(err.message || "Failed to load sales analytics.");
     } finally {
       setLoadingAnalytics(false);
+    }
+  }, [notify]);
+
+  const loadGeoAnalytics = useCallback(async () => {
+    setLoadingGeo(true);
+    try {
+      const data = await getAdminGeoAnalyticsRequest();
+      setGeoAnalytics(data.geoStats || []);
+    } catch (err) {
+      notify(err.message || "Failed to load geographic analytics.");
+    } finally {
+      setLoadingGeo(false);
+    }
+  }, [notify]);
+
+  const loadSubscribers = useCallback(async () => {
+    setLoadingSubscribers(true);
+    try {
+      const data = await getNewsletterSubscribersRequest();
+      setSubscribersList(data.subscribers || []);
+    } catch (err) {
+      notify(err.message || "Failed to load newsletter subscribers.");
+    } finally {
+      setLoadingSubscribers(false);
     }
   }, [notify]);
 
@@ -538,8 +570,15 @@ export function AdminPage() {
   useEffect(() => {
     if (user?.role === "admin" && section === "overview") {
       loadAnalytics().catch(() => {});
+      loadGeoAnalytics().catch(() => {});
     }
-  }, [section, loadAnalytics, user]);
+  }, [section, loadAnalytics, loadGeoAnalytics, user]);
+
+  useEffect(() => {
+    if (user?.role === "admin" && section === "newsletter") {
+      loadSubscribers().catch(() => {});
+    }
+  }, [section, loadSubscribers, user]);
 
   useEffect(() => {
     if (user?.role === "admin" && section === "coupons") {

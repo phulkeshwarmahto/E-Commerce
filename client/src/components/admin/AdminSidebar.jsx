@@ -8,6 +8,7 @@ export function AdminSidebar({ section, onChange }) {
     { id: "reports", label: "⚠️ Reports" },
     { id: "returns", label: "🔄 Returns" },
     { id: "messaging", label: "✉️ Messaging" },
+    { id: "newsletter", label: "📧 Newsletter" },
     { id: "coupons", label: "🎟️ Coupons" },
     { id: "brands", label: "📢 Spotlights" },
     { id: "categories", label: "📁 Categories" },
