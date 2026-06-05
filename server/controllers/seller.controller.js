@@ -73,6 +73,7 @@ export const createSellerProduct = async (req, res) => {
     isFeatured: Boolean(req.body.isFeatured),
     seller: sellerId,
     deliveryFee: req.body.deliveryFee !== undefined ? Number(req.body.deliveryFee) : 0,
+    variants: req.body.variants || [],
   });
 
   return res.status(201).json(new ApiResponse(true, "Product created.", { product: product.toClient() }));
@@ -91,8 +92,7 @@ export const updateSellerProduct = async (req, res) => {
     return res.status(403).json(new ApiResponse(false, "Not authorized to update this product."));
   }
 
-  // Only pick mutable fields — never assign _id, __v, seller (populated), etc.
-  const { name, category, description, badge, emoji, images, tags, isFeatured, inStock } = req.body;
+  const { name, category, description, badge, emoji, images, tags, isFeatured, inStock, variants } = req.body;
 
   if (name !== undefined) product.name = name;
   if (category !== undefined) product.category = category;
@@ -103,6 +103,7 @@ export const updateSellerProduct = async (req, res) => {
   if (tags !== undefined) product.tags = tags;
   if (isFeatured !== undefined) product.isFeatured = Boolean(isFeatured);
   if (inStock !== undefined) product.inStock = Boolean(inStock);
+  if (variants !== undefined) product.variants = variants;
 
   if (req.body.slug) product.slug = req.body.slug;
   product.price = Number(req.body.price ?? product.price);
@@ -215,3 +216,124 @@ export const updateSellerOrderStatus = async (req, res) => {
 
   return res.json(new ApiResponse(true, "Order status updated.", { order: order.toClient() }));
 };
+
+export const getSellerProducts = async (req, res) => {
+  const page = Math.max(1, Number(req.query.page || 1));
+  const limit = Math.max(1, Number(req.query.limit || 10));
+  const skip = (page - 1) * limit;
+
+  const filters = { seller: req.user._id };
+
+  const [products, totalItems] = await Promise.all([
+    Product.find(filters).sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Product.countDocuments(filters),
+  ]);
+
+  const totalPages = Math.ceil(totalItems / limit);
+
+  return res.json(
+    new ApiResponse(true, "Seller products fetched.", {
+      products: products.map((p) => p.toClient()),
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+    })
+  );
+};
+
+export const getSellerOrders = async (req, res) => {
+  const page = Math.max(1, Number(req.query.page || 1));
+  const limit = Math.max(1, Number(req.query.limit || 10));
+  const skip = (page - 1) * limit;
+
+  const products = await Product.find({ seller: req.user._id }, "_id");
+  const productIds = products.map((p) => p._id);
+
+  const filters = { "items.productId": { $in: productIds } };
+
+  const [orders, totalItems] = await Promise.all([
+    Order.find(filters).sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Order.countDocuments(filters),
+  ]);
+
+  const totalPages = Math.ceil(totalItems / limit);
+
+  return res.json(
+    new ApiResponse(true, "Seller orders fetched.", {
+      orders: orders.map((o) => o.toClient()),
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+    })
+  );
+};
+
+export const getSellerSalesAnalytics = async (req, res) => {
+  const sellerId = req.user._id;
+
+  const products = await Product.find({ seller: sellerId }, "_id");
+  const productIds = products.map((p) => p._id);
+
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const orders = await Order.find({
+    createdAt: { $gte: thirtyDaysAgo },
+    status: { $ne: "Cancelled" },
+    "items.productId": { $in: productIds },
+  });
+
+  const dailySalesMap = {};
+
+  orders.forEach((order) => {
+    const dateString = order.createdAt.toISOString().split("T")[0];
+    if (!dailySalesMap[dateString]) {
+      dailySalesMap[dateString] = { revenue: 0, orders: 0 };
+    }
+
+    let orderRevenueForSeller = 0;
+    let containsSellerProduct = false;
+
+    order.items.forEach((item) => {
+      if (productIds.some((pId) => pId.toString() === item.productId.toString())) {
+        orderRevenueForSeller += item.price * item.quantity;
+        containsSellerProduct = true;
+      }
+    });
+
+    if (containsSellerProduct) {
+      dailySalesMap[dateString].revenue += orderRevenueForSeller;
+      dailySalesMap[dateString].orders += 1;
+    }
+  });
+
+  const labels = [];
+  const revenueData = [];
+  const orderData = [];
+
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dateString = d.toISOString().split("T")[0];
+    const match = dailySalesMap[dateString];
+
+    labels.push(dateString.slice(5)); // MM-DD
+    revenueData.push(match ? match.revenue : 0);
+    orderData.push(match ? match.orders : 0);
+  }
+
+  return res.json(
+    new ApiResponse(true, "Seller sales analytics fetched.", {
+      labels,
+      revenueData,
+      orderData,
+    })
+  );
+};
+

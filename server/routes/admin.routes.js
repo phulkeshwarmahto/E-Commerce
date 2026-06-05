@@ -16,6 +16,11 @@ import {
   getBrandsAdmin,
   createBrandAdmin,
   deleteBrandAdmin,
+  banUser,
+  unbanUser,
+  getReports,
+  resolveReport,
+  getSalesAnalytics,
 } from "../controllers/admin.controller.js";
 import { requireAuth } from "../middleware/auth.middleware.js";
 import { isAdmin } from "../middleware/admin.middleware.js";
@@ -34,6 +39,8 @@ router.get("/users", asyncHandler(getUsers));
 router.patch("/users/:id/credit-score", asyncHandler(updateUserCreditScore));
 router.patch("/users/:id/certification", asyncHandler(updateUserCertification));
 router.patch("/users/:id/role", asyncHandler(updateUserRole));
+router.patch("/users/:id/ban", asyncHandler(banUser));
+router.patch("/users/:id/unban", asyncHandler(unbanUser));
 router.post("/send-notification", asyncHandler(sendNotification));
 router.post("/broadcast-notification", asyncHandler(broadcastNotification));
 router.get("/coupons", asyncHandler(getCouponsAdmin));
@@ -42,5 +49,8 @@ router.delete("/coupons/:id", asyncHandler(deleteCouponAdmin));
 router.get("/brands", asyncHandler(getBrandsAdmin));
 router.post("/brands", asyncHandler(createBrandAdmin));
 router.delete("/brands/:id", asyncHandler(deleteBrandAdmin));
+router.get("/reports", asyncHandler(getReports));
+router.patch("/reports/:id/resolve", asyncHandler(resolveReport));
+router.get("/analytics/sales", asyncHandler(getSalesAnalytics));
 
 export default router;
