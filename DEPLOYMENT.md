@@ -244,7 +244,7 @@ mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/grambazaar?retryW
 
 | Key | Value |
 |---|---|
-| `DATABASE_URL` | `mongodb+srv://user:pass@cluster0.xxxxx.mongodb.net/grambazaar?retryWrites=true&w=majority` |
+| `MONGODB_URI` | `mongodb+srv://user:pass@cluster0.xxxxx.mongodb.net/grambazaar?retryWrites=true&w=majority` |
 
 ### Step 4 — Update `server/config/db.js`
 
@@ -255,7 +255,7 @@ import mongoose from "mongoose";
 
 export const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.DATABASE_URL);
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
     console.log(`MongoDB connected: ${conn.connection.host}`);
   } catch (error) {
     console.error("MongoDB connection failed:", error.message);
@@ -308,16 +308,31 @@ export const connectDB = async () => {
    |---|---|
    | `RAZORPAY_KEY_ID` | `rzp_test_xxxxxxxx` |
    | `RAZORPAY_KEY_SECRET` | `your_key_secret` |
+   | `RAZORPAY_WEBHOOK_SECRET` | `your_webhook_secret_key` |
 
-4. Update `server/config/razorpay.js`:
+4. Configure Razorpay Dashboard Webhook:
+   - Go to Razorpay Dashboard → **Settings** → **Webhooks**.
+   - Click **Add New Webhook**.
+   - Set URL to: `https://your-api.onrender.com/api/payment/webhook`
+   - Set Secret to matches `RAZORPAY_WEBHOOK_SECRET`.
+   - Select Active Events: `payment.captured`, `order.paid`.
+
+5. Update `server/config/razorpay.js`:
 
    ```js
    import Razorpay from "razorpay";
 
-   export const razorpay = new Razorpay({
-     key_id: process.env.RAZORPAY_KEY_ID,
-     key_secret: process.env.RAZORPAY_KEY_SECRET,
-   });
+   let razorpayInstance = null;
+
+   export const getRazorpay = () => {
+     if (!razorpayInstance) {
+       razorpayInstance = new Razorpay({
+         key_id: process.env.RAZORPAY_KEY_ID,
+         key_secret: process.env.RAZORPAY_KEY_SECRET,
+       });
+     }
+     return razorpayInstance;
+   };
    ```
 
    > Install the SDK: `npm install razorpay --prefix server`

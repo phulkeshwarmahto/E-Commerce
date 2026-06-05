@@ -1,0 +1,18 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Allow: /shop
+Allow: /products/
+Allow: /contact
+Allow: /vs-competitors
+Allow: /info/
+
+# Disallow private dashboard and session routes to conserve search budget
+Disallow: /admin/
+Disallow: /seller/
+Disallow: /checkout/
+Disallow: /cart/
+Disallow: /orders/
+Disallow: /account/
+
+Sitemap: https://grambazaar.in/sitemap.xml

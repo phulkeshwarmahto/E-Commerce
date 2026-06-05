@@ -105,16 +105,22 @@ MAIL_FROM="GramBazaar <orders@your-domain.com>"
 - Implemented an inline payment status select dropdown for COD orders in merchant and admin tables.
 - Added a tax-compliant, printable single-page PDF Invoice modal.
 - Integrated React `createPortal` centered modals with 6px glassmorphic blur overlays.
-- Built a premium SEO optimization framework with JSON-LD Product/WebSite markup schemas.
+- Built a premium SEO optimization framework with JSON-LD Product/WebSite markup schemas, static robots.txt, and sitemap.xml.
+- Implemented multiple server-side saved addresses (address book CRUD API and checkout quick-fill UI).
+- Implemented stock availability alerts ("Notify Me" subscription and automated restock email automation).
+- Exposed SKU and Barcode catalog fields for product listings.
+- Added catalog Draft/Publish status toggles to hide products from customers until ready.
+- Integrated site-wide settings panel to configure shipping parameters and Cloudinary-backed homepage banners.
+- Created static dynamic page routes for Shipping Policy, Easy Returns, FAQs, About Us, Careers, Press, and Sustainability.
+- Added a secure Razorpay payment webhook endpoint (`POST /api/payment/webhook`) to handle payment captured and order paid notifications.
 
 ## Remaining Production Tasks
 
 - Add refresh-token rotation or httpOnly cookie sessions for long-lived auth.
-- Add Razorpay webhook handling for delayed payment reconciliation.
 - Add API and UI tests for auth, cart, checkout, payment verification, uploads, admin authorization, and inventory.
 - Add CI checks for client lint/build and server syntax/tests.
-- Review `npm audit` results before launch; the install currently reports 4 moderate vulnerabilities.
-- Replace seed demo users before using a production database.
+- Review `npm audit` results before launch.
+- Replace seed demo credentials with unique passwords before deployment.
 
 ## Local Run Order
 
