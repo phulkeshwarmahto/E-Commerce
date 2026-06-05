@@ -30,10 +30,10 @@ const footerLinks = {
 const paymentMethods = ["VISA", "Mastercard", "UPI", "Razorpay", "Net Banking", "COD"];
 
 const socialLinks = [
-  { label: "Facebook", icon: "f", href: "#" },
-  { label: "Instagram", icon: "in", href: "#" },
-  { label: "Twitter/X", icon: "𝕏", href: "#" },
-  { label: "YouTube", icon: "▶", href: "#" },
+  { label: "Facebook", icon: "f", href: "https://facebook.com/grambazaar" },
+  { label: "Instagram", icon: "in", href: "https://instagram.com/grambazaar" },
+  { label: "Twitter/X", icon: "𝕏", href: "https://x.com/grambazaar" },
+  { label: "YouTube", icon: "▶", href: "https://youtube.com/grambazaar" },
 ];
 
 export function Footer() {
@@ -110,6 +110,8 @@ export function Footer() {
                 <a
                   key={s.label}
                   href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={s.label}
                   className="w-8 h-8 rounded-full bg-white/10 hover:bg-amber-400 hover:text-gray-900
                              flex items-center justify-center text-xs font-bold text-white
