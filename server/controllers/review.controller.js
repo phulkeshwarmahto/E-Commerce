@@ -95,3 +95,37 @@ export const createReview = async (req, res) => {
 
   res.status(201).json(new ApiResponse(true, "Review submitted.", { review: review.toClient() }));
 };
+
+export const voteReview = async (req, res) => {
+  const { id } = req.params;
+  const { direction } = req.body; // "up", "down", "none"
+
+  if (!["up", "down", "none"].includes(direction)) {
+    return res.status(400).json(new ApiResponse(false, "Invalid vote direction."));
+  }
+
+  const review = await Review.findById(id);
+  if (!review) {
+    return res.status(404).json(new ApiResponse(false, "Review not found."));
+  }
+
+  const userId = req.user._id;
+
+  if (!review.upvotes) review.upvotes = [];
+  if (!review.downvotes) review.downvotes = [];
+
+  review.upvotes = review.upvotes.filter(uid => uid.toString() !== userId.toString());
+  review.downvotes = review.downvotes.filter(uid => uid.toString() !== userId.toString());
+
+  if (direction === "up") {
+    review.upvotes.push(userId);
+  } else if (direction === "down") {
+    review.downvotes.push(userId);
+  }
+
+  await review.save();
+
+  return res.json(
+    new ApiResponse(true, "Vote registered.", { review: review.toClient() })
+  );
+};

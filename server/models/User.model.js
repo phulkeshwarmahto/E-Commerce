@@ -25,6 +25,9 @@ const userSchema = new mongoose.Schema(
     emailVerificationToken: { type: String },
     emailVerificationExpires: { type: Date },
     isActive: { type: Boolean, default: true },
+    loyaltyPoints: { type: Number, default: 0 },
+    referralCode: { type: String, unique: true, sparse: true },
+    referredBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
   },
   { timestamps: true },
 );
@@ -43,6 +46,8 @@ userSchema.methods.toClient = function toClient() {
     address: this.address || { line1: "", city: "", state: "", pincode: "" },
     isVerified: this.isVerified,
     isActive: this.isActive,
+    loyaltyPoints: this.loyaltyPoints || 0,
+    referralCode: this.referralCode || "",
   };
 };
 

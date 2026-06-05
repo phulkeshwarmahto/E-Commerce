@@ -4,6 +4,7 @@ import { Cart } from "../models/Cart.model.js";
 import { Coupon } from "../models/Coupon.model.js";
 import { Order } from "../models/Order.model.js";
 import { Product } from "../models/Product.model.js";
+import { User } from "../models/User.model.js";
 import { Notification } from "../models/Notification.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
@@ -77,29 +78,43 @@ const buildOrderItems = async (rawItems) => {
       throw new Error("One or more products were not found.");
     }
 
-    if (item.variantName) {
-      const variant = product.variants.find((v) => v.name === item.variantName);
+    let price;
+    let variantName = item.variantName;
+
+    if (variantName) {
+      const variant = product.variants.find((v) => v.name === variantName);
       if (!variant || variant.stockCount < quantity) {
-        throw new Error(`Product "${product.name}" (${item.variantName}) is out of stock or unavailable in the requested quantity.`);
+        throw new Error(`Product "${product.name}" (${variantName}) is out of stock or unavailable in the requested quantity.`);
       }
-      items.push({
-        product,
-        quantity,
-        variantName: item.variantName,
-        price: variant.price,
-        subtotal: variant.price * quantity,
-      });
+      price = variant.price;
     } else {
       if (!product.inStock || product.stockCount < quantity) {
         throw new Error(`Product "${product.name}" is out of stock or unavailable in the requested quantity.`);
       }
-      items.push({
-        product,
-        quantity,
-        price: product.price,
-        subtotal: product.price * quantity,
-      });
+      price = product.price;
     }
+
+    // Apply Quantity Discounts
+    const qDiscounts = product.quantityDiscounts || [];
+    let applicableDiscountPercent = 0;
+    for (const qd of qDiscounts) {
+      if (quantity >= qd.quantity && qd.discountPercent > applicableDiscountPercent) {
+        applicableDiscountPercent = qd.discountPercent;
+      }
+    }
+    const originalPrice = price;
+    if (applicableDiscountPercent > 0) {
+      price = Math.round(price * (1 - applicableDiscountPercent / 100));
+    }
+
+    items.push({
+      product,
+      quantity,
+      variantName,
+      price,
+      originalPrice,
+      subtotal: price * quantity,
+    });
   }
 
   return items;
@@ -137,7 +152,18 @@ export const createOrder = async (req, res) => {
   const subtotal = orderItems.reduce((sum, item) => sum + item.subtotal, 0);
   const shippingFee = orderItems.reduce((sum, item) => sum + (item.product.deliveryFee || 0) * item.quantity, 0);
   const { discount, couponCode } = await calculateDiscount(req.body.couponCode, orderItems);
-  const total = Math.max(subtotal + shippingFee - discount, 0);
+
+  // Loyalty Discount Calculation
+  const loyaltyPoints = req.user.loyaltyPoints || 0;
+  let loyaltyDiscountPercent = 0;
+  if (loyaltyPoints > 1500) {
+    loyaltyDiscountPercent = 10;
+  } else if (loyaltyPoints > 500) {
+    loyaltyDiscountPercent = 5;
+  }
+  const loyaltyDiscount = Math.round((subtotal * loyaltyDiscountPercent) / 100);
+
+  const total = Math.max(subtotal + shippingFee - discount - loyaltyDiscount, 0);
   const paymentMethod = req.body.paymentMethod || "cod";
   const orderNumber = `ORD-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
 
@@ -162,12 +188,82 @@ export const createOrder = async (req, res) => {
     shippingFee,
     discount,
     couponCode,
+    loyaltyDiscount,
+    specialInstructions: req.body.specialInstructions || "",
     total,
     status: "Processing",
     statusHistory: [{ status: "Processing", note: "Order created" }],
     deliverySlot: req.body.deliverySlot || "",
     estimatedDeliveryDate: req.body.estimatedDeliveryDate ? new Date(req.body.estimatedDeliveryDate) : undefined,
   });
+
+  // Check if it's the user's first order
+  const isFirstOrder = (await Order.countDocuments({ userId: req.user._id })) === 1;
+  if (isFirstOrder && req.user.referredBy) {
+    const referrer = await User.findById(req.user.referredBy);
+    if (referrer) {
+      // Create coupon for referee
+      const refereeCouponCode = `REF-WELCOME-15-${req.user._id.toString().slice(-6)}`.toUpperCase();
+      try {
+        await Coupon.create({
+          code: refereeCouponCode,
+          discountType: "percent",
+          discountValue: 15,
+          minOrderAmount: 100,
+          active: true,
+        });
+        await Notification.create({
+          userId: req.user._id,
+          title: "🎁 Referral Welcome Reward",
+          message: `Thank you for placing your first order! As a referred user, here is your 15% discount coupon: ${refereeCouponCode}`,
+        });
+      } catch (err) {
+        console.error("Failed to create referee referral coupon:", err);
+      }
+
+      // Create coupon for referrer
+      const referrerCouponCode = `REF-WELCOME-15-${referrer._id.toString().slice(-6)}`.toUpperCase();
+      try {
+        await Coupon.create({
+          code: referrerCouponCode,
+          discountType: "percent",
+          discountValue: 15,
+          minOrderAmount: 100,
+          active: true,
+        });
+        await Notification.create({
+          userId: referrer._id,
+          title: "🎁 Referral Reward Credited!",
+          message: `Your friend ${req.user.name || req.user.email} placed their first order! Here is your 15% discount coupon: ${referrerCouponCode}`,
+        });
+      } catch (err) {
+        console.error("Failed to create referrer referral coupon:", err);
+      }
+    }
+  }
+
+  // Credit loyalty points
+  const pointsEarned = Math.floor(total / 100);
+  if (pointsEarned > 0) {
+    await User.updateOne({ _id: req.user._id }, { $inc: { loyaltyPoints: pointsEarned } });
+    const updatedUser = await User.findById(req.user._id);
+    let newMembership = "Silver";
+    if (updatedUser.loyaltyPoints > 1500) {
+      newMembership = "Platinum";
+    } else if (updatedUser.loyaltyPoints > 500) {
+      newMembership = "Gold";
+    }
+    if (updatedUser.membership !== newMembership) {
+      updatedUser.membership = newMembership;
+      await updatedUser.save();
+
+      await Notification.create({
+        userId: req.user._id,
+        title: "🎉 Membership Upgraded!",
+        message: `Congratulations! You have been upgraded to ${newMembership} status. Enjoy additional perks and checkout discounts.`,
+      });
+    }
+  }
 
   // Decrement stock levels
   for (const item of orderItems) {

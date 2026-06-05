@@ -38,6 +38,12 @@ const productSchema = new mongoose.Schema(
         stockCount: { type: Number, default: 0 },
       }
     ],
+    quantityDiscounts: [
+      {
+        quantity: { type: Number, min: 2, required: true },
+        discountPercent: { type: Number, min: 1, max: 99, required: true },
+      }
+    ],
   },
   { timestamps: true },
 );
@@ -50,6 +56,7 @@ productSchema.methods.toClient = function toClient() {
     ...raw,
     id: this._id.toString(),
     specifications: raw.specifications || {},
+    quantityDiscounts: raw.quantityDiscounts || [],
   };
 };
 

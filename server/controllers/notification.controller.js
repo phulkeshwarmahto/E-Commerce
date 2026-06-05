@@ -1,5 +1,5 @@
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { Notification } from "../models/Notification.model.js";
+import { Notification, notificationEvents } from "../models/Notification.model.js";
 
 export const getNotifications = async (req, res) => {
   const notifications = await Notification.find({ userId: req.user._id }).sort({ createdAt: -1 });
@@ -33,4 +33,25 @@ export const markAsRead = async (req, res) => {
 export const markAllAsRead = async (req, res) => {
   await Notification.updateMany({ userId: req.user._id, isRead: false }, { isRead: true });
   res.json(new ApiResponse(true, "All notifications marked as read."));
+};
+
+export const streamNotifications = (req, res) => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  // Keep-alive comment
+  res.write(":\n\n");
+
+  const onNewNotification = (notification) => {
+    if (notification.userId.toString() === req.user._id.toString()) {
+      res.write(`data: ${JSON.stringify(notification.toClient())}\n\n`);
+    }
+  };
+
+  notificationEvents.on("new-notification", onNewNotification);
+
+  req.on("close", () => {
+    notificationEvents.off("new-notification", onNewNotification);
+  });
 };

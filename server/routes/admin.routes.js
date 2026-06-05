@@ -25,6 +25,7 @@ import {
   approveReview,
   rejectReview,
   exportAdminSalesCSV,
+  getGeoAnalytics,
 } from "../controllers/admin.controller.js";
 import { requireAuth } from "../middleware/auth.middleware.js";
 import { isAdmin } from "../middleware/admin.middleware.js";
@@ -57,6 +58,7 @@ router.get("/reports", asyncHandler(getReports));
 router.patch("/reports/:id/resolve", asyncHandler(resolveReport));
 router.get("/analytics/sales", asyncHandler(getSalesAnalytics));
 router.get("/analytics/export", asyncHandler(exportAdminSalesCSV));
+router.get("/analytics/geo", asyncHandler(getGeoAnalytics));
 router.get("/reviews/pending", asyncHandler(getPendingReviews));
 router.patch("/reviews/:id/approve", asyncHandler(approveReview));
 router.delete("/reviews/:id/reject", asyncHandler(rejectReview));

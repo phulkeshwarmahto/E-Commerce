@@ -10,6 +10,8 @@ const reviewSchema = new mongoose.Schema(
     body: { type: String, required: true },
     media: { type: [String], default: [] },
     isApproved: { type: Boolean, default: false },
+    upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] }],
+    downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] }],
   },
   { timestamps: true },
 );
@@ -28,6 +30,8 @@ reviewSchema.methods.toClient = function toClient() {
     body: this.body,
     media: this.media,
     isApproved: this.isApproved,
+    upvotes: (this.upvotes || []).map(id => id.toString()),
+    downvotes: (this.downvotes || []).map(id => id.toString()),
     createdAt: this.createdAt,
   };
 };

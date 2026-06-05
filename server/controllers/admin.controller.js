@@ -703,3 +703,32 @@ export const exportAdminSalesCSV = async (req, res) => {
   return res.status(200).send(csvContent);
 };
 
+export const getGeoAnalytics = async (req, res) => {
+  const geoStats = await Order.aggregate([
+    {
+      $group: {
+        _id: {
+          state: { $ifNull: ["$shippingAddress.state", "Unknown"] },
+          city: { $ifNull: ["$shippingAddress.city", "Unknown"] }
+        },
+        salesCount: { $sum: 1 },
+        revenue: { $sum: "$total" }
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        state: "$_id.state",
+        city: "$_id.city",
+        salesCount: 1,
+        revenue: 1
+      }
+    },
+    { $sort: { revenue: -1 } }
+  ]);
+
+  return res.json(
+    new ApiResponse(true, "Geographic analytics fetched.", { geoStats })
+  );
+};
+

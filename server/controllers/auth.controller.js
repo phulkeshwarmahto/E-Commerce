@@ -4,6 +4,11 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { generateToken } from "../utils/generateToken.js";
 import { User } from "../models/User.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
+import { cloudinaryUpload } from "../utils/cloudinaryUpload.js";
+import { Order } from "../models/Order.model.js";
+import { Review } from "../models/Review.model.js";
+import { Wishlist } from "../models/Wishlist.model.js";
+import { SupportTicket } from "../models/SupportTicket.model.js";
 
 export const register = async (req, res) => {
   const email = req.body.email.trim().toLowerCase();
@@ -22,12 +27,33 @@ export const register = async (req, res) => {
   const requestedRole = req.body.role || "user";
   const role = allowedSelfRoles.includes(requestedRole) ? requestedRole : "user";
 
+  let referredBy = null;
+  const refCode = req.body.referredByCode || req.body.referralCode;
+  if (refCode) {
+    const referrer = await User.findOne({ referralCode: refCode.trim().toUpperCase() });
+    if (referrer) {
+      referredBy = referrer._id;
+    }
+  }
+
+  let referralCode;
+  let isUnique = false;
+  while (!isUnique) {
+    const namePart = req.body.name.trim().replace(/[^a-zA-Z0-9]/g, "").substring(0, 5).toUpperCase();
+    const randPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+    referralCode = `${namePart}-${randPart}`;
+    const check = await User.findOne({ referralCode });
+    if (!check) isUnique = true;
+  }
+
   const user = await User.create({
     name: req.body.name.trim(),
     email,
     passwordHash,
     role,
     membership: "Silver",
+    referralCode,
+    referredBy,
   });
 
   // Send email verification on registration
@@ -155,6 +181,25 @@ export const googleLogin = async (req, res) => {
       const requestedRole = role || "user";
       const finalRole = allowedRoles.includes(requestedRole) ? requestedRole : "user";
 
+      let referredBy = null;
+      const refCode = req.body.referredByCode || req.body.referralCode;
+      if (refCode) {
+        const referrer = await User.findOne({ referralCode: refCode.trim().toUpperCase() });
+        if (referrer) {
+          referredBy = referrer._id;
+        }
+      }
+
+      let referralCode;
+      let isUnique = false;
+      while (!isUnique) {
+        const namePart = name.replace(/[^a-zA-Z0-9]/g, "").substring(0, 5).toUpperCase();
+        const randPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+        referralCode = `${namePart}-${randPart}`;
+        const check = await User.findOne({ referralCode });
+        if (!check) isUnique = true;
+      }
+
       user = await User.create({
         name,
         email,
@@ -162,6 +207,8 @@ export const googleLogin = async (req, res) => {
         avatarUrl,
         role: finalRole,
         membership: "Silver",
+        referralCode,
+        referredBy,
       });
     }
 
@@ -382,4 +429,44 @@ export const deleteAccount = async (req, res) => {
   await user.save();
 
   return res.json(new ApiResponse(true, "Your account has been deactivated successfully."));
+};
+
+export const uploadAvatar = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json(new ApiResponse(false, "No image file provided."));
+  }
+  const image = await cloudinaryUpload(req.file);
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return res.status(404).json(new ApiResponse(false, "User not found."));
+  }
+  user.avatarUrl = image.url;
+  await user.save();
+  return res.json(new ApiResponse(true, "Avatar updated successfully.", { user: user.toClient() }));
+};
+
+export const exportUserData = async (req, res) => {
+  const userId = req.user._id;
+
+  const orders = await Order.find({ userId });
+  const reviews = await Review.find({ userId });
+  const wishlist = await Wishlist.find({ userId });
+  const supportTickets = await SupportTicket.find({ userId });
+
+  const exportData = {
+    profile: req.user.toClient(),
+    registeredAt: req.user.createdAt,
+    loyaltyPoints: req.user.loyaltyPoints || 0,
+    referralCode: req.user.referralCode || "",
+    address: req.user.address || {},
+    orders: orders.map(o => o.toClient ? o.toClient() : o),
+    reviews: reviews.map(r => r.toClient ? r.toClient() : r),
+    wishlist: wishlist.map(w => w.toObject ? w.toObject() : w),
+    supportTickets: supportTickets.map(s => s.toClient ? s.toClient() : s),
+    exportedAt: new Date().toISOString(),
+  };
+
+  res.setHeader("Content-Disposition", `attachment; filename="grambazaar_${req.user.name.replace(/\s+/g, "_")}_data.json"`);
+  res.setHeader("Content-Type", "application/json");
+  return res.send(JSON.stringify(exportData, null, 2));
 };

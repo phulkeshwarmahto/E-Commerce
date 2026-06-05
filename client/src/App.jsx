@@ -93,6 +93,36 @@ export default function App() {
     }
   }, [auth.token]);
 
+  useEffect(() => {
+    if (!auth.token) return;
+
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:5001";
+    const eventSource = new EventSource(`${backendUrl}/api/notifications/stream?token=${auth.token}`);
+
+    eventSource.onmessage = (event) => {
+      try {
+        if (event.data === ":") return; // Keep-alive comment
+        const data = JSON.parse(event.data);
+        if (data && data.title) {
+          setToastMessage(`🔔 ${data.title}: ${data.message}`);
+          if (orders && typeof orders.reload === "function") {
+            orders.reload().catch(() => {});
+          }
+        }
+      } catch (err) {
+        // Quietly fail JSON parsing for non-json
+      }
+    };
+
+    eventSource.onerror = (err) => {
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [auth.token, orders]);
+
   const toggleWishlist = async (id) => {
     if (auth.token) {
       try {

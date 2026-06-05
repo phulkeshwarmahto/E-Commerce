@@ -49,6 +49,8 @@ const orderSchema = new mongoose.Schema(
     shippingFee: { type: Number, default: 0, min: 0 },
     discount: { type: Number, default: 0, min: 0 },
     couponCode: { type: String, default: "" },
+    loyaltyDiscount: { type: Number, default: 0, min: 0 },
+    specialInstructions: { type: String, default: "" },
     total: { type: Number, required: true, min: 0 },
     status: { type: String, enum: ORDER_STATUSES, default: "Processing" },
     statusHistory: { type: [statusHistorySchema], default: [] },
