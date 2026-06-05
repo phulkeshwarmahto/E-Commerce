@@ -10,11 +10,13 @@ import { InvoiceModal } from "../components/ui/InvoiceModal";
 import { Pagination } from "../components/ui/Pagination";
 import { Modal } from "../components/ui/Modal";
 import { createReturnRequest } from "../api/return.api";
+import { OrderChatDrawer } from "../components/ui/OrderChatDrawer";
 
 export function OrdersPage() {
   const navigate = useNavigate();
   const { orders, user, notify, cart } = useAppContext();
   const [trackingId, setTrackingId] = useState(null);
+  const [chatOrder, setChatOrder] = useState(null);
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState({ type: "seller", id: "", name: "" });
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
@@ -170,6 +172,13 @@ export function OrdersPage() {
                     className="px-3 py-1.5 border border-gray-200 text-gray-500 rounded-lg text-xs font-semibold hover:text-red-650 hover:border-red-200 hover:bg-red-50/10 transition-all cursor-pointer bg-white"
                   >
                     ⚠️ Report Issue
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setChatOrder(order)}
+                    className="px-3 py-1.5 border border-[#c4622d]/30 text-[#c4622d] rounded-lg text-xs font-semibold hover:bg-amber-50/10 transition-all cursor-pointer bg-white"
+                  >
+                    💬 Message Seller
                   </button>
                   <button
                     className="track-btn"
@@ -422,6 +431,14 @@ export function OrdersPage() {
             </div>
           </form>
         </Modal>
+      )}
+      {chatOrder && (
+        <OrderChatDrawer
+          orderId={chatOrder.id}
+          orderNumber={chatOrder.orderNumber || chatOrder.id}
+          recipientId={null}
+          onClose={() => setChatOrder(null)}
+        />
       )}
     </section>
   );

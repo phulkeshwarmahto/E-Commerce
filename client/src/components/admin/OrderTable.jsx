@@ -2,7 +2,7 @@ import { statusColors } from "../../constants/statusColors";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { formatDate } from "../../utils/formatDate";
 
-export function OrderTable({ orders, onUpdateStatus, readOnly = false }) {
+export function OrderTable({ orders, onUpdateStatus, readOnly = false, onChat }) {
   return (
     <div className="table-card">
       <table>
@@ -13,6 +13,7 @@ export function OrderTable({ orders, onUpdateStatus, readOnly = false }) {
             <th>Total</th>
             <th>Status</th>
             <th>Payment Status</th>
+            {onChat && <th>Chat</th>}
           </tr>
         </thead>
         <tbody>
@@ -71,6 +72,18 @@ export function OrderTable({ orders, onUpdateStatus, readOnly = false }) {
                   )
                 )}
               </td>
+              {onChat && (
+                <td>
+                  <button
+                    type="button"
+                    onClick={() => onChat(order)}
+                    className="p-1.5 hover:bg-orange/10 text-orange rounded-lg transition-all border-0 bg-transparent cursor-pointer text-base"
+                    title="Open Order Chat"
+                  >
+                    💬
+                  </button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

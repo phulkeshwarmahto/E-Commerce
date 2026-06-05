@@ -26,6 +26,7 @@ import { Pagination } from "../components/ui/Pagination";
 import { useAppContext } from "../hooks/useAppContext";
 import { formatCurrency } from "../utils/formatCurrency";
 import { ReportModal } from "../components/ui/ReportModal";
+import { OrderChatDrawer } from "../components/ui/OrderChatDrawer";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 
 export function SellerPage() {
@@ -89,6 +90,8 @@ export function SellerPage() {
     currentPage: 1,
     limit: 10,
   });
+
+  const [chatOrder, setChatOrder] = useState(null);
 
   // Sales Analytics
   const [salesAnalytics, setSalesAnalytics] = useState(null);
@@ -649,6 +652,7 @@ export function SellerPage() {
               {dashboard.recentOrders?.length > 0 ? (
                 <OrderTable
                   orders={dashboard.recentOrders.slice(0, 5)}
+                  onChat={(order) => setChatOrder(order)}
                   onUpdateStatus={async (id, status, paymentStatus) => {
                     try {
                       await updateSellerOrderStatusRequest(id, status, paymentStatus);
@@ -801,6 +805,7 @@ export function SellerPage() {
                 <div className="stack gap-4">
                   <OrderTable
                     orders={ordersList}
+                    onChat={(order) => setChatOrder(order)}
                     onUpdateStatus={async (id, status, paymentStatus) => {
                       try {
                         await updateSellerOrderStatusRequest(id, status, paymentStatus);
@@ -1279,6 +1284,15 @@ export function SellerPage() {
         targetId={reportTarget.id}
         targetName={reportTarget.name}
       />
+
+      {chatOrder && (
+        <OrderChatDrawer
+          orderId={chatOrder.id}
+          orderNumber={chatOrder.orderNumber || chatOrder.id}
+          recipientId={chatOrder.userId?.id || chatOrder.userId?._id || chatOrder.userId}
+          onClose={() => setChatOrder(null)}
+        />
+      )}
     </section>
   );
 }

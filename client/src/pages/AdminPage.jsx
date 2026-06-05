@@ -812,8 +812,61 @@ export function AdminPage() {
                   )}
                 </div>
               ) : (
-                <p className="text-xs text-gray-405 italic my-4 px-2">Loading interactive sales charts...</p>
+                <p className="text-xs text-gray-455 italic my-4 px-2">Loading interactive sales charts...</p>
               )}
+
+              {/* Geographic Sales Distribution Card */}
+              <div className="bg-white rounded-2xl border border-gray-150 p-5 shadow-sm my-6">
+                <h3 className="text-xs font-black uppercase tracking-wider text-[#9b6b3a] mb-4">🌍 Geographic Sales Distribution</h3>
+                {loadingGeo ? (
+                  <p className="text-xs text-gray-500 italic py-4 animate-pulse">Loading geographic statistics...</p>
+                ) : geoAnalytics && geoAnalytics.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* List of locations */}
+                    <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
+                      {geoAnalytics.map((stat, idx) => (
+                        <div key={idx} className="flex justify-between items-center bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-xs">
+                          <div>
+                            <span className="font-bold text-gray-800">{stat.city}</span>
+                            <span className="text-gray-400 font-medium ml-1">({stat.state})</span>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-extrabold text-gray-900">₹{stat.revenue}</div>
+                            <div className="text-[10px] text-gray-400 font-bold">{stat.salesCount} {stat.salesCount === 1 ? "order" : "orders"}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Simple SVG Bar visualization of top geographic markets */}
+                    <div className="flex flex-col justify-center">
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">Revenue Breakdown by City</p>
+                      <div className="space-y-3">
+                        {geoAnalytics.slice(0, 5).map((stat, idx) => {
+                          const maxRevenue = geoAnalytics[0]?.revenue || 1;
+                          const percent = Math.max(5, Math.min(100, (stat.revenue / maxRevenue) * 100));
+                          return (
+                            <div key={idx} className="space-y-1">
+                              <div className="flex justify-between text-[11px] font-bold">
+                                <span className="text-gray-700">{stat.city}</span>
+                                <span className="text-orange">₹{stat.revenue}</span>
+                              </div>
+                              <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-gradient-to-r from-amber-500 to-[#c4622d] rounded-full transition-all duration-500"
+                                  style={{ width: `${percent}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-400 italic py-4">No geographic sales data recorded yet.</p>
+                )}
+              </div>
 
               <OrderTable
                 orders={dashboard.recentOrders}
@@ -1437,6 +1490,54 @@ export function AdminPage() {
                     </button>
                   </div>
                 </form>
+              )}
+            </div>
+          {section === "newsletter" ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 stack">
+              <div className="section-head mb-4">
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900">📧 Newsletter Subscribers</h2>
+                  <p className="text-xs text-gray-500">View and manage email list registrations for newsletters and product promotions.</p>
+                </div>
+              </div>
+
+              {loadingSubscribers ? (
+                <p className="text-sm text-gray-500 py-6 text-center animate-pulse">Loading subscribers...</p>
+              ) : subscribersList.length > 0 ? (
+                <div className="table-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-gray-50 border-b-2 border-gray-200">
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-left">Email Address</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-left">Status</th>
+                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-left">Joined Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {subscribersList.map((sub) => (
+                        <tr key={sub._id || sub.email} className="hover:bg-amber-50/20 transition-colors border-b border-gray-100 last:border-0">
+                          <td className="!py-3 !px-4 font-semibold text-gray-900 text-sm">{sub.email}</td>
+                          <td className="!py-3 !px-4">
+                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide border ${
+                              sub.active
+                                ? "bg-green-50 text-green-700 border-green-200"
+                                : "bg-red-50 text-red-700 border-red-200"
+                            }`}>
+                              {sub.active ? "Active" : "Unsubscribed"}
+                            </span>
+                          </td>
+                          <td className="!py-3 !px-4 text-gray-500 text-xs">
+                            {new Date(sub.createdAt).toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 py-10 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                  No newsletter subscribers found.
+                </p>
               )}
             </div>
           ) : null}
