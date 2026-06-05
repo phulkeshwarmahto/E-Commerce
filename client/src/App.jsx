@@ -192,6 +192,7 @@ export default function App() {
                   <Route path="/verify-email" element={<VerifyEmailPage />} />
                   <Route path="/contact" element={<ContactPage />} />
                   <Route path="/vs-competitors" element={<VSCompetitorsPage />} />
+                  <Route path="/info/:slug" element={<StaticContentPage />} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </Suspense>

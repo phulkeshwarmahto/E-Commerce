@@ -11,19 +11,19 @@ const footerLinks = {
     { label: "Health", to: "/shop?category=Health" },
   ],
   Help: [
-    { label: "Shipping Policy", to: "#" },
-    { label: "Easy Returns", to: "#" },
+    { label: "Shipping Policy", to: "/info/shipping-policy" },
+    { label: "Easy Returns", to: "/info/easy-returns" },
     { label: "Track Order", to: "/orders" },
     { label: "Contact Us", to: "/contact" },
-    { label: "FAQ", to: "#" },
+    { label: "FAQ", to: "/info/faq" },
   ],
   Company: [
-    { label: "About Us", to: "#" },
-    { label: "Blog", to: "#" },
+    { label: "About Us", to: "/info/about-us" },
+    { label: "Blog", to: "/info/blog" },
     { label: "Purity vs Aggregators", to: "/vs-competitors" },
-    { label: "Careers", to: "#" },
-    { label: "Press", to: "#" },
-    { label: "Sustainability", to: "#" },
+    { label: "Careers", to: "/info/careers" },
+    { label: "Press", to: "/info/press" },
+    { label: "Sustainability", to: "/info/sustainability" },
   ],
 };
 

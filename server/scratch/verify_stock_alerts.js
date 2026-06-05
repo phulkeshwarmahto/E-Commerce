@@ -21,7 +21,7 @@ const run = async () => {
   user = await User.create({
     name: "Stock Tester",
     email: "stock_tester@grambazaar.com",
-    role: "buyer",
+    role: "user",
     isVerified: true
   });
   console.log(`Created test user: ${user.name}`);
@@ -32,6 +32,7 @@ const run = async () => {
   }
   product = await Product.create({
     name: "Out of Stock Honey",
+    slug: "out-of-stock-honey",
     price: 150,
     category: "Pantry",
     description: "Delicious pure wild honey",

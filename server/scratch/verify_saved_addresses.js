@@ -18,7 +18,7 @@ const run = async () => {
   user = await User.create({
     name: "Address Tester",
     email: "address_tester@grambazaar.com",
-    role: "buyer",
+    role: "user",
     isVerified: true
   });
   console.log(`Created test user: ${user.name}`);
