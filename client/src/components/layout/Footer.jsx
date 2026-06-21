@@ -98,7 +98,7 @@ export function Footer() {
             <div className="flex items-center gap-2 mb-3">
               <span className="text-amber-400 text-2xl">🛒</span>
               <span className="text-white font-extrabold text-xl tracking-tight">
-                Garamm<span className="text-amber-400">Bazaar</span>
+                Garam<span className="text-amber-400">Bazaar</span>
               </span>
             </div>
             <p className="text-gray-400 text-[0.82rem] leading-relaxed mb-5">
