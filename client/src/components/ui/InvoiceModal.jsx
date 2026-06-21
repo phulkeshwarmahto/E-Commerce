@@ -62,7 +62,7 @@ export function InvoiceModal({ isOpen, onClose, order }) {
               <div className="flex items-center gap-1 mb-1.5">
                 <span className="text-[#c4622d] text-2xl">🛒</span>
                 <span className="text-lg font-black text-gray-900 tracking-tight">
-                  Gram<span className="text-[#c4622d]">Bazaar</span>
+                  Garam<span className="text-[#c4622d]">Bazaar</span>
                 </span>
               </div>
               <p className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">India's Finest Everyday Essentials</p>

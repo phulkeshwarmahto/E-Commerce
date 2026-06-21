@@ -151,7 +151,7 @@ export function AuthPage() {
           <button onClick={() => navigate("/")} className="inline-flex items-center gap-2">
             <span className="text-3xl">🛒</span>
             <span className="text-white font-extrabold text-2xl tracking-tight">
-              Gram<span className="text-amber-400">Bazaar</span>
+              Garam<span className="text-amber-400">Bazaar</span>
             </span>
           </button>
           <p className="text-white/60 text-sm mt-1">India's finest everyday essentials</p>

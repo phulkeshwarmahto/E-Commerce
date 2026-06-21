@@ -69,7 +69,7 @@ const promoCards = [
   },
   {
     title: "Earn Rewards",
-    sub: "Shop and earn GramCoins on every order.",
+    sub: "Shop and earn GaramCoins on every order.",
     icon: "🪙",
     gradient: "from-[#7a4a1a] to-[#c4622d]",
   },

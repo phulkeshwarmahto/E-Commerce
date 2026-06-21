@@ -37,7 +37,7 @@ export function ForgotPasswordPage() {
         <button onClick={() => navigate("/")} className="inline-flex items-center gap-2 mb-4">
           <span className="text-3xl">🛒</span>
           <span className="text-white font-extrabold text-2xl tracking-tight">
-            Gram<span className="text-amber-400">Bazaar</span>
+            Garam<span className="text-amber-400">Bazaar</span>
           </span>
         </button>
         <h2 className="text-center text-3xl font-extrabold text-white">

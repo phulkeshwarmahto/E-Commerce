@@ -152,7 +152,7 @@ Backlinks act as votes of confidence. To rank faster, build your domain authorit
    - Maintain uniform Name, Address, and Phone (NAP) details everywhere.
 3. **Eco-Friendly Blog Partnerships**:
    - Reach out to healthy lifestyle bloggers and healthy eating influencers for reviews.
-   - Offer promo codes (`GRAM10`) in exchange for honest product reviews linking back to your shop.
+   - Offer promo codes (`Garam10`) in exchange for honest product reviews linking back to your shop.
 
 ---
 

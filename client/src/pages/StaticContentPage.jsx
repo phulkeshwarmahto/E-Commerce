@@ -220,7 +220,7 @@ const staticPages = {
         </p>
         <ul className="list-decimal pl-5 space-y-4 mt-4">
           <li>
-            <strong>Zero-Plastic Glass Container Initiative:</strong> We package dry grains, flours, cold-pressed oils, and wild honeys in reusable, food-grade glass jars and cardboard boxes. We encourage Ranchi consumers to return empty jars upon their next delivery in exchange for loyalty GramCoins.
+            <strong>Zero-Plastic Glass Container Initiative:</strong> We package dry grains, flours, cold-pressed oils, and wild honeys in reusable, food-grade glass jars and cardboard boxes. We encourage Ranchi consumers to return empty jars upon their next delivery in exchange for loyalty GaramCoins.
           </li>
           <li>
             <strong>Reducing Food Miles:</strong> We source 100% of our honey, ghee, millets, and spices from farmers inside a 200km radius of our Ranchi distribution hub, keeping logistics emissions lower than commercial national aggregators.

@@ -193,7 +193,7 @@ GaramBazaar/
 │   │   │   │   ├── ProductCard.jsx     # Grid card with add-to-cart
 │   │   │   │   ├── ProductGrid.jsx     # Responsive grid wrapper
 │   │   │   │   ├── ProductBadge.jsx    # sale / new badges
-│   │   │   │   └── RatingBar.jsx       # Distribution histogram
+│   │   │   │   └── RatingBar.jsx       # Distribution histoGaram
 │   │   │   │
 │   │   │   ├── 📂 cart/
 │   │   │   │   ├── CartItem.jsx
@@ -619,7 +619,7 @@ All protected routes require: `Authorization: Bearer <access_token>`
     "pincode": "834001"
   },
   "paymentMethod": "upi",
-  "couponCode": "GRAM10"
+  "couponCode": "Garam10"
 }
 ```
 
@@ -815,7 +815,7 @@ All protected routes require: `Authorization: Bearer <access_token>`
 │        ₹598                  │  Total            ₹738   │
 │  ─────────────────────────   │                          │
 │  [img] Product Name          │  [Promo code] [Apply]    │
-│  ...                         │  GRAM10 / SAVE20 / FIRST50│
+│  ...                         │  Garam10 / SAVE20 / FIRST50│
 │                              │  [Proceed to Checkout →] │
 │                              │  🔒 Secure · 💳 · 📦    │
 └──────────────────────────────┴──────────────────────────┘

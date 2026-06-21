@@ -197,7 +197,7 @@ export function Navbar() {
           {/* Cart icon in logo */}
           <span className="text-amber-400 text-2xl md:text-[1.7rem] leading-none">🛒</span>
           <span className="font-extrabold text-white text-lg md:text-[1.45rem] leading-none tracking-tight">
-            Gram<span className="text-amber-400">Bazaar</span>
+            Garam<span className="text-amber-400">Bazaar</span>
           </span>
         </button>
 

@@ -8,7 +8,7 @@ const coupons = [
   { code: "FIRST50", discountType: "flat", discountValue: 50, minOrderAmount: 299 },
 ];
 
-await Coupon.deleteOne({ code: "GRAM10" });
+await Coupon.deleteOne({ code: "Garam10" });
 
 for (const coupon of coupons) {
   await Coupon.findOneAndUpdate({ code: coupon.code }, { $set: coupon }, { upsert: true, new: true });

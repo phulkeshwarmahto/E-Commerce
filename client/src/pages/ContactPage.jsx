@@ -59,7 +59,7 @@ export function ContactPage() {
         <button onClick={() => navigate("/")} className="inline-flex items-center gap-2 mb-4 hover:scale-105 transition-transform">
           <span className="text-4xl">🛒</span>
           <span className="text-white font-extrabold text-3xl tracking-tight">
-            Gram<span className="text-amber-500">Bazaar</span>
+            Garam<span className="text-amber-500">Bazaar</span>
           </span>
         </button>
         <h2 className="text-center text-4xl font-extrabold text-white tracking-tight">

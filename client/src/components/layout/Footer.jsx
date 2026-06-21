@@ -31,7 +31,7 @@ const paymentMethods = ["VISA", "Mastercard", "UPI", "Razorpay", "Net Banking", 
 
 const socialLinks = [
   { label: "Facebook", icon: "f", href: "https://facebook.com/GaramBazaar" },
-  { label: "Instagram", icon: "in", href: "https://instagram.com/GaramBazaar" },
+  { label: "InstaGaram", icon: "in", href: "https://instaGaram.com/GaramBazaar" },
   { label: "Twitter/X", icon: "𝕏", href: "https://x.com/GaramBazaar" },
   { label: "YouTube", icon: "▶", href: "https://youtube.com/GaramBazaar" },
 ];
@@ -98,7 +98,7 @@ export function Footer() {
             <div className="flex items-center gap-2 mb-3">
               <span className="text-amber-400 text-2xl">🛒</span>
               <span className="text-white font-extrabold text-xl tracking-tight">
-                Gram<span className="text-amber-400">Bazaar</span>
+                Garamm<span className="text-amber-400">Bazaar</span>
               </span>
             </div>
             <p className="text-gray-400 text-[0.82rem] leading-relaxed mb-5">

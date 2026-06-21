@@ -412,7 +412,7 @@ export function AccountPage() {
               {user.referralCode && (
                 <div className="border-t border-gray-200/50 mt-4 pt-4 text-left">
                   <h4 className="text-xs font-bold text-gray-300 flex items-center gap-1.5 mb-2">
-                    <span>🎁 Referral Program</span>
+                    <span>🎁 Referral ProGaram</span>
                   </h4>
                   <p className="text-[10px] text-gray-400 mb-2">
                     Invite friends! When they place their first order, both of you receive a 15% discount coupon!

@@ -199,7 +199,7 @@ GaramBazaar/
 │   │   │   │   ├── ProductCard.jsx     # Grid card with add-to-cart
 │   │   │   │   ├── ProductGrid.jsx     # Responsive grid wrapper
 │   │   │   │   ├── ProductBadge.jsx    # sale / new badges
-│   │   │   │   └── RatingBar.jsx       # Distribution histogram
+│   │   │   │   └── RatingBar.jsx       # Distribution histoGaram
 │   │   │   │
 │   │   │   ├── 📂 cart/
 │   │   │   │   ├── CartItem.jsx
@@ -625,7 +625,7 @@ All protected routes require: `Authorization: Bearer <access_token>`
     "pincode": "834001"
   },
   "paymentMethod": "upi",
-  "couponCode": "GRAM10"
+  "couponCode": "Garam10"
 }
 ```
 
@@ -821,7 +821,7 @@ All protected routes require: `Authorization: Bearer <access_token>`
 │        ₹598                  │  Total            ₹738   │
 │  ─────────────────────────   │                          │
 │  [img] Product Name          │  [Promo code] [Apply]    │
-│  ...                         │  GRAM10 / SAVE20 / FIRST50│
+│  ...                         │  Garam10 / SAVE20 / FIRST50│
 │                              │  [Proceed to Checkout →] │
 │                              │  🔒 Secure · 💳 · 📦    │
 └──────────────────────────────┴──────────────────────────┘
@@ -1247,7 +1247,7 @@ Following a comprehensive platform-wide feature audit, **100% of the 68 missing 
 
 ### 💬 4. Customer Engagement & Support Desk
 * **Review Moderation & Voting**: Added edit/delete controls for buyer reviews, along with helpfulness upvoting.
-* **Loyalty Points & Rewards**: Integrated a membership tier progression (Silver, Gold, Platinum) with dynamic GramCoins loyalty earnings based on order subtotals.
+* **Loyalty Points & Rewards**: Integrated a membership tier progression (Silver, Gold, Platinum) with dynamic GaramCoins loyalty earnings based on order subtotals.
 * **Referral Code System**: Users can invite friends using unique referral codes to unlock promo coupons.
 * **Wishlist price alerts**: Added automated background notifications that alert users if items in their server-saved wishlist undergo price reductions.
 * **Contact Support & Ticketing**: Created a support ticket desk (`/contact`) allowing guest and authenticated users to file inquiries.
