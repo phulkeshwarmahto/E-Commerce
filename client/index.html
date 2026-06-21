@@ -28,6 +28,88 @@
     <meta property="twitter:description" content="Everyday essentials, thoughtfully sourced from local artisan collectives and farmer cooperatives across India." />
     <meta property="twitter:image" content="https://GaramBazaar.in/favicon.png" />
 
+    <!-- Structured Data (JSON-LD) for Search Sitelinks & Search Box -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://garambazaar.vercel.app/#website",
+          "url": "https://garambazaar.vercel.app/",
+          "name": "GramBazaar",
+          "description": "Everyday essentials, thoughtfully sourced from local artisan collectives and farmer cooperatives across India.",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://garambazaar.vercel.app/shop?search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://garambazaar.vercel.app/#organization",
+          "name": "GramBazaar",
+          "url": "https://garambazaar.vercel.app/",
+          "logo": {
+            "@type": "ImageObject",
+            "@id": "https://garambazaar.vercel.app/#logo",
+            "url": "https://garambazaar.vercel.app/favicon.png",
+            "caption": "GramBazaar Logo"
+          },
+          "sameAs": [
+            "https://www.facebook.com/grambazaar",
+            "https://www.instagram.com/grambazaar"
+          ]
+        },
+        {
+          "@type": "ItemList",
+          "@id": "https://garambazaar.vercel.app/#sitelinks",
+          "name": "GramBazaar Store Categories",
+          "itemListElement": [
+            {
+              "@type": "SiteNavigationElement",
+              "position": 1,
+              "name": "Pantry Specials",
+              "description": "Certified organic flours, wild honeys, wood-pressed oils, and spices.",
+              "url": "https://garambazaar.vercel.app/shop?category=Pantry"
+            },
+            {
+              "@type": "SiteNavigationElement",
+              "position": 2,
+              "name": "Organic Beverages",
+              "description": "Natural herbal teas, juices, and organic drinks.",
+              "url": "https://garambazaar.vercel.app/shop?category=Beverages"
+            },
+            {
+              "@type": "SiteNavigationElement",
+              "position": 3,
+              "name": "Home Essentials",
+              "description": "Eco-friendly home and kitchen products.",
+              "url": "https://garambazaar.vercel.app/shop?category=Home"
+            },
+            {
+              "@type": "SiteNavigationElement",
+              "position": 4,
+              "name": "Personal Care",
+              "description": "Artisanal soaps, natural skincare, and organic oils.",
+              "url": "https://garambazaar.vercel.app/shop?category=Personal%20Care"
+            },
+            {
+              "@type": "SiteNavigationElement",
+              "position": 5,
+              "name": "Health & Wellness",
+              "description": "Herbal supplements and traditional remedies.",
+              "url": "https://garambazaar.vercel.app/shop?category=Health"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <!-- Google tag (gtag.js) -->
