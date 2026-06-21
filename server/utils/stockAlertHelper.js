@@ -44,8 +44,8 @@ export const processStockAlerts = async (productId) => {
         try {
           await sendEmail({
             to: alert.userId.email,
-            subject: `GramBazaar: "${displayName}" is Back in Stock!`,
-            text: `Hello ${alert.userId.name || "Customer"},\n\nGood news! "${displayName}" is back in stock on GramBazaar.\n\nVisit our store to purchase it now: ${process.env.CLIENT_URL || "http://localhost:5173"}/product/${product.slug || product._id}\n\nHappy shopping!\nGramBazaar Team`,
+            subject: `GaramBazaar: "${displayName}" is Back in Stock!`,
+            text: `Hello ${alert.userId.name || "Customer"},\n\nGood news! "${displayName}" is back in stock on GaramBazaar.\n\nVisit our store to purchase it now: ${process.env.CLIENT_URL || "http://localhost:5173"}/product/${product.slug || product._id}\n\nHappy shopping!\nGaramBazaar Team`,
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
                 <h2 style="color: #ea580c; border-bottom: 2px solid #f97316; padding-bottom: 10px;">🌿 Back in Stock!</h2>

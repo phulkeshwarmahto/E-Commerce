@@ -81,7 +81,7 @@ export function CheckoutPage() {
 
   useDocumentMetadata({
     title: "Secure Checkout",
-    description: "Complete your order safely on GramBazaar. Secure payment options and nationwide delivery."
+    description: "Complete your order safely on GaramBazaar. Secure payment options and nationwide delivery."
   });
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("cod");
@@ -443,7 +443,7 @@ export function CheckoutPage() {
           key: paymentOrder.keyId,
           amount: paymentOrder.amount,
           currency: paymentOrder.currency || "INR",
-          name: "GramBazaar",
+          name: "GaramBazaar",
           description: `Order ${order.id}`,
           order_id: paymentOrder.razorpayOrderId,
           prefill: {
@@ -903,12 +903,12 @@ export function CheckoutPage() {
                 <div className="flex justify-between items-center w-full max-w-xs border border-gray-100 bg-gray-50/50 rounded-xl p-2.5 text-xs text-left">
                   <div>
                     <span className="text-[10px] text-gray-400 block uppercase font-bold">UPI VPA</span>
-                    <span className="font-semibold text-gray-800 font-mono">pay@grambazaar</span>
+                    <span className="font-semibold text-gray-800 font-mono">pay@GaramBazaar</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => {
-                      navigator.clipboard.writeText("pay@grambazaar");
+                      navigator.clipboard.writeText("pay@GaramBazaar");
                       notify("UPI Address copied to clipboard!");
                     }}
                     className="text-[#c4622d] font-bold hover:underline"
@@ -929,7 +929,7 @@ export function CheckoutPage() {
                 <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Simulated Card Details</p>
                 <div className="bg-gradient-to-r from-gray-800 to-gray-700 text-white rounded-2xl p-4 shadow-md font-mono flex flex-col justify-between h-36">
                   <div className="flex justify-between items-start">
-                    <span className="text-sm font-bold tracking-widest">GramBazaar Card</span>
+                    <span className="text-sm font-bold tracking-widest">GaramBazaar Card</span>
                     <span className="text-xl">💳</span>
                   </div>
                   <div className="text-base tracking-widest my-2">4111 •••• •••• 1111</div>

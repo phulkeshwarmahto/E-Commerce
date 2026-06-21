@@ -1,6 +1,6 @@
-# 🚀 GramBazaar — Deployment Guide
+# 🚀 GaramBazaar — Deployment Guide
 
-Deploy the **GramBazaar** E-Commerce app using **Vercel** (frontend) and **Render** (backend) — both offer generous free tiers.
+Deploy the **GaramBazaar** E-Commerce app using **Vercel** (frontend) and **Render** (backend) — both offer generous free tiers.
 
 ```
 ┌────────────────────────┐         ┌────────────────────────┐
@@ -101,7 +101,7 @@ git push origin main
 
 | Setting | Value |
 |---|---|
-| **Name** | `grambazaar-api` (or any name you like) |
+| **Name** | `GaramBazaar-api` (or any name you like) |
 | **Region** | Choose the one closest to your users |
 | **Branch** | `main` |
 | **Root Directory** | `server` |
@@ -134,18 +134,18 @@ Click **"Create Web Service"**. Render will:
 Once deployed, Render gives you a URL like:
 
 ```
-https://grambazaar-api.onrender.com
+https://GaramBazaar-api.onrender.com
 ```
 
 Test the health endpoint:
 
 ```bash
-curl https://grambazaar-api.onrender.com/api/health
+curl https://GaramBazaar-api.onrender.com/api/health
 ```
 
 Expected response:
 ```json
-{ "success": true, "message": "GramBazaar API is running." }
+{ "success": true, "message": "GaramBazaar API is running." }
 ```
 
 ✅ **Save this URL** — you'll need it for the frontend.
@@ -173,7 +173,7 @@ Expected response:
 
 | Key | Value |
 |---|---|
-| `VITE_API_BASE_URL` | `https://grambazaar-api.onrender.com/api` |
+| `VITE_API_BASE_URL` | `https://GaramBazaar-api.onrender.com/api` |
 
 > ⚠️ Replace with your **actual Render URL** from Step 3 above. Include `/api` at the end.
 
@@ -187,7 +187,7 @@ Click **"Deploy"**. Vercel will:
 Your frontend URL will look like:
 
 ```
-https://grambazaar.vercel.app
+https://GaramBazaar.vercel.app
 ```
 
 ✅ **Save this URL** — you need it for the next step.
@@ -204,7 +204,7 @@ Go to your Render service → **Environment** → update:
 
 | Key | Value |
 |---|---|
-| `CLIENT_URL` | `https://grambazaar.vercel.app` |
+| `CLIENT_URL` | `https://GaramBazaar.vercel.app` |
 
 > This configures CORS so the frontend can call the API. **No trailing slash.**
 
@@ -237,14 +237,14 @@ The project currently uses an in-memory mock data store. To connect a real datab
 Go to **Database** → **Connect** → **Drivers** → Copy the connection string:
 
 ```
-mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/grambazaar?retryWrites=true&w=majority
+mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/GaramBazaar?retryWrites=true&w=majority
 ```
 
 ### Step 3 — Add to Render Environment
 
 | Key | Value |
 |---|---|
-| `MONGODB_URI` | `mongodb+srv://user:pass@cluster0.xxxxx.mongodb.net/grambazaar?retryWrites=true&w=majority` |
+| `MONGODB_URI` | `mongodb+srv://user:pass@cluster0.xxxxx.mongodb.net/GaramBazaar?retryWrites=true&w=majority` |
 
 ### Step 4 — Update `server/config/db.js`
 
@@ -372,8 +372,8 @@ Access to fetch has been blocked by CORS policy
 
 **Fix:**
 - Go to Render → Environment → set `CLIENT_URL` to your **exact** Vercel URL
-- No trailing slash: `https://grambazaar.vercel.app` ✅
-- With trailing slash: `https://grambazaar.vercel.app/` ❌
+- No trailing slash: `https://GaramBazaar.vercel.app` ✅
+- With trailing slash: `https://GaramBazaar.vercel.app/` ❌
 
 ---
 
@@ -458,4 +458,4 @@ Access to fetch has been blocked by CORS policy
 
 ---
 
-<p align="center">Made with ❤️ for <strong>GramBazaar</strong></p>
+<p align="center">Made with ❤️ for <strong>GaramBazaar</strong></p>

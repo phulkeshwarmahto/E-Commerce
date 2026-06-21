@@ -14,7 +14,7 @@ import { OrderChatDrawer } from "../components/ui/OrderChatDrawer";
 
 export function OrdersPage() {
   const navigate = useNavigate();
-  const { orders, user, notify, cart } = useAppContext();
+  const { orders, user, notify, cart, confirm } = useAppContext();
   const [trackingId, setTrackingId] = useState(null);
   const [chatOrder, setChatOrder] = useState(null);
   const [reportModalOpen, setReportModalOpen] = useState(false);
@@ -53,7 +53,7 @@ export function OrdersPage() {
 
   useDocumentMetadata({
     title: "My Orders",
-    description: "Track your orders, view shipping status, and browse purchase history on GramBazaar."
+    description: "Track your orders, view shipping status, and browse purchase history on GaramBazaar."
   });
 
   if (user?.role === "seller") {
@@ -149,7 +149,7 @@ export function OrdersPage() {
                     <button
                       type="button"
                       onClick={async () => {
-                        if (confirm("Are you sure you want to cancel this order?")) {
+                        if (await confirm("Are you sure you want to cancel this order?")) {
                           try {
                             await orders.cancelOrder(order.id);
                             notify("Order cancelled successfully.");

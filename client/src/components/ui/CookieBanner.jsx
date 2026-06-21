@@ -4,19 +4,19 @@ export function CookieBanner() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    const consent = localStorage.getItem("grambazaar_cookies_accepted");
+    const consent = localStorage.getItem("GaramBazaar_cookies_accepted");
     if (!consent) {
       setShow(true);
     }
   }, []);
 
   const handleAccept = () => {
-    localStorage.setItem("grambazaar_cookies_accepted", "accepted");
+    localStorage.setItem("GaramBazaar_cookies_accepted", "accepted");
     setShow(false);
   };
 
   const handleDecline = () => {
-    localStorage.setItem("grambazaar_cookies_accepted", "declined");
+    localStorage.setItem("GaramBazaar_cookies_accepted", "declined");
     setShow(false);
   };
 
@@ -29,7 +29,7 @@ export function CookieBanner() {
         <div className="space-y-1">
           <h4 className="text-xs font-black text-gray-900 uppercase tracking-wider">Cookie Policy Acceptance</h4>
           <p className="text-[11px] text-gray-500 leading-relaxed">
-            GramBazaar uses essential session cookies to save items in your shopping cart and keep you logged in. By accepting, you consent to our privacy guidelines.
+            GaramBazaar uses essential session cookies to save items in your shopping cart and keep you logged in. By accepting, you consent to our privacy guidelines.
           </p>
         </div>
       </div>

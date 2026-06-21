@@ -1,4 +1,4 @@
-# GramBazaar - Email Delivery & Bulk Mailing Guide (No-Domain Setup)
+# GaramBazaar - Email Delivery & Bulk Mailing Guide (No-Domain Setup)
 
 If you do not own a custom domain and want to send transactional and bulk emails to buyers for free, this guide outlines your options, limitations, and how to safely send bulk emails (e.g., 100 emails at once) without getting blocked.
 
@@ -31,10 +31,10 @@ If you are sending the same notification to 100 users, send **one** email and pu
 * **Nodemailer Code Example**:
   ```javascript
   await transporter.sendMail({
-    from: 'GramBazaar <pkmahto009@gmail.com>',
+    from: 'GaramBazaar <pkmahto009@gmail.com>',
     to: 'pkmahto009@gmail.com', // Send to yourself
     bcc: ['buyer1@example.com', 'buyer2@example.com', ...], // List of 100 buyers
-    subject: 'Special Offer from GramBazaar',
+    subject: 'Special Offer from GaramBazaar',
     html: '<p>Check out our new products!</p>',
   });
   ```
@@ -68,7 +68,7 @@ If each of the 100 emails has personalized content (e.g., "Hello [Name]"), you m
 ---
 
 ## 4. Alternative: Transitioning to a Paid/Domain Setup (For 5,000+ Users)
-If your website traffic grows and you need to send **5,000+ emails/month**, you will need to buy a domain (e.g., `grambazaar.in`, which costs about $5 to $10 per year) and verify it on a dedicated service:
+If your website traffic grows and you need to send **5,000+ emails/month**, you will need to buy a domain (e.g., `GaramBazaar.in`, which costs about $5 to $10 per year) and verify it on a dedicated service:
 
 | Provider | Free Tier Limit | Pros | Cons |
 | :--- | :--- | :--- | :--- |
@@ -89,7 +89,7 @@ If you decide to register a custom domain later and want to use Brevo's free tie
    * **SMTP Server/Host**: `smtp-relay.brevo.com`
    * **Port**: `587` (TLS) or `465` (SSL)
    * **SMTP Username (Login)**: Your Brevo login email address.
-4. Click **Generate a new SMTP key**, name it (e.g. `GramBazaar Production`), and copy the password key shown.
+4. Click **Generate a new SMTP key**, name it (e.g. `GaramBazaar Production`), and copy the password key shown.
 
 ### Step 2: Disable IP Security Blocking (Crucial for Render Hosting)
 By default, Brevo rejects connection requests from unknown IPs (like Render's rotated IPs).
@@ -102,7 +102,7 @@ By default, Brevo rejects connection requests from unknown IPs (like Render's ro
 To avoid emails landing in the spam folder:
 1. In the top-right corner, click your organization name and select **Senders & IPs**.
 2. Go to the **Domains** tab and click **Add a domain**.
-3. Enter your purchased domain (e.g., `grambazaar.in`).
+3. Enter your purchased domain (e.g., `GaramBazaar.in`).
 4. Copy the generated TXT and SPF records, log in to your domain registrar (GoDaddy, Namecheap, Cloudflare, etc.), and add them to your DNS settings.
 5. Click **Verify & Authenticate** in Brevo.
 
@@ -113,6 +113,6 @@ SMTP_HOST=smtp-relay.brevo.com
 SMTP_PORT=587
 SMTP_USER=your-brevo-username-email@example.com
 SMTP_PASS=xsmtpsib-your-generated-smtp-key
-MAIL_FROM="GramBazaar <no-reply@yourdomain.com>"
+MAIL_FROM="GaramBazaar <no-reply@yourdomain.com>"
 ```
 

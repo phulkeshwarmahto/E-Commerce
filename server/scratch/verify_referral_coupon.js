@@ -1,7 +1,7 @@
 /**
  * verify_referral_coupon.js
  * ─────────────────────────
- * Validates the referral coupon loop logic used by GramBazaar.
+ * Validates the referral coupon loop logic used by GaramBazaar.
  *
  *   Signup Flow:
  *     ▸ Every new user gets a unique referralCode (e.g. ABCDE-XY12)

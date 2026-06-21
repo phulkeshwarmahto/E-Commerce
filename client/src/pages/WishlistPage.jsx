@@ -10,7 +10,7 @@ export function WishlistPage() {
 
   useDocumentMetadata({
     title: "My Wishlist",
-    description: "View and shop your saved favorites. Track prices and availability of your preferred organic products on GramBazaar."
+    description: "View and shop your saved favorites. Track prices and availability of your preferred organic products on GaramBazaar."
   });
 
   return (

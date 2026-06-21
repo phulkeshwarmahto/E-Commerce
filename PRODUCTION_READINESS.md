@@ -1,10 +1,10 @@
-# GramBazaar Production Readiness
+# GaramBazaar Production Readiness
 
-GramBazaar has been moved from a mock Express prototype toward a production backend. The API now uses MongoDB/Mongoose models, bcrypt password hashing, signed JWT access tokens, server-side order totals, inventory checks, Cloudinary upload plumbing, Razorpay payment verification, SMTP email support, rate limiting, Helmet, and structured request logging.
+GaramBazaar has been moved from a mock Express prototype toward a production backend. The API now uses MongoDB/Mongoose models, bcrypt password hashing, signed JWT access tokens, server-side order totals, inventory checks, Cloudinary upload plumbing, Razorpay payment verification, SMTP email support, rate limiting, Helmet, and structured request logging.
 
 ## 🛠️ Applied Stack & Architectural Rationale ("Why Used")
 
-Every tool and technology in GramBazaar's architecture was chosen to optimize performance, enhance security, ensure scalability under Render/Vercel free tier constraints, and provide a premium shopper experience.
+Every tool and technology in GaramBazaar's architecture was chosen to optimize performance, enhance security, ensure scalability under Render/Vercel free tier constraints, and provide a premium shopper experience.
 
 ### 🌐 Frontend Technologies
 
@@ -67,7 +67,7 @@ Server:
 NODE_ENV=development
 PORT=5001
 CLIENT_URL=http://localhost:5173
-MONGODB_URI=mongodb://127.0.0.1:27017/grambazaar
+MONGODB_URI=mongodb://127.0.0.1:27017/GaramBazaar
 JWT_ACCESS_SECRET=replace_with_32_plus_character_access_secret
 JWT_REFRESH_SECRET=replace_with_32_plus_character_refresh_secret
 JWT_ACCESS_EXPIRES=15m
@@ -83,7 +83,7 @@ SMTP_HOST=smtp.example.com
 SMTP_PORT=587
 SMTP_USER=replace_me
 SMTP_PASS=replace_me
-MAIL_FROM="GramBazaar <orders@your-domain.com>"
+MAIL_FROM="GaramBazaar <orders@your-domain.com>"
 ```
 
 ## What Changed

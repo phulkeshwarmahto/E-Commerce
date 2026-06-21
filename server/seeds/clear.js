@@ -17,5 +17,5 @@ await Promise.all([
   User.deleteMany({}),
 ]);
 
-console.log("Cleared GramBazaar database.");
+console.log("Cleared GaramBazaar database.");
 process.exit(0);

@@ -68,19 +68,19 @@ export const register = async (req, res) => {
 
     await sendEmail({
       to: user.email,
-      subject: "Welcome to GramBazaar! Verify Your Email Address",
+      subject: "Welcome to GaramBazaar! Verify Your Email Address",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
           <h2 style="color: #ea580c; border-bottom: 2px solid #f97316; padding-bottom: 10px;">Verify Your Email Address</h2>
           <p style="font-size: 16px; color: #333;">Hello ${user.name || "User"},</p>
-          <p style="font-size: 16px; color: #333;">Welcome to GramBazaar! Please click the button below to verify your email address:</p>
+          <p style="font-size: 16px; color: #333;">Welcome to GaramBazaar! Please click the button below to verify your email address:</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${verifyUrl}" style="background-color: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Verify Email</a>
           </div>
           <p style="font-size: 14px; color: #666;">This link is valid for 24 hours.</p>
         </div>
       `,
-      text: `Hello ${user.name || "User"}, welcome to GramBazaar! Verify your email using this link: ${verifyUrl}`,
+      text: `Hello ${user.name || "User"}, welcome to GaramBazaar! Verify your email using this link: ${verifyUrl}`,
     });
   } catch (emailErr) {
     console.error("Failed to send welcome verification email during registration:", emailErr.message);
@@ -273,7 +273,7 @@ export const forgotPassword = async (req, res) => {
   try {
     await sendEmail({
       to: user.email,
-      subject: "GramBazaar Password Reset Link",
+      subject: "GaramBazaar Password Reset Link",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
           <h2 style="color: #ea580c; border-bottom: 2px solid #f97316; padding-bottom: 10px;">Password Reset Request</h2>
@@ -371,19 +371,19 @@ export const sendEmailVerification = async (req, res) => {
   try {
     await sendEmail({
       to: user.email,
-      subject: "GramBazaar Email Verification Link",
+      subject: "GaramBazaar Email Verification Link",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
           <h2 style="color: #ea580c; border-bottom: 2px solid #f97316; padding-bottom: 10px;">Verify Your Email Address</h2>
           <p style="font-size: 16px; color: #333;">Hello ${user.name || "User"},</p>
-          <p style="font-size: 16px; color: #333;">Welcome to GramBazaar! Please click the button below to verify your email address:</p>
+          <p style="font-size: 16px; color: #333;">Welcome to GaramBazaar! Please click the button below to verify your email address:</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${verifyUrl}" style="background-color: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Verify Email</a>
           </div>
           <p style="font-size: 14px; color: #666;">This link is valid for 24 hours.</p>
         </div>
       `,
-      text: `Hello ${user.name || "User"}, welcome to GramBazaar! Verify your email using this link: ${verifyUrl}`,
+      text: `Hello ${user.name || "User"}, welcome to GaramBazaar! Verify your email using this link: ${verifyUrl}`,
     });
     return res.json(new ApiResponse(true, "Verification email sent successfully."));
   } catch (err) {
@@ -466,7 +466,7 @@ export const exportUserData = async (req, res) => {
     exportedAt: new Date().toISOString(),
   };
 
-  res.setHeader("Content-Disposition", `attachment; filename="grambazaar_${req.user.name.replace(/\s+/g, "_")}_data.json"`);
+  res.setHeader("Content-Disposition", `attachment; filename="GaramBazaar_${req.user.name.replace(/\s+/g, "_")}_data.json"`);
   res.setHeader("Content-Type", "application/json");
   return res.send(JSON.stringify(exportData, null, 2));
 };

@@ -163,12 +163,12 @@ export function InvoiceModal({ isOpen, onClose, order }) {
           <div className="border-t border-gray-200 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-gray-400">
             <div>
               <p>💻 This is a computer generated invoice and requires no physical signature.</p>
-              <p className="mt-0.5">Thank you for supporting sustainable farming with GramBazaar!</p>
+              <p className="mt-0.5">Thank you for supporting sustainable farming with GaramBazaar!</p>
             </div>
             <div className="text-center md:text-right border border-dashed border-gray-200 rounded-lg p-2 bg-gray-50/30">
               <p className="font-bold text-gray-500 tracking-wide uppercase text-[8px]">Authorized Signatory</p>
               <div className="h-6 w-24 mx-auto md:ml-auto my-1 flex items-center justify-center font-serif text-[#c4622d] font-bold opacity-60">
-                GramBazaar
+                GaramBazaar
               </div>
             </div>
           </div>

@@ -94,7 +94,7 @@ export const verifyUpiPayment = async (req, res) => {
 
 export const razorpayWebhook = async (req, res) => {
   const signature = req.headers["x-razorpay-signature"];
-  const secret = process.env.RAZORPAY_WEBHOOK_SECRET || "myGramBazaarWebhook@2026!secure";
+  const secret = process.env.RAZORPAY_WEBHOOK_SECRET || "myGaramBazaarWebhook@2026!secure";
 
   // Verify signature
   const shasum = crypto.createHmac("sha256", secret);

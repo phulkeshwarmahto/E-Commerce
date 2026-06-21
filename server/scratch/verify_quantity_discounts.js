@@ -1,7 +1,7 @@
 /**
  * verify_quantity_discounts.js
  * ────────────────────────────
- * Validates the tiered quantity-discount logic used by GramBazaar.
+ * Validates the tiered quantity-discount logic used by GaramBazaar.
  *
  *   ▸ Product may have quantityDiscounts: [{ quantity, discountPercent }]
  *   ▸ The highest-tier discount whose threshold is met is applied

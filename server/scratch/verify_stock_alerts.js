@@ -14,13 +14,13 @@ const run = async () => {
   console.log("Connected to MongoDB.");
 
   // Clean up any old test data
-  let user = await User.findOne({ email: "stock_tester@grambazaar.com" });
+  let user = await User.findOne({ email: "stock_tester@GaramBazaar.com" });
   if (user) {
     await User.deleteOne({ _id: user._id });
   }
   user = await User.create({
     name: "Stock Tester",
-    email: "stock_tester@grambazaar.com",
+    email: "stock_tester@GaramBazaar.com",
     role: "user",
     isVerified: true
   });

@@ -192,7 +192,7 @@ export function Navbar() {
           className="flex items-center gap-1.5 shrink-0 px-2 py-1.5 rounded
                      border border-transparent hover:border-white/40
                      transition-colors duration-150 group"
-          aria-label="GramBazaar Home"
+          aria-label="GaramBazaar Home"
         >
           {/* Cart icon in logo */}
           <span className="text-amber-400 text-2xl md:text-[1.7rem] leading-none">🛒</span>

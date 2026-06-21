@@ -30,7 +30,7 @@ import { OrderChatDrawer } from "../components/ui/OrderChatDrawer";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 
 export function SellerPage() {
-  const { user, notify } = useAppContext();
+  const { user, notify, confirm } = useAppContext();
   const navigate = useNavigate();
   const [section, setSection] = useState("overview");
 
@@ -50,7 +50,7 @@ export function SellerPage() {
 
   useDocumentMetadata({
     title: "Merchant Dashboard",
-    description: "Manage your seller profile, list organic products, track store orders, and view performance insights on GramBazaar.",
+    description: "Manage your seller profile, list organic products, track store orders, and view performance insights on GaramBazaar.",
     noindex: true
   });
 
@@ -257,7 +257,7 @@ export function SellerPage() {
   const handleExportCSV = async () => {
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:5001";
-      const session = JSON.parse(localStorage.getItem("grambazaar_session") || "{}");
+      const session = JSON.parse(localStorage.getItem("GaramBazaar_session") || "{}");
       const token = session?.token;
       if (!token) throw new Error("Authentication required.");
 
@@ -310,7 +310,7 @@ export function SellerPage() {
   };
 
   const handleDeleteCoupon = async (id) => {
-    if (!confirm("Are you sure you want to delete this coupon?")) return;
+    if (!(await confirm("Are you sure you want to delete this coupon?"))) return;
     try {
       await deleteSellerCouponRequest(id);
       notify("Coupon deleted successfully.");
@@ -379,7 +379,7 @@ export function SellerPage() {
   }
 
   const handleDeleteProduct = async (id) => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
+    if (await confirm("Are you sure you want to delete this product?")) {
       try {
         await deleteSellerProductRequest(id);
         notify("Product deleted successfully.");
@@ -883,7 +883,7 @@ export function SellerPage() {
                                     type="button"
                                     className="button text-[10px] px-2.5 py-1.5 font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg border-0 cursor-pointer"
                                     onClick={async () => {
-                                      if (confirm("Are you sure you want to APPROVE this return request? Stock will be restored and refund initiated.")) {
+                                      if (await confirm("Are you sure you want to APPROVE this return request? Stock will be restored and refund initiated.")) {
                                         try {
                                           await updateReturnRequestStatus(ret.id, "approved");
                                           notify("Return request approved.");
@@ -900,7 +900,7 @@ export function SellerPage() {
                                     type="button"
                                     className="button text-[10px] px-2.5 py-1.5 font-bold bg-red-600 hover:bg-red-700 text-white rounded-lg border-0 cursor-pointer"
                                     onClick={async () => {
-                                      if (confirm("Are you sure you want to REJECT this return request?")) {
+                                      if (await confirm("Are you sure you want to REJECT this return request?")) {
                                         try {
                                           await updateReturnRequestStatus(ret.id, "rejected");
                                           notify("Return request rejected.");

@@ -126,7 +126,7 @@ export function HomePage() {
     schema: {
       "@context": "https://schema.org",
       "@type": "Store",
-      "name": "GramBazaar",
+      "name": "GaramBazaar",
       "description": "India's Finest Everyday Essentials. 100% natural, organic products sourced directly from local farmers.",
       "url": window.location.origin,
       "logo": `${window.location.origin}/favicon.png`,

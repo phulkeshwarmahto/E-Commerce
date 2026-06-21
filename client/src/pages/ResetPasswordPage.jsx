@@ -16,8 +16,8 @@ export function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   useDocumentMetadata({
-    title: "Reset Password - GramBazaar",
-    description: "Choose a new password for your GramBazaar account."
+    title: "Reset Password - GaramBazaar",
+    description: "Choose a new password for your GaramBazaar account."
   });
 
   const handleSubmit = async (e) => {

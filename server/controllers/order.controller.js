@@ -474,7 +474,7 @@ export const createOrder = async (req, res) => {
     await sendEmail({
       to: req.user.email,
       subject: `Order ${order.orderNumber} confirmed`,
-      text: `Your GramBazaar order ${order.orderNumber} has been placed.`,
+      text: `Your GaramBazaar order ${order.orderNumber} has been placed.`,
     });
   } catch (emailError) {
     console.error("Gracefully caught mail sending failure:", emailError.message);

@@ -18,8 +18,8 @@ export function ContactPage() {
   const [errorMsg, setErrorMsg] = useState("");
 
   useDocumentMetadata({
-    title: "Contact Us & Support - GramBazaar",
-    description: "Submit support requests and inquiries to the GramBazaar team."
+    title: "Contact Us & Support - GaramBazaar",
+    description: "Submit support requests and inquiries to the GaramBazaar team."
   });
 
   // Pre-populate user details if logged in

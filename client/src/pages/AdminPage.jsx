@@ -51,7 +51,7 @@ import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 import { ImageUploadZone } from "../components/admin/ImageUploadZone";
 
 export function AdminPage() {
-  const { user, notify, categories, reloadCategories } = useAppContext();
+  const { user, notify, categories, reloadCategories, confirm } = useAppContext();
   const [section, setSection] = useState("overview");
 
   // Seller Verification states
@@ -78,7 +78,7 @@ export function AdminPage() {
 
   useDocumentMetadata({
     title: "Administrator Panel",
-    description: "Manage system dashboard, moderate products, review orders, verify user profiles, and send notifications on GramBazaar.",
+    description: "Manage system dashboard, moderate products, review orders, verify user profiles, and send notifications on GaramBazaar.",
     noindex: true
   });
   const [dashboard, setDashboard] = useState(null);
@@ -198,7 +198,7 @@ export function AdminPage() {
   const handleExportCSV = async () => {
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:5001";
-      const session = JSON.parse(localStorage.getItem("grambazaar_session") || "{}");
+      const session = JSON.parse(localStorage.getItem("GaramBazaar_session") || "{}");
       const token = session?.token;
       if (!token) throw new Error("Authentication required.");
 
@@ -357,7 +357,7 @@ export function AdminPage() {
   };
 
   const handleRejectReview = async (id) => {
-    if (!confirm("Are you sure you want to REJECT and delete this review?")) return;
+    if (!(await confirm("Are you sure you want to REJECT and delete this review?"))) return;
     try {
       await rejectReviewRequest(id);
       notify("Review rejected and deleted.");
@@ -503,7 +503,7 @@ export function AdminPage() {
   };
 
   const handleDeleteCoupon = async (id) => {
-    if (!confirm("Are you sure you want to delete this coupon?")) return;
+    if (!(await confirm("Are you sure you want to delete this coupon?"))) return;
     try {
       await deleteAdminCouponRequest(id);
       notify("Coupon deleted successfully.");
@@ -549,7 +549,7 @@ export function AdminPage() {
   };
 
   const handleDeleteBrand = async (id) => {
-    if (!confirm("Are you sure you want to delete this brand spotlight?")) return;
+    if (!(await confirm("Are you sure you want to delete this brand spotlight?"))) return;
     try {
       await deleteAdminBrandRequest(id);
       notify("Brand spotlight deleted successfully.");
@@ -1189,7 +1189,7 @@ export function AdminPage() {
                                     type="button"
                                     className="button text-[11px] px-3 py-1.5 inline-flex items-center gap-1 font-semibold whitespace-nowrap bg-red-600 hover:bg-red-700 text-white border-0 cursor-pointer rounded-lg"
                                     onClick={async () => {
-                                      if (confirm(`Are you sure you want to ban ${usr.name || "this user"}? They won't be able to log in.`)) {
+                                      if (await confirm(`Are you sure you want to ban ${usr.name || "this user"}? They won't be able to log in.`)) {
                                         try {
                                           await banUserRequest(usr.id);
                                           notify(`${usr.name || "User"} has been banned.`);
@@ -1281,7 +1281,7 @@ export function AdminPage() {
                                 type="button"
                                 className="button text-[10px] px-2.5 py-1.5 font-bold bg-red-600 hover:bg-red-700 text-white rounded-lg border-0 cursor-pointer"
                                 onClick={async () => {
-                                  if (confirm(`Are you sure you want to resolve and DELETE the reported ${rpt.targetType}?`)) {
+                                  if (await confirm(`Are you sure you want to resolve and DELETE the reported ${rpt.targetType}?`)) {
                                     try {
                                       await resolveReportRequest(rpt.id, "deleteTarget");
                                       notify(`Report resolved and target ${rpt.targetType} deleted.`);
@@ -1367,7 +1367,7 @@ export function AdminPage() {
                                     type="button"
                                     className="button text-[10px] px-2.5 py-1.5 font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg border-0 cursor-pointer"
                                     onClick={async () => {
-                                      if (confirm("Are you sure you want to APPROVE this return request? Stock will be restored and refund initiated.")) {
+                                      if (await confirm("Are you sure you want to APPROVE this return request? Stock will be restored and refund initiated.")) {
                                         try {
                                           await updateReturnRequestStatus(ret.id, "approved");
                                           notify("Return request approved.");
@@ -1384,7 +1384,7 @@ export function AdminPage() {
                                     type="button"
                                     className="button text-[10px] px-2.5 py-1.5 font-bold bg-red-600 hover:bg-red-700 text-white rounded-lg border-0 cursor-pointer"
                                     onClick={async () => {
-                                      if (confirm("Are you sure you want to REJECT this return request?")) {
+                                      if (await confirm("Are you sure you want to REJECT this return request?")) {
                                         try {
                                           await updateReturnRequestStatus(ret.id, "rejected");
                                           notify("Return request rejected.");
@@ -1891,7 +1891,7 @@ export function AdminPage() {
           {section === "seller-verifications" ? (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 stack">
               <h2 className="text-lg font-bold text-gray-900 mb-1">🏪 Seller Verification Queue</h2>
-              <p className="text-xs text-gray-500 mb-4">Review and approve registration requests from new merchants on GramBazaar.</p>
+              <p className="text-xs text-gray-500 mb-4">Review and approve registration requests from new merchants on GaramBazaar.</p>
 
               {loadingSellers ? (
                 <p className="text-sm text-gray-500 py-6 text-center animate-pulse">Loading pending sellers...</p>
@@ -2317,6 +2317,7 @@ function CategoryFormSection({ onCreated, notify }) {
 }
 
 function CategoryListSection({ categories, onUpdated, onDeleted, notify }) {
+  const { confirm } = useAppContext();
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ name: "", emoji: "" });
 
@@ -2342,7 +2343,7 @@ function CategoryListSection({ categories, onUpdated, onDeleted, notify }) {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this category? Products in this category will need manual reassignment.")) return;
+    if (!(await confirm("Are you sure you want to delete this category? Products in this category will need manual reassignment."))) return;
     try {
       await deleteCategoryRequest(id);
       notify("Category deleted successfully.");

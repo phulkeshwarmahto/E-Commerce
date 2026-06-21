@@ -1,7 +1,7 @@
 /**
  * verify_loyalty_points.js
  * ────────────────────────
- * Validates the loyalty-points logic used by GramBazaar.
+ * Validates the loyalty-points logic used by GaramBazaar.
  *
  *   ▸ Points earning : 1 pt per ₹100 spent (floor)
  *   ▸ Tier thresholds: Silver (0–500), Gold (501–1500), Platinum (1501+)

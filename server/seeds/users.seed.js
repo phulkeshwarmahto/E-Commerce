@@ -13,8 +13,8 @@ const users = [
     membership: "Gold",
   },
   {
-    name: "GramBazaar Admin",
-    email: "admin@grambazaar.in",
+    name: "GaramBazaar Admin",
+    email: "admin@GaramBazaar.in",
     password: process.env.SEED_ADMIN_PASSWORD,
     role: "admin",
     membership: "Platinum",

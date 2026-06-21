@@ -4,7 +4,7 @@ import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 export function NotFoundPage() {
   useDocumentMetadata({
     title: "Page Not Found",
-    description: "The page you are looking for does not exist on GramBazaar.",
+    description: "The page you are looking for does not exist on GaramBazaar.",
     noindex: true
   });
 

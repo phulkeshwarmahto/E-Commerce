@@ -60,7 +60,7 @@ export function ProductDetailPage() {
   // Track recently viewed
   useEffect(() => {
     if (product && product.id) {
-      const local = localStorage.getItem("grambazaar_recently_viewed");
+      const local = localStorage.getItem("GaramBazaar_recently_viewed");
       let list = local ? JSON.parse(local) : [];
       list = list.filter((p) => p.id !== product.id);
       list.unshift({
@@ -76,18 +76,18 @@ export function ProductDetailPage() {
         bg: product.bg,
         images: product.images,
       });
-      localStorage.setItem("grambazaar_recently_viewed", JSON.stringify(list.slice(0, 6)));
+      localStorage.setItem("GaramBazaar_recently_viewed", JSON.stringify(list.slice(0, 6)));
     }
   }, [product]);
 
   // Load recently viewed & comparison state
   const loadCompareState = () => {
-    const localRV = localStorage.getItem("grambazaar_recently_viewed");
+    const localRV = localStorage.getItem("GaramBazaar_recently_viewed");
     if (localRV && product?.id) {
       const list = JSON.parse(localRV).filter((p) => p.id !== product.id);
       setRecentlyViewed(list);
     }
-    const localComp = localStorage.getItem("grambazaar_compare_list");
+    const localComp = localStorage.getItem("GaramBazaar_compare_list");
     const listComp = localComp ? JSON.parse(localComp) : [];
     setCompareList(listComp);
     setIsInCompare(listComp.some((p) => p.id === product?.id));
@@ -106,7 +106,7 @@ export function ProductDetailPage() {
 
   const toggleCompare = () => {
     if (!product) return;
-    const local = localStorage.getItem("grambazaar_compare_list");
+    const local = localStorage.getItem("GaramBazaar_compare_list");
     let list = local ? JSON.parse(local) : [];
     const exists = list.some((p) => p.id === product.id);
     if (exists) {
@@ -133,7 +133,7 @@ export function ProductDetailPage() {
       setIsInCompare(true);
       notify("Added to comparison list.");
     }
-    localStorage.setItem("grambazaar_compare_list", JSON.stringify(list));
+    localStorage.setItem("GaramBazaar_compare_list", JSON.stringify(list));
     window.dispatchEvent(new Event("compare-list-updated"));
   };
 
@@ -185,7 +185,7 @@ export function ProductDetailPage() {
     const shareUrl = window.location.href;
     const shareData = {
       title: product.name,
-      text: `Check out ${product.name} on GramBazaar!`,
+      text: `Check out ${product.name} on GaramBazaar!`,
       url: shareUrl,
     };
 
@@ -375,7 +375,7 @@ export function ProductDetailPage() {
                       onClick={() => navigate(`/seller/${product.seller._id || product.seller}`)}
                       className="font-bold text-[#c4622d] hover:underline cursor-pointer bg-transparent border-0 p-0 text-xs"
                     >
-                      {product.seller.name || "GramBazaar Partner"}
+                      {product.seller.name || "GaramBazaar Partner"}
                     </button>
                     {product.seller.certificationStatus === "Certified" && (
                       <span className="ml-1.5 text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-semibold border border-emerald-100">
@@ -919,7 +919,7 @@ export function ProductDetailPage() {
               <button
                 type="button"
                 onClick={() => {
-                  localStorage.setItem("grambazaar_compare_list", JSON.stringify([]));
+                  localStorage.setItem("GaramBazaar_compare_list", JSON.stringify([]));
                   window.dispatchEvent(new Event("compare-list-updated"));
                 }}
                 className="bg-transparent text-gray-400 hover:text-white font-bold text-xs py-1.5 px-2 rounded-xl cursor-pointer border-0 transition-colors"

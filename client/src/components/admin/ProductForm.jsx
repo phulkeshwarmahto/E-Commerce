@@ -21,7 +21,7 @@ const baseState = {
 };
 
 export function ProductForm({ product, onSubmit, onClose }) {
-  const { categories } = useAppContext();
+  const { categories, alert } = useAppContext();
   const [form, setForm] = useState(baseState);
   const [newVariant, setNewVariant] = useState({
     name: "",
@@ -56,9 +56,9 @@ export function ProductForm({ product, onSubmit, onClose }) {
     });
   }, [product]);
 
-  const handleAddVariant = () => {
+  const handleAddVariant = async () => {
     if (!newVariant.name || !newVariant.price) {
-      alert("Please enter variant name and price.");
+      await alert("Please enter variant name and price.");
       return;
     }
     const variant = {
@@ -86,19 +86,19 @@ export function ProductForm({ product, onSubmit, onClose }) {
     }));
   };
 
-  const handleAddDiscount = () => {
+  const handleAddDiscount = async () => {
     if (!newDiscount.quantity || !newDiscount.discountPercent) {
-      alert("Please enter quantity and discount percent.");
+      await alert("Please enter quantity and discount percent.");
       return;
     }
     const q = Number(newDiscount.quantity);
     const d = Number(newDiscount.discountPercent);
     if (q < 2) {
-      alert("Quantity must be at least 2.");
+      await alert("Quantity must be at least 2.");
       return;
     }
     if (d < 1 || d > 99) {
-      alert("Discount percent must be between 1 and 99.");
+      await alert("Discount percent must be between 1 and 99.");
       return;
     }
     setForm((current) => ({

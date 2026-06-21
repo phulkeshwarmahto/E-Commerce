@@ -11,7 +11,7 @@ export function OrderSuccessPage() {
 
   useDocumentMetadata({
     title: "Order Success",
-    description: "Thank you for shopping at GramBazaar! Your order is being processed.",
+    description: "Thank you for shopping at GaramBazaar! Your order is being processed.",
     noindex: true
   });
 

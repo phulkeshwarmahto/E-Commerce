@@ -3,7 +3,7 @@ import { useEffect } from "react";
 export function useDocumentMetadata({ title, description, schema, noindex = false }) {
   useEffect(() => {
     // 1. Update Document Title
-    const suffix = "GramBazaar";
+    const suffix = "GaramBazaar";
     if (title) {
       document.title = `${title} | ${suffix}`;
     } else {

@@ -1,8 +1,8 @@
-# 🛒 GramBazaar — MERN Full Stack E-Commerce Platform
+# 🛒 GaramBazaar — MERN Full Stack E-Commerce Platform
 
 <div align="center">
 
-![GramBazaar Banner](https://img.shields.io/badge/GramBazaar-India's%20Organic%20Marketplace-c4622d?style=for-the-badge&logo=shopify&logoColor=white)
+![GaramBazaar Banner](https://img.shields.io/badge/GaramBazaar-India's%20Organic%20Marketplace-c4622d?style=for-the-badge&logo=shopify&logoColor=white)
 
 [![MongoDB](https://img.shields.io/badge/MongoDB-6.0-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://mongodb.com)
 [![Express](https://img.shields.io/badge/Express-4.18-000000?style=flat-square&logo=express&logoColor=white)](https://expressjs.com)
@@ -44,7 +44,7 @@
 
 ## 🌿 Project Overview
 
-GramBazaar is a full-stack MERN e-commerce platform built for selling natural, organic, and artisan Indian products. It supports a complete shopping experience — from product discovery to checkout — alongside a rich admin panel for store owners and a review system for customers.
+GaramBazaar is a full-stack MERN e-commerce platform built for selling natural, organic, and artisan Indian products. It supports a complete shopping experience — from product discovery to checkout — alongside a rich admin panel for store owners and a review system for customers.
 
 ```
 Customer Journey:
@@ -154,7 +154,7 @@ Login → Dashboard → Manage Products → Update Orders → Monitor Reviews
 ## 📁 Project Structure
 
 ```
-grambazaar/
+GaramBazaar/
 │
 ├── 📂 client/                          # React Frontend
 │   ├── 📂 public/
@@ -510,7 +510,7 @@ grambazaar/
 
 ## 📡 API Documentation
 
-**Base URL:** `https://api.grambazaar.in/api`
+**Base URL:** `https://api.GaramBazaar.in/api`
 
 All protected routes require: `Authorization: Bearer <access_token>`
 
@@ -1006,7 +1006,7 @@ Video thumbnails: w_400,h_300,c_fill,so_0
 ```env
 VITE_API_BASE_URL=http://localhost:5000/api
 VITE_RAZORPAY_KEY_ID=rzp_test_xxxxxxxx
-VITE_CLOUDINARY_CLOUD_NAME=grambazaar
+VITE_CLOUDINARY_CLOUD_NAME=GaramBazaar
 ```
 
 ### Server `.env`
@@ -1017,7 +1017,7 @@ PORT=5000
 CLIENT_URL=http://localhost:5173
 
 # MongoDB
-MONGO_URI=mongodb+srv://<user>:<pass>@cluster0.mongodb.net/grambazaar?retryWrites=true
+MONGO_URI=mongodb+srv://<user>:<pass>@cluster0.mongodb.net/GaramBazaar?retryWrites=true
 
 # JWT
 JWT_ACCESS_SECRET=your_access_secret_min_32_chars
@@ -1026,7 +1026,7 @@ JWT_ACCESS_EXPIRES=15m
 JWT_REFRESH_EXPIRES=7d
 
 # Cloudinary
-CLOUDINARY_CLOUD_NAME=grambazaar
+CLOUDINARY_CLOUD_NAME=GaramBazaar
 CLOUDINARY_API_KEY=123456789012345
 CLOUDINARY_API_SECRET=xxxxxxxxxxxxxxxxxxxx
 
@@ -1037,9 +1037,9 @@ RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxxxxxxx
 # Nodemailer
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=noreply@grambazaar.in
+SMTP_USER=noreply@GaramBazaar.in
 SMTP_PASS=your_app_password
-EMAIL_FROM="GramBazaar <noreply@grambazaar.in>"
+EMAIL_FROM="GaramBazaar <noreply@GaramBazaar.in>"
 ```
 
 ---
@@ -1055,8 +1055,8 @@ EMAIL_FROM="GramBazaar <noreply@grambazaar.in>"
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/grambazaar.git
-cd grambazaar
+git clone https://github.com/yourusername/GaramBazaar.git
+cd GaramBazaar
 ```
 
 ### 2. Install Dependencies
@@ -1090,7 +1090,7 @@ npm run seed:all         # Seeds everything
 ```
 
 > **Demo credentials after seeding:**
-> - Admin: `admin@grambazaar.in` / `Admin@123`
+> - Admin: `admin@GaramBazaar.in` / `Admin@123`
 > - User: `phulkeshwar@example.com` / `password123`
 
 ### 5. Run in Development
@@ -1170,7 +1170,7 @@ Build Command:    npm run build
 Output Directory: dist
 
 # Add environment variables in Vercel dashboard:
-VITE_API_BASE_URL      = https://api.grambazaar.in/api
+VITE_API_BASE_URL      = https://api.GaramBazaar.in/api
 VITE_RAZORPAY_KEY_ID   = rzp_live_xxxx
 ```
 
@@ -1181,7 +1181,7 @@ VITE_RAZORPAY_KEY_ID   = rzp_live_xxxx
 # Add environment variables from server/.env
 # Railway auto-detects Node.js and runs: npm start
 
-# Custom domain: api.grambazaar.in → Railway deployment URL
+# Custom domain: api.GaramBazaar.in → Railway deployment URL
 ```
 
 ### Alternative: Docker Compose
@@ -1312,8 +1312,8 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 <div align="center">
 
-Built with ♥ in India 🇮🇳 by the GramBazaar team
+Built with ♥ in India 🇮🇳 by the GaramBazaar team
 
-**[grambazaar.in](https://grambazaar.in)** · **[Docs](#)** · **[API](#)**
+**[GaramBazaar.in](https://GaramBazaar.in)** · **[Docs](#)** · **[API](#)**
 
 </div>

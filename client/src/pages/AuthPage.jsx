@@ -42,7 +42,7 @@ export function AuthPage() {
 
   useDocumentMetadata({
     title: "Sign In / Register",
-    description: "Log in or create a GramBazaar account. Join as a buyer to shop organic foods, or register as a merchant to sell online."
+    description: "Log in or create a GaramBazaar account. Join as a buyer to shop organic foods, or register as a merchant to sell online."
   });
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
@@ -179,7 +179,7 @@ export function AuthPage() {
           <div className="p-6">
             {/* Title */}
             <h1 className="text-xl font-bold text-gray-900 mb-1">
-              {mode === "signin" ? "Welcome back!" : "Join GramBazaar"}
+              {mode === "signin" ? "Welcome back!" : "Join GaramBazaar"}
             </h1>
             <p className="text-gray-500 text-sm mb-5">
               {mode === "signin"

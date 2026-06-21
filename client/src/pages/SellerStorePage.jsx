@@ -28,7 +28,7 @@ export function SellerStorePage() {
   useDocumentMetadata({
     title: profile ? `${profile.name}'s Organic Storefront` : "Organic Storefront",
     description: profile
-      ? `Shop authentic natural everyday essentials from certified merchant ${profile.name}. Browse farm-fresh products with transparent credit scores on GramBazaar.`
+      ? `Shop authentic natural everyday essentials from certified merchant ${profile.name}. Browse farm-fresh products with transparent credit scores on GaramBazaar.`
       : "Shop natural essentials from verified sellers.",
   });
 
@@ -128,7 +128,7 @@ export function SellerStorePage() {
           </div>
 
           <p className="text-gray-500 text-sm md:text-base leading-relaxed max-w-xl">
-            Welcome to our premium storefront on GramBazaar. We source only authentic, 100% natural, and premium quality everyday ingredients directly from our farmers.
+            Welcome to our premium storefront on GaramBazaar. We source only authentic, 100% natural, and premium quality everyday ingredients directly from our farmers.
           </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t border-gray-200/60 max-w-2xl">

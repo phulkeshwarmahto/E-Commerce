@@ -1,4 +1,4 @@
-const AUTH_KEY = "grambazaar_auth";
+const AUTH_KEY = "GaramBazaar_auth";
 
 export const getStoredSession = () => {
   const raw = localStorage.getItem(AUTH_KEY);

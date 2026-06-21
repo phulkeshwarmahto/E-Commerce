@@ -13,7 +13,7 @@ export function VerifyEmailPage() {
 
   useDocumentMetadata({
     title: "Email Verification",
-    description: "Verify your email address to secure your GramBazaar account.",
+    description: "Verify your email address to secure your GaramBazaar account.",
     noindex: true
   });
 

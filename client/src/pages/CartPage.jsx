@@ -13,7 +13,7 @@ export function CartPage() {
 
   useDocumentMetadata({
     title: "Your Shopping Cart",
-    description: "Review your organic essentials, apply coupons, and checkout securely on GramBazaar."
+    description: "Review your organic essentials, apply coupons, and checkout securely on GaramBazaar."
   });
 
   if (user?.role === "seller") {

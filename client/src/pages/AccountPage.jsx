@@ -8,7 +8,7 @@ import { apiRequest } from "../api/axios";
 import { getStoredSession } from "../store/authStore";
 
 export function AccountPage() {
-  const { user, logout, orders, updateProfile, notify } = useAppContext();
+  const { user, logout, orders, updateProfile, notify, confirm } = useAppContext();
   const [profileOpen, setProfileOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -33,7 +33,7 @@ export function AccountPage() {
 
   useDocumentMetadata({
     title: "My Account Profile",
-    description: "Manage your personal profile, addresses, delivery settings, and account information on GramBazaar."
+    description: "Manage your personal profile, addresses, delivery settings, and account information on GaramBazaar."
   });
 
   // Edit profile states
@@ -95,7 +95,7 @@ export function AccountPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `grambazaar_${user.name.replace(/\s+/g, "_")}_data.json`;
+      a.download = `GaramBazaar_${user.name.replace(/\s+/g, "_")}_data.json`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -161,7 +161,7 @@ export function AccountPage() {
   };
 
   const handleDeactivate = async () => {
-    if (window.confirm("Are you sure you want to deactivate your account? This action is permanent and you will be logged out.")) {
+    if (await confirm("Are you sure you want to deactivate your account? This action is permanent and you will be logged out.")) {
       setDeactivating(true);
       try {
         await deleteAccountRequest();
@@ -181,7 +181,7 @@ export function AccountPage() {
       <section className="page-content">
         <div className="guest-account">
           <div className="guest-emoji">👤</div>
-          <h2>Welcome to GramBazaar</h2>
+          <h2>Welcome to GaramBazaar</h2>
           <p>Sign in to access your orders, wishlist, and account settings.</p>
           <Link className="hero-cta guest-btn" to="/auth">
             Sign In →

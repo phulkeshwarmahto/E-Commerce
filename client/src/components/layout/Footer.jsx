@@ -30,10 +30,10 @@ const footerLinks = {
 const paymentMethods = ["VISA", "Mastercard", "UPI", "Razorpay", "Net Banking", "COD"];
 
 const socialLinks = [
-  { label: "Facebook", icon: "f", href: "https://facebook.com/grambazaar" },
-  { label: "Instagram", icon: "in", href: "https://instagram.com/grambazaar" },
-  { label: "Twitter/X", icon: "𝕏", href: "https://x.com/grambazaar" },
-  { label: "YouTube", icon: "▶", href: "https://youtube.com/grambazaar" },
+  { label: "Facebook", icon: "f", href: "https://facebook.com/GaramBazaar" },
+  { label: "Instagram", icon: "in", href: "https://instagram.com/GaramBazaar" },
+  { label: "Twitter/X", icon: "𝕏", href: "https://x.com/GaramBazaar" },
+  { label: "YouTube", icon: "▶", href: "https://youtube.com/GaramBazaar" },
 ];
 
 export function Footer() {
@@ -170,7 +170,7 @@ export function Footer() {
 
       {/* ── Footer Bottom Bar ────────────────────────────────────── */}
       <div className="bg-[#0d1117] text-gray-500 text-[0.72rem] text-center py-3 px-4">
-        © 2026 GramBazaar Pvt. Ltd. · All rights reserved · Built with care in India 🇮🇳
+        © 2026 GaramBazaar Pvt. Ltd. · All rights reserved · Built with care in India 🇮🇳
       </div>
     </>
   );

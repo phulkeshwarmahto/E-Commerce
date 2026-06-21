@@ -318,13 +318,13 @@ export const sendNotification = async (req, res) => {
         text: message,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
-            <h2 style="color: #ea580c; border-bottom: 2px solid #f97316; padding-bottom: 10px;">Message from GramBazaar Admin</h2>
+            <h2 style="color: #ea580c; border-bottom: 2px solid #f97316; padding-bottom: 10px;">Message from GaramBazaar Admin</h2>
             <p style="font-size: 16px; line-height: 1.5; color: #333;">Hello ${user.name || "User"},</p>
             <div style="background-color: #fcf8f2; border-left: 4px solid #ea580c; padding: 15px; margin: 20px 0; font-style: italic; color: #555;">
               ${message.replace(/\n/g, "<br/>")}
             </div>
             <p style="font-size: 12px; color: #777; margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px;">
-              This is a personalized notification sent from the GramBazaar Administrator Panel. Please do not reply directly to this automated email.
+              This is a personalized notification sent from the GaramBazaar Administrator Panel. Please do not reply directly to this automated email.
             </p>
           </div>
         `,
@@ -378,13 +378,13 @@ export const broadcastNotification = async (req, res) => {
           text: message,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
-              <h2 style="color: #ea580c; border-bottom: 2px solid #f97316; padding-bottom: 10px;">📢 Announcement from GramBazaar</h2>
+              <h2 style="color: #ea580c; border-bottom: 2px solid #f97316; padding-bottom: 10px;">📢 Announcement from GaramBazaar</h2>
               <p style="font-size: 16px; line-height: 1.5; color: #333;">Hello ${u.name || "User"},</p>
               <div style="background-color: #fcf8f2; border-left: 4px solid #ea580c; padding: 15px; margin: 20px 0; font-style: italic; color: #555;">
                 ${message.replace(/\n/g, "<br/>")}
               </div>
               <p style="font-size: 12px; color: #777; margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px;">
-                This is a broadcast notification sent from the GramBazaar Administrator Panel. Please do not reply directly to this automated email.
+                This is a broadcast notification sent from the GaramBazaar Administrator Panel. Please do not reply directly to this automated email.
               </p>
             </div>
           `,

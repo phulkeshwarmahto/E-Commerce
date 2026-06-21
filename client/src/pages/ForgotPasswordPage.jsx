@@ -11,8 +11,8 @@ export function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
 
   useDocumentMetadata({
-    title: "Forgot Password - GramBazaar",
-    description: "Request a password reset link for your GramBazaar account."
+    title: "Forgot Password - GaramBazaar",
+    description: "Request a password reset link for your GaramBazaar account."
   });
 
   const handleSubmit = async (e) => {

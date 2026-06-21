@@ -15,4 +15,4 @@ Disallow: /cart/
 Disallow: /orders/
 Disallow: /account/
 
-Sitemap: https://grambazaar.in/sitemap.xml
+Sitemap: https://GaramBazaar.in/sitemap.xml

@@ -27,7 +27,7 @@ export const sendEmail = async ({ to, subject, html, text }) => {
 
   try {
     await transporter.sendMail({
-      from: process.env.MAIL_FROM || "GramBazaar <no-reply@grambazaar.local>",
+      from: process.env.MAIL_FROM || "GaramBazaar <no-reply@GaramBazaar.local>",
       to,
       subject,
       html,

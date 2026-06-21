@@ -59,7 +59,7 @@ const run = async () => {
   if (!seller) {
     seller = await User.create({
       name: "Test Seller",
-      email: "testseller@grambazaar.com",
+      email: "testseller@GaramBazaar.com",
       role: "seller",
       isVerified: true
     });
@@ -67,14 +67,14 @@ const run = async () => {
   console.log(`Using Seller: ${seller.name} (${seller._id})`);
 
   // Find another user (e.g. admin or other seller)
-  let otherSeller = await User.findOne({ email: "admin@grambazaar.com" });
+  let otherSeller = await User.findOne({ email: "admin@GaramBazaar.com" });
   if (!otherSeller) {
     otherSeller = await User.findOne({ role: "admin" });
   }
   if (!otherSeller) {
     otherSeller = await User.create({
       name: "Other Merchant",
-      email: "other@grambazaar.com",
+      email: "other@GaramBazaar.com",
       role: "seller",
       isVerified: true
     });

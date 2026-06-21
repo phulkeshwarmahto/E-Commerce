@@ -70,14 +70,14 @@ const staticPages = {
     content: (
       <div className="space-y-6 text-sm text-gray-700 leading-relaxed">
         <div className="space-y-4">
-          <h3 className="font-bold text-gray-900 text-sm">🌾 How does GramBazaar source its products?</h3>
+          <h3 className="font-bold text-gray-900 text-sm">🌾 How does GaramBazaar source its products?</h3>
           <p className="text-gray-600">
             We partner directly with Self-Help Groups (SHGs), organic farmer collectives, and traditional artisan families. There are no middlemen in our supply line. 70%+ of consumer revenue goes directly to rural farmers.
           </p>
         </div>
         <hr className="border-gray-150" />
         <div className="space-y-4">
-          <h3 className="font-bold text-gray-900 text-sm">🔒 Are the payments on GramBazaar secure?</h3>
+          <h3 className="font-bold text-gray-900 text-sm">🔒 Are the payments on GaramBazaar secure?</h3>
           <p className="text-gray-600">
             Yes! We integrate with Razorpay, a fully secure, PCI-DSS compliant Indian payment gateway. We support all major Credit/Debit cards, UPI VPAs, and Net Banking. All transactions are SSL encrypted.
           </p>
@@ -86,7 +86,7 @@ const staticPages = {
         <div className="space-y-4">
           <h3 className="font-bold text-gray-900 text-sm">🐝 Is your forest honey pasteurized?</h3>
           <p className="text-gray-600">
-            Absolutely not. GramBazaar honey is raw, single-source forest honey. It is double-filtered to remove physical debris but is not heated or pasteurized, preserving all enzymes, minerals, and healthy pollen.
+            Absolutely not. GaramBazaar honey is raw, single-source forest honey. It is double-filtered to remove physical debris but is not heated or pasteurized, preserving all enzymes, minerals, and healthy pollen.
           </p>
         </div>
         <hr className="border-gray-150" />
@@ -105,7 +105,7 @@ const staticPages = {
     content: (
       <div className="space-y-6 text-sm text-gray-700 leading-relaxed text-left">
         <p>
-          GramBazaar was founded in Ranchi with a simple, powerful vision: <strong>to bridge the gap between India's organic farmers and urban families seeking clean food.</strong>
+          GaramBazaar was founded in Ranchi with a simple, powerful vision: <strong>to bridge the gap between India's organic farmers and urban families seeking clean food.</strong>
         </p>
         <p>
           Our regional farmlands are rich in biodiversity and traditional agricultural wisdom. However, local smallholder farmers often lack access to premium markets, forcing them to sell healthy harvest to brokers at unviable wholesale prices.
@@ -129,14 +129,14 @@ const staticPages = {
     )
   },
   "blog": {
-    title: "GramBazaar Journal",
+    title: "GaramBazaar Journal",
     subtitle: "Traditional agricultural wisdom, seasonal recipes, and rural artisan spotlight stories.",
     content: (
       <div className="space-y-6 text-sm text-gray-700 leading-relaxed">
         <div className="space-y-2 border-b border-gray-100 pb-5 text-left">
           <span className="text-[10px] bg-orange-50 border border-orange-200 text-[#ea580c] font-black uppercase tracking-wider px-2 py-0.5 rounded">Spotlight</span>
           <h3 className="font-bold text-gray-900 text-base mt-2">🌾 The Rise of Traditional Millets: Sourced from Ranchi Cooperatives</h3>
-          <p className="text-gray-500 text-xs mt-1">Published on June 2, 2026 by GramBazaar Editorial</p>
+          <p className="text-gray-500 text-xs mt-1">Published on June 2, 2026 by GaramBazaar Editorial</p>
           <p className="text-xs md:text-sm text-gray-600 mt-2">
             Millets are climate-resilient, water-efficient crops packed with iron, protein, and calcium. Read our deep dive into how smallholder farmer groups in rural Ranchi are reviving ragi, bajra, and jowar cultivation using organic farming methods.
           </p>
@@ -154,7 +154,7 @@ const staticPages = {
     )
   },
   "careers": {
-    title: "Careers at GramBazaar",
+    title: "Careers at GaramBazaar",
     subtitle: "Help us build a cleaner, fairer, and more community-driven supply chain. Join our mission.",
     content: (
       <div className="space-y-6 text-sm text-gray-700 leading-relaxed text-left">
@@ -191,7 +191,7 @@ const staticPages = {
           <div className="border border-gray-200 rounded-xl p-4 bg-white flex items-start gap-4">
             <span className="text-2xl mt-1">🗞️</span>
             <div>
-              <strong className="block text-gray-950 text-sm">GramBazaar Awarded 'Rural Impact Enterprise of the Year' 2026</strong>
+              <strong className="block text-gray-950 text-sm">GaramBazaar Awarded 'Rural Impact Enterprise of the Year' 2026</strong>
               <p className="text-gray-500 text-xs mt-1">
                 Local newspapers featured our efforts in training over 500+ tribal women in sustainable honey harvesting and organic spice grading.
               </p>
@@ -202,7 +202,7 @@ const staticPages = {
             <div>
               <strong className="block text-gray-950 text-sm">Cooperative Spotlight on Ranchi Doordarshan</strong>
               <p className="text-gray-500 text-xs mt-1">
-                A documentary segment showcasing the cold-press wood-churned mustard oil processing units established in collaboration with GramBazaar.
+                A documentary segment showcasing the cold-press wood-churned mustard oil processing units established in collaboration with GaramBazaar.
               </p>
             </div>
           </div>
@@ -216,7 +216,7 @@ const staticPages = {
     content: (
       <div className="space-y-6 text-sm text-gray-700 leading-relaxed text-left">
         <p>
-          GramBazaar is dedicated to maintaining a carbon-neutral footprint and preserving local eco-systems. Our sustainability directives target three key areas:
+          GaramBazaar is dedicated to maintaining a carbon-neutral footprint and preserving local eco-systems. Our sustainability directives target three key areas:
         </p>
         <ul className="list-decimal pl-5 space-y-4 mt-4">
           <li>
@@ -255,7 +255,7 @@ export function StaticContentPage() {
   };
 
   useDocumentMetadata({
-    title: `${page.title} - GramBazaar Information`,
+    title: `${page.title} - GaramBazaar Information`,
     description: page.subtitle,
   });
 

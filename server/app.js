@@ -62,7 +62,7 @@ app.use(express.json({ limit: "2mb" }));
 app.use(apiRateLimiter);
 
 app.get("/api/health", (_req, res) => {
-  res.json({ success: true, message: "GramBazaar API is running." });
+  res.json({ success: true, message: "GaramBazaar API is running." });
 });
 
 app.use("/api/auth", authRoutes);

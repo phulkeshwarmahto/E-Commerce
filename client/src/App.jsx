@@ -9,6 +9,7 @@ import { Footer } from "./components/layout/Footer";
 import { Navbar } from "./components/layout/Navbar";
 import { PageTransition } from "./components/layout/PageTransition";
 import { Toast } from "./components/ui/Toast";
+import { ConfirmationModal } from "./components/ui/ConfirmationModal";
 import { AppContext } from "./context/AppContext";
 import { useAuth } from "./hooks/useAuth";
 import { useCart } from "./hooks/useCart";
@@ -57,6 +58,40 @@ export default function App() {
   const orders = useOrders(auth.token);
   const [wishlistIds, setWishlistIds] = useState(() => getStoredWishlist());
   const [toastMessage, setToastMessage] = useState("");
+  const [modalConfig, setModalConfig] = useState(null);
+
+  const showAlert = useCallback((message, options = {}) => {
+    return new Promise((resolve) => {
+      setModalConfig({
+        type: "alert",
+        message,
+        title: options.title || "Notice",
+        isDestructive: options.isDestructive ?? false,
+        confirmText: options.confirmText || "OK",
+        resolve: (value) => {
+          setModalConfig(null);
+          resolve(value);
+        }
+      });
+    });
+  }, []);
+
+  const showConfirm = useCallback((message, options = {}) => {
+    return new Promise((resolve) => {
+      setModalConfig({
+        type: "confirm",
+        message,
+        title: options.title || "Confirm Action",
+        isDestructive: options.isDestructive ?? /delete|deactivate|ban|reject|cancel/i.test(message),
+        confirmText: options.confirmText || "Confirm",
+        cancelText: options.cancelText || "Cancel",
+        resolve: (value) => {
+          setModalConfig(null);
+          resolve(value);
+        }
+      });
+    });
+  }, []);
 
   const [categories, setCategories] = useState([
     { id: "1", name: "Pantry", emoji: "🥫", slug: "pantry" },
@@ -156,8 +191,10 @@ export default function App() {
       categories,
       reloadCategories,
       notify: setToastMessage,
+      confirm: showConfirm,
+      alert: showAlert,
     }),
-    [auth, cart, orders, wishlistIds, categories, reloadCategories],
+    [auth, cart, orders, wishlistIds, categories, reloadCategories, showConfirm, showAlert],
   );
 
   return (
@@ -200,6 +237,7 @@ export default function App() {
           </main>
           <Footer />
           <Toast message={toastMessage} onClose={() => setToastMessage("")} />
+          <ConfirmationModal config={modalConfig} />
           <CookieBanner />
         </div>
       </BrowserRouter>

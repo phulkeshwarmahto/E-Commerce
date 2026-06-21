@@ -53,7 +53,7 @@ export function ShopPage() {
 
   useDocumentMetadata({
     title: "Shop Organic Essentials",
-    description: "Browse GramBazaar's premium catalog of 100% natural, farm-fresh products. Filter by category, price, and active deals with secure nationwide shipping."
+    description: "Browse GaramBazaar's premium catalog of 100% natural, farm-fresh products. Filter by category, price, and active deals with secure nationwide shipping."
   });
   const [inStockOnly, setInStockOnly] = useState(false);
 

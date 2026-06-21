@@ -1,4 +1,4 @@
-const WISHLIST_KEY = "grambazaar_wishlist";
+const WISHLIST_KEY = "GaramBazaar_wishlist";
 
 export const getStoredWishlist = () => {
   const raw = localStorage.getItem(WISHLIST_KEY);

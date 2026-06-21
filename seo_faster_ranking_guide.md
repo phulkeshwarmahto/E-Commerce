@@ -1,12 +1,12 @@
-# GramBazaar: Premium E-Commerce Faster Ranking & SEO Optimization Blueprint
+# GaramBazaar: Premium E-Commerce Faster Ranking & SEO Optimization Blueprint
 
-This master guide outlines a comprehensive roadmap to optimize GramBazaar's technical, on-page, and off-page architecture, enabling search engine bots to discover, index, and rank your organic storefront within **30 to 45 days**.
+This master guide outlines a comprehensive roadmap to optimize GaramBazaar's technical, on-page, and off-page architecture, enabling search engine bots to discover, index, and rank your organic storefront within **30 to 45 days**.
 
 ---
 
 ## 🗺️ Indexation & Crawling Architecture Flow
 
-The flowchart below visualizes how Googlebot crawls, indexes, and renders GramBazaar's dynamic pages, emphasizing the role of caching and sitemaps:
+The flowchart below visualizes how Googlebot crawls, indexes, and renders GaramBazaar's dynamic pages, emphasizing the role of caching and sitemaps:
 
 ```mermaid
 graph TD
@@ -73,33 +73,33 @@ Showcases the navigation structure to search users, improving Click-Through-Rate
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": "https://grambazaar.com"
+      "item": "https://GaramBazaar.com"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "Pantry",
-      "item": "https://grambazaar.com/shop?category=Pantry"
+      "item": "https://GaramBazaar.com/shop?category=Pantry"
     },
     {
       "@type": "ListItem",
       "position": 3,
       "name": "Himalayan Rock Salt",
-      "item": "https://grambazaar.com/product/himalayan-rock-salt"
+      "item": "https://GaramBazaar.com/product/himalayan-rock-salt"
     }
   ]
 }
 ```
 
 ### 🏪 Local Business Schema (Farmers' Marketplace Highlight)
-Identifies GramBazaar as a trusted regional community marketplace:
+Identifies GaramBazaar as a trusted regional community marketplace:
 
 ```json
 {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
-  "name": "GramBazaar Store",
-  "image": "https://grambazaar.com/assets/logo.png",
+  "name": "GaramBazaar Store",
+  "image": "https://GaramBazaar.com/assets/logo.png",
   "telephone": "+91-9876543210",
   "priceRange": "$$",
   "address": {
@@ -145,7 +145,7 @@ Google uses E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) 
 Backlinks act as votes of confidence. To rank faster, build your domain authority with target link sources:
 
 1. **Digital PR & Community Profiles**:
-   - Write articles about how GramBazaar helps local Self-Help Groups (SHGs) bypass middlemen.
+   - Write articles about how GaramBazaar helps local Self-Help Groups (SHGs) bypass middlemen.
    - Pitch stories to local agricultural and business portals (e.g. *YourStory*, *Better India*).
 2. **Local Citations**:
    - Submit your listing to local directories: IndiaMART, TradeIndia, and Google Business Profile.
@@ -158,7 +158,7 @@ Backlinks act as votes of confidence. To rank faster, build your domain authorit
 
 ## 🔍 5. Competitor Keyword Interception & Comparison SEO Strategy
 
-To capture traffic from customers searching for large e-grocery aggregators, you can leverage **Comparative SEO** (interception marketing). By targeting keywords comparing GramBazaar's farm-direct organic purity with aggregators' mass-market supply, you capture high-intent buyers looking for alternatives to **Amazon, Flipkart, Blinkit, BigBasket, Zepto, and Swiggy Instamart**.
+To capture traffic from customers searching for large e-grocery aggregators, you can leverage **Comparative SEO** (interception marketing). By targeting keywords comparing GaramBazaar's farm-direct organic purity with aggregators' mass-market supply, you capture high-intent buyers looking for alternatives to **Amazon, Flipkart, Blinkit, BigBasket, Zepto, and Swiggy Instamart**.
 
 ### 🎯 High-Converting Competitor Keyword Combinations
 
@@ -166,11 +166,11 @@ Create comparative landing pages, blog entries, or FAQ schemas around these keyw
 
 | Target Competitor | Keyword Intent Cluster | Recommended Blog / Page URL | Target Long-Tail SEO Keywords |
 | :--- | :--- | :--- | :--- |
-| **Blinkit / Zepto** | Instant Delivery vs. Organic Purity | `/vs-blinkit-zepto` | *"Blinkit alternative for pure organic spices"*, *"Blinkit vs GramBazaar local honey"*, *"Zepto pesticide-free groceries"* |
-| **Amazon Fresh** | Bulk Logistics vs. Direct Farmer Support | `/vs-amazon-fresh` | *"Organic A2 Ghee GramBazaar vs Amazon Fresh"*, *"Amazon Fresh organic vegetables alternative"*, *"Genuine farm ghee online"* |
-| **BigBasket** | Tata Mass Retail vs. Artisan Cooperatives | `/vs-bigbasket` | *"GramBazaar vs BigBasket organic review"*, *"Tata BigBasket alternative Jharkhand"*, *"Cheaper cold-pressed mustard oil than BigBasket"* |
+| **Blinkit / Zepto** | Instant Delivery vs. Organic Purity | `/vs-blinkit-zepto` | *"Blinkit alternative for pure organic spices"*, *"Blinkit vs GaramBazaar local honey"*, *"Zepto pesticide-free groceries"* |
+| **Amazon Fresh** | Bulk Logistics vs. Direct Farmer Support | `/vs-amazon-fresh` | *"Organic A2 Ghee GaramBazaar vs Amazon Fresh"*, *"Amazon Fresh organic vegetables alternative"*, *"Genuine farm ghee online"* |
+| **BigBasket** | Tata Mass Retail vs. Artisan Cooperatives | `/vs-bigbasket` | *"GaramBazaar vs BigBasket organic review"*, *"Tata BigBasket alternative Jharkhand"*, *"Cheaper cold-pressed mustard oil than BigBasket"* |
 | **Flipkart Grocery** | E-commerce Discounts vs. Traceable Sourcing | `/vs-flipkart` | *"Flipkart Grocery vs local organic stores"*, *"Purity test for Flipkart organic flour alternative"*, *"Flipkart Grocery Ranchi alternative"* |
-| **Swiggy Instamart** | Quick Commerce Convenience vs. Health Focus | `/vs-swiggy-instamart` | *"Instamart organic snacks vs GramBazaar"*, *"Swiggy Instamart pesticide-free local produce"* |
+| **Swiggy Instamart** | Quick Commerce Convenience vs. Health Focus | `/vs-swiggy-instamart` | *"Instamart organic snacks vs GaramBazaar"*, *"Swiggy Instamart pesticide-free local produce"* |
 
 ### 🛠️ 1. Competitor Comparison Table Landing Pages
 Create a dedicated route or blog section comparing your values to trigger indexing for search terms containing competitor names:
@@ -178,12 +178,12 @@ Create a dedicated route or blog section comparing your values to trigger indexi
 ```html
 <!-- Recommended HTML Layout for comparison landing pages -->
 <div class="seo-comparison-container">
-  <h2>Why Health-Conscious Buyers Choose GramBazaar Over Blinkit, BigBasket, and Amazon Fresh</h2>
+  <h2>Why Health-Conscious Buyers Choose GaramBazaar Over Blinkit, BigBasket, and Amazon Fresh</h2>
   <table>
     <thead>
       <tr>
         <th>Feature</th>
-        <th>GramBazaar</th>
+        <th>GaramBazaar</th>
         <th>Blinkit / Zepto / Instamart</th>
         <th>BigBasket / Amazon Fresh / Flipkart</th>
       </tr>
@@ -216,10 +216,10 @@ Create a dedicated route or blog section comparing your values to trigger indexi
 Embed these questions inside your Product FAQs or blog footer using `Question` and `Answer` schema. Google routinely ranks schema answers in search dropdowns above organic listings:
 
 > **Q: Is there an organic local alternative to Amazon Fresh and Flipkart Grocery in Ranchi?**
-> * **A:** Yes! GramBazaar is Ranchi's local community marketplace offering traceable, certified organic pantry staples and A2 dairy products sourced directly from regional farmer cooperatives, delivering fresh produce faster and cleaner than mass corporate warehouses.
+> * **A:** Yes! GaramBazaar is Ranchi's local community marketplace offering traceable, certified organic pantry staples and A2 dairy products sourced directly from regional farmer cooperatives, delivering fresh produce faster and cleaner than mass corporate warehouses.
 
-> **Q: How does GramBazaar's honey and ghee compare to Blinkit or Zepto listings?**
-> * **A:** Unlike Blinkit or Zepto which list factory-processed, pasteurized honey and mass-refined ghee, GramBazaar specializes in raw, unprocessed, wild forest honey and wood-churned A2 Desi cow ghee. We prioritize health and purity over immediate 10-minute convenience.
+> **Q: How does GaramBazaar's honey and ghee compare to Blinkit or Zepto listings?**
+> * **A:** Unlike Blinkit or Zepto which list factory-processed, pasteurized honey and mass-refined ghee, GaramBazaar specializes in raw, unprocessed, wild forest honey and wood-churned A2 Desi cow ghee. We prioritize health and purity over immediate 10-minute convenience.
 
 ### 🚀 3. Dynamic Meta Title Combinations
 Configure long-tail keyword combinations inside the `useDocumentMetadata` hook for products. 

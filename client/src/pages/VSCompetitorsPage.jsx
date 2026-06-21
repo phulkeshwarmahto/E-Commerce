@@ -5,13 +5,13 @@ export function VSCompetitorsPage() {
   const navigate = useNavigate();
 
   useDocumentMetadata({
-    title: "GramBazaar vs Blinkit, BigBasket, Amazon Fresh & Flipkart Grocery",
-    description: "Compare GramBazaar's farm-direct organic purity with Amazon Fresh, Flipkart, BigBasket, Blinkit, and Swiggy Instamart. Healthier and more sustainable than commercial aggregators.",
+    title: "GaramBazaar vs Blinkit, BigBasket, Amazon Fresh & Flipkart Grocery",
+    description: "Compare GaramBazaar's farm-direct organic purity with Amazon Fresh, Flipkart, BigBasket, Blinkit, and Swiggy Instamart. Healthier and more sustainable than commercial aggregators.",
     schema: {
       "@context": "https://schema.org",
       "@type": "WebPage",
-      "name": "GramBazaar vs Blinkit, BigBasket, Amazon Fresh & Flipkart Grocery Sourcing Comparison",
-      "description": "A comprehensive sourcing and purity comparison between GramBazaar and grocery aggregators."
+      "name": "GaramBazaar vs Blinkit, BigBasket, Amazon Fresh & Flipkart Grocery Sourcing Comparison",
+      "description": "A comprehensive sourcing and purity comparison between GaramBazaar and grocery aggregators."
     }
   });
 
@@ -23,10 +23,10 @@ export function VSCompetitorsPage() {
         <div className="text-center">
           <p className="text-[0.72rem] font-bold uppercase tracking-widest text-[#9b6b3a] mb-1">Purity & Sourcing Blueprint</p>
           <h1 className="text-2xl md:text-3xl font-extrabold text-[#2c1a0e] leading-tight">
-            GramBazaar vs. E-Grocery Aggregators
+            GaramBazaar vs. E-Grocery Aggregators
           </h1>
           <p className="text-gray-500 text-sm mt-2 max-w-xl mx-auto">
-            Why health-conscious buyers choose GramBazaar's certified organic, direct-from-farm ingredients over mass-market retail supply lines.
+            Why health-conscious buyers choose GaramBazaar's certified organic, direct-from-farm ingredients over mass-market retail supply lines.
           </p>
         </div>
 
@@ -37,7 +37,7 @@ export function VSCompetitorsPage() {
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50/50">
                 <th className="p-3 font-bold text-gray-700">Feature</th>
-                <th className="p-3 font-bold text-[#c4622d]">GramBazaar</th>
+                <th className="p-3 font-bold text-[#c4622d]">GaramBazaar</th>
                 <th className="p-3 font-bold text-gray-600">Blinkit / Zepto / Swiggy Instamart</th>
                 <th className="p-3 font-bold text-gray-600">BigBasket / Amazon Fresh / Flipkart</th>
               </tr>
@@ -85,15 +85,15 @@ export function VSCompetitorsPage() {
             <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Google Search People Also Ask</span>
             <h3 className="font-bold text-gray-900 text-sm">Is there an organic local alternative to Amazon Fresh and Flipkart Grocery in Ranchi?</h3>
             <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
-              Yes! <strong>GramBazaar</strong> is Ranchi's local community marketplace offering traceable, certified organic pantry staples and A2 dairy products sourced directly from regional farmer cooperatives, delivering fresh produce faster and cleaner than mass corporate warehouses.
+              Yes! <strong>GaramBazaar</strong> is Ranchi's local community marketplace offering traceable, certified organic pantry staples and A2 dairy products sourced directly from regional farmer cooperatives, delivering fresh produce faster and cleaner than mass corporate warehouses.
             </p>
           </div>
 
           <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-2">
             <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Google Search People Also Ask</span>
-            <h3 className="font-bold text-gray-900 text-sm">How does GramBazaar's honey and ghee compare to Blinkit or Zepto listings?</h3>
+            <h3 className="font-bold text-gray-900 text-sm">How does GaramBazaar's honey and ghee compare to Blinkit or Zepto listings?</h3>
             <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
-              Unlike Blinkit or Zepto which list factory-processed, pasteurized honey and mass-refined ghee, GramBazaar specializes in raw, unprocessed, wild forest honey and wood-churned A2 Desi cow ghee. We prioritize health and purity over immediate 10-minute convenience.
+              Unlike Blinkit or Zepto which list factory-processed, pasteurized honey and mass-refined ghee, GaramBazaar specializes in raw, unprocessed, wild forest honey and wood-churned A2 Desi cow ghee. We prioritize health and purity over immediate 10-minute convenience.
             </p>
           </div>
         </div>
