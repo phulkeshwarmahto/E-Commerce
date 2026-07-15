@@ -4,6 +4,7 @@ import {
   me,
   register,
   googleLogin,
+  logout,
   updateProfile,
   forgotPassword,
   resetPassword,
@@ -30,6 +31,7 @@ const router = Router();
 router.post("/register", authRateLimiter, validate(registerValidator), asyncHandler(register));
 router.post("/login", authRateLimiter, validate(loginValidator), asyncHandler(login));
 router.post("/google-login", authRateLimiter, asyncHandler(googleLogin));
+router.post("/logout", asyncHandler(logout));
 router.get("/me", asyncHandler(requireAuth), me);
 router.put("/profile", asyncHandler(requireAuth), asyncHandler(updateProfile));
 router.post("/forgot-password", authRateLimiter, asyncHandler(forgotPassword));

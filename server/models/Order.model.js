@@ -13,6 +13,7 @@ const orderItemSchema = new mongoose.Schema(
     emoji: { type: String, default: "📦" },
     image: { type: String, default: "" },
     variantName: { type: String },
+    fulfillmentStatus: { type: String, enum: ORDER_STATUSES, default: "Processing" },
   },
   { _id: false },
 );
@@ -60,6 +61,8 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true },
 );
 orderSchema.index({ userId: 1, createdAt: -1 });
+orderSchema.index({ "payment.razorpayOrderId": 1 });
+orderSchema.index({ "payment.razorpayPaymentId": 1 });
 
 
 orderSchema.methods.toClient = function toClient() {

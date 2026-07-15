@@ -546,3 +546,28 @@ export const cancelOrder = async (req, res) => {
 
   return res.json(new ApiResponse(true, "Order cancelled successfully.", { order: order.toClient() }));
 };
+
+export const getOrderById = async (req, res) => {
+  const { id } = req.params;
+  const order = await Order.findOne({ orderNumber: id });
+
+  if (!order) {
+    return res.status(404).json(new ApiResponse(false, "Order not found."));
+  }
+
+  const isOwner = order.userId.toString() === req.user._id.toString();
+  const isAdmin = req.user.role === "admin";
+  let isSellerForOrder = false;
+
+  if (req.user.role === "seller") {
+    const products = await Product.find({ seller: req.user._id });
+    const productIds = products.map((p) => p._id.toString());
+    isSellerForOrder = order.items.some((item) => productIds.includes(item.productId.toString()));
+  }
+
+  if (!isOwner && !isAdmin && !isSellerForOrder) {
+    return res.status(403).json(new ApiResponse(false, "Unauthorized to view this order."));
+  }
+
+  return res.json(new ApiResponse(true, "Order fetched successfully.", { order: order.toClient() }));
+};

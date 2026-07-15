@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { generateToken } from "../utils/generateToken.js";
+import { generateToken, COOKIE_OPTIONS } from "../utils/generateToken.js";
 import { User } from "../models/User.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import { cloudinaryUpload } from "../utils/cloudinaryUpload.js";
@@ -86,10 +86,12 @@ export const register = async (req, res) => {
     console.error("Failed to send welcome verification email during registration:", emailErr.message);
   }
 
+  const token = generateToken(user);
+  res.cookie("token", token, COOKIE_OPTIONS);
+
   return res.status(201).json(
     new ApiResponse(true, "Account created.", {
       user: user.toClient(),
-      token: generateToken(user),
     }),
   );
 };
@@ -105,10 +107,12 @@ export const login = async (req, res) => {
     return res.status(403).json(new ApiResponse(false, "This account has been deactivated. Please contact support."));
   }
 
+  const token = generateToken(user);
+  res.cookie("token", token, COOKIE_OPTIONS);
+
   return res.json(
     new ApiResponse(true, "Login successful.", {
       user: user.toClient(),
-      token: generateToken(user),
     }),
   );
 };
@@ -212,10 +216,12 @@ export const googleLogin = async (req, res) => {
       });
     }
 
+    const token = generateToken(user);
+    res.cookie("token", token, COOKIE_OPTIONS);
+
     return res.json(
       new ApiResponse(true, "Google login successful.", {
         user: user.toClient(),
-        token: generateToken(user),
       }),
     );
   } catch (error) {
@@ -534,3 +540,9 @@ export const deleteAddress = async (req, res) => {
   await user.save();
   return res.json(new ApiResponse(true, "Address deleted successfully.", { savedAddresses: user.savedAddresses }));
 };
+
+export const logout = async (req, res) => {
+  res.clearCookie("token", COOKIE_OPTIONS);
+  return res.json(new ApiResponse(true, "Logged out successfully."));
+};
+

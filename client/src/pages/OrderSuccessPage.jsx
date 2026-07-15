@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
-import { useAppContext } from "../hooks/useAppContext";
+import { getOrderByIdRequest } from "../api/orders.api";
 import { InvoiceModal } from "../components/ui/InvoiceModal";
 
 export function OrderSuccessPage() {
   const { orderId } = useParams();
-  const { orders } = useAppContext();
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
 
   useDocumentMetadata({
@@ -15,7 +16,20 @@ export function OrderSuccessPage() {
     noindex: true
   });
 
-  const currentOrder = orders.orders.find((o) => o.orderNumber === orderId);
+  useEffect(() => {
+    getOrderByIdRequest(orderId)
+      .then((data) => {
+        if (data && data.order) {
+          setOrder(data.order);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load order details:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [orderId]);
 
   return (
     <section className="page-content success-card">
@@ -26,7 +40,9 @@ export function OrderSuccessPage() {
         <Link className="button button-primary" to="/orders">
           Track orders
         </Link>
-        {currentOrder && (
+        {loading ? (
+          <span className="text-xs text-gray-500">Loading invoice details...</span>
+        ) : order ? (
           <button
             type="button"
             onClick={() => setInvoiceModalOpen(true)}
@@ -34,18 +50,20 @@ export function OrderSuccessPage() {
           >
             📄 View Invoice
           </button>
-        )}
+        ) : null}
         <Link className="button button-secondary" to="/shop">
           Continue shopping
         </Link>
       </div>
 
       {/* Invoice Modal */}
-      <InvoiceModal
-        isOpen={invoiceModalOpen}
-        onClose={() => setInvoiceModalOpen(false)}
-        order={currentOrder}
-      />
+      {order && (
+        <InvoiceModal
+          isOpen={invoiceModalOpen}
+          onClose={() => setInvoiceModalOpen(false)}
+          order={order}
+        />
+      )}
     </section>
   );
 }

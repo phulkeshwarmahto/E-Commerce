@@ -77,21 +77,18 @@ export function ShopPage() {
       page,
       priceMin: debouncedPriceMin,
       priceMax: debouncedPriceMax,
+      sort,
       limit: 12
     }),
-    [badge, category, debouncedSearch, page, debouncedPriceMin, debouncedPriceMax]
+    [badge, category, debouncedSearch, page, debouncedPriceMin, debouncedPriceMax, sort]
   );
   const { products, loading, error, pagination } = useProducts(filters);
 
   const sortedProducts = useMemo(() => {
     let list = [...products];
     if (inStockOnly) list = list.filter((p) => p.inStock);
-    if (sort === "price-asc")  return list.sort((a, b) => a.price - b.price);
-    if (sort === "price-desc") return list.sort((a, b) => b.price - a.price);
-    if (sort === "rating")     return list.sort((a, b) => b.rating - a.rating);
-    if (sort === "newest")     return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     return list;
-  }, [products, sort, inStockOnly]);
+  }, [products, inStockOnly]);
 
   const setParam = (key, value) => {
     const next = new URLSearchParams(searchParams);

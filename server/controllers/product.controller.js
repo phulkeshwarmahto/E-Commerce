@@ -16,12 +16,7 @@ const buildMongoQuery = (req) => {
   const filters = {};
 
   if (search) {
-    const escapedSearch = escapeRegex(search);
-    filters.$or = [
-      { name: { $regex: escapedSearch, $options: "i" } },
-      { description: { $regex: escapedSearch, $options: "i" } },
-      { tags: { $regex: escapedSearch, $options: "i" } },
-    ];
+    filters.$text = { $search: search };
   }
 
   if (category !== "All") {
@@ -56,10 +51,24 @@ const buildMongoQuery = (req) => {
   if (!req.user || req.user.role === "user") {
     filters.isPublished = true;
   } else if (req.user.role === "seller") {
-    filters.$or = [
-      { isPublished: true },
-      { seller: req.user._id }
-    ];
+    if (filters.$text) {
+      // If doing a text search, we need to combine it with $or for published vs owner
+      filters.$and = [
+        { $text: { $search: search } },
+        {
+          $or: [
+            { isPublished: true },
+            { seller: req.user._id }
+          ]
+        }
+      ];
+      delete filters.$text; // Remove top-level $text search
+    } else {
+      filters.$or = [
+        { isPublished: true },
+        { seller: req.user._id }
+      ];
+    }
   }
 
   return filters;
@@ -72,8 +81,26 @@ export const getProducts = async (req, res) => {
 
   const mongoQuery = buildMongoQuery(req);
 
+  const sortParam = req.query.sort || "relevance";
+  let sortOption = { createdAt: -1 };
+  if (sortParam === "price-asc") {
+    sortOption = { price: 1 };
+  } else if (sortParam === "price-desc") {
+    sortOption = { price: -1 };
+  } else if (sortParam === "rating") {
+    sortOption = { rating: -1 };
+  } else if (sortParam === "newest") {
+    sortOption = { createdAt: -1 };
+  } else if (sortParam === "relevance" && req.query.search) {
+    sortOption = { score: { $meta: "textScore" } };
+  }
+
+  const queryProj = sortParam === "relevance" && req.query.search
+    ? { score: { $meta: "textScore" } }
+    : {};
+
   const [products, totalItems, featured] = await Promise.all([
-    Product.find(mongoQuery).sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Product.find(mongoQuery, queryProj).sort(sortOption).skip(skip).limit(limit),
     Product.countDocuments(mongoQuery),
     Product.find({ isFeatured: true, isPublished: true }).sort({ rating: -1 }).limit(12),
   ]);

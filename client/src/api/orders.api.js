@@ -5,3 +5,4 @@ export const createOrderRequest = (payload) =>
   apiRequest("/orders", { method: "POST", body: payload });
 export const cancelOrderRequest = (id) =>
   apiRequest(`/orders/${id}/cancel`, { method: "PATCH" });
+export const getOrderByIdRequest = (id) => apiRequest(`/orders/${id}`);

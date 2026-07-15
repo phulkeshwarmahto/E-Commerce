@@ -201,7 +201,24 @@ export const updateSellerOrderStatus = async (req, res) => {
   }
 
   if (status) {
-    order.status = status;
+    order.items.forEach((item) => {
+      if (sellerProductIds.includes(item.productId.toString()) || req.user.role === "admin") {
+        item.fulfillmentStatus = status;
+      }
+    });
+
+    const statuses = order.items.map((item) => item.fulfillmentStatus);
+    if (statuses.every((s) => s === "Cancelled")) {
+      order.status = "Cancelled";
+    } else if (statuses.every((s) => s === "Delivered")) {
+      order.status = "Delivered";
+    } else if (statuses.every((s) => s === "Returned")) {
+      order.status = "Returned";
+    } else if (statuses.some((s) => s === "Processing")) {
+      order.status = "Processing";
+    } else if (statuses.some((s) => s === "On the Way")) {
+      order.status = "On the Way";
+    }
   }
   if (paymentStatus) {
     order.payment.status = paymentStatus;

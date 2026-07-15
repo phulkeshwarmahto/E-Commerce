@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { loginRequest, meRequest, registerRequest, googleLoginRequest, updateProfileRequest } from "../api/auth.api";
+import { loginRequest, meRequest, registerRequest, googleLoginRequest, logoutRequest, updateProfileRequest } from "../api/auth.api";
 import {
   clearStoredSession,
   getStoredSession,
@@ -68,7 +68,12 @@ export function useAuth() {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await logoutRequest();
+    } catch (err) {
+      console.error("Failed to call logout API:", err);
+    }
     setSession(null);
     clearStoredSession();
   };

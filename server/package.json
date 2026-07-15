@@ -9,7 +9,8 @@
     "seed:products": "node seeds/products.seed.js",
     "seed:users": "node seeds/users.seed.js",
     "seed:all": "node seeds/products.seed.js && node seeds/users.seed.js && node seeds/orders.seed.js",
-    "seed:clear": "node seeds/clear.js"
+    "seed:clear": "node seeds/clear.js",
+    "test": "node --test tests/integration.test.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

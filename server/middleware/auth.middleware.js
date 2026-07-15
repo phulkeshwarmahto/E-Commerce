@@ -2,8 +2,11 @@ import { User } from "../models/User.model.js";
 import { parseToken } from "../utils/generateToken.js";
 
 export const requireAuth = async (req, res, next) => {
-  const header = req.headers.authorization || "";
-  let token = header.startsWith("Bearer ") ? header.slice(7) : "";
+  let token = req.cookies?.token || "";
+  if (!token) {
+    const header = req.headers.authorization || "";
+    token = header.startsWith("Bearer ") ? header.slice(7) : "";
+  }
   if (!token && req.query.token) {
     token = req.query.token;
   }
@@ -28,8 +31,11 @@ export const requireAuth = async (req, res, next) => {
 };
 
 export const optionalAuth = async (req, res, next) => {
-  const header = req.headers.authorization || "";
-  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
+  let token = req.cookies?.token || "";
+  if (!token) {
+    const header = req.headers.authorization || "";
+    token = header.startsWith("Bearer ") ? header.slice(7) : "";
+  }
   if (!token) {
     return next();
   }
@@ -46,3 +52,4 @@ export const optionalAuth = async (req, res, next) => {
   }
   next();
 };
+

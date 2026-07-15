@@ -1,10 +1,15 @@
-export const registerValidator = [
-  (req) => (!req.body.name ? "Name is required." : null),
-  (req) => (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(req.body.email || "") ? "Valid email is required." : null),
-  (req) => (!req.body.password || req.body.password.length < 8 ? "Password must be at least 8 characters." : null),
-];
+import { z } from "zod";
 
-export const loginValidator = [
-  (req) => (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(req.body.email || "") ? "Valid email is required." : null),
-  (req) => (!req.body.password ? "Password is required." : null),
-];
+export const registerValidator = z.object({
+  name: z.string().trim().min(1, "Name is required."),
+  email: z.string().trim().email("Valid email is required."),
+  password: z.string().min(8, "Password must be at least 8 characters."),
+  role: z.enum(["user", "seller"]).optional(),
+  referredByCode: z.string().trim().optional(),
+  referralCode: z.string().trim().optional(),
+});
+
+export const loginValidator = z.object({
+  email: z.string().trim().email("Valid email is required."),
+  password: z.string().min(1, "Password is required."),
+});

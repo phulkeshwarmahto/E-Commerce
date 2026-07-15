@@ -10,6 +10,13 @@ const getSecret = () => {
   return secret;
 };
 
+export const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax", // Lax is standard for local dev with different ports
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days (matching JWT_REFRESH_EXPIRES if we use it, or default 7d)
+};
+
 export const generateToken = (user) =>
   jwt.sign(
     {
@@ -18,7 +25,7 @@ export const generateToken = (user) =>
       role: user.role,
     },
     getSecret(),
-    { expiresIn: process.env.JWT_ACCESS_EXPIRES || "15m" },
+    { expiresIn: process.env.JWT_REFRESH_EXPIRES || "7d" }, // Set access token expiry to matching cookie lifespan for simplicity
   );
 
 export const parseToken = (token) => {
@@ -33,3 +40,4 @@ export const parseToken = (token) => {
     return null;
   }
 };
+

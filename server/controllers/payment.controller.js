@@ -75,26 +75,14 @@ export const verifyPayment = async (req, res) => {
   res.json(new ApiResponse(true, "Payment verified.", { verified: true, order: order.toClient() }));
 };
 
-export const verifyUpiPayment = async (req, res) => {
-  const { orderId } = req.body;
-  const order = await findOrderByIdOrNumber(orderId, req.user._id);
-
-  if (!order) {
-    return res.status(404).json(new ApiResponse(false, "Order not found."));
-  }
-
-  order.payment.status = "paid";
-  order.payment.razorpayPaymentId = `upi_${crypto.randomBytes(6).toString("hex")}`;
-  order.status = "Processing";
-  order.statusHistory.push({ status: "Processing", note: "Simulated UPI Payment Completed" });
-  await order.save();
-
-  res.json(new ApiResponse(true, "UPI Payment verified successfully.", { verified: true, order: order.toClient() }));
-};
-
 export const razorpayWebhook = async (req, res) => {
   const signature = req.headers["x-razorpay-signature"];
-  const secret = process.env.RAZORPAY_WEBHOOK_SECRET || "myGaramBazaarWebhook@2026!secure";
+  const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+  if (!secret) {
+    console.error("RAZORPAY_WEBHOOK_SECRET is not configured.");
+    return res.status(500).json(new ApiResponse(false, "Webhook configuration error."));
+  }
 
   // Verify signature
   const shasum = crypto.createHmac("sha256", secret);

@@ -53,6 +53,7 @@ app.use(
         callback(new Error(`CORS origin denied: ${origin}`));
       }
     },
+    credentials: true,
   }),
 );
 app.use(helmet());

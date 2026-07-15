@@ -50,6 +50,7 @@ export async function apiRequest(path, options = {}) {
   const fetchOptions = {
     method: options.method || "GET",
     headers,
+    credentials: "include",
     body:
       options.body instanceof FormData
         ? options.body

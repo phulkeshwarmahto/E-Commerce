@@ -61,10 +61,19 @@ export const createReview = async (req, res) => {
     { upsert: true, new: true, setDefaultsOnInsert: true },
   );
 
-  const productReviews = await Review.find({ productId: product._id, isApproved: true });
-  product.reviewCount = productReviews.length;
-  product.rating =
-    productReviews.reduce((sum, entry) => sum + entry.rating, 0) / Math.max(productReviews.length, 1);
+  const stats = await Review.aggregate([
+    { $match: { productId: product._id, isApproved: true } },
+    {
+      $group: {
+        _id: null,
+        reviewCount: { $sum: 1 },
+        averageRating: { $avg: "$rating" },
+      },
+    },
+  ]);
+
+  product.reviewCount = stats[0]?.reviewCount || 0;
+  product.rating = stats[0]?.averageRating || 0;
   await product.save();
 
   // Create notifications for product's seller and all admins
