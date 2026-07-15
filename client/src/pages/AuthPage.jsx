@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAppContext } from "../hooks/useAppContext";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 
@@ -95,12 +95,11 @@ export function AuthPage() {
 
   const activeRole = roles.find((r) => r.id === selectedRole);
 
-  // Admin can't sign up
-  const availableRoles = mode === "signup"
-    ? roles.filter((r) => !r.signInOnly)
-    : roles;
+  // Exclude admin from available roles in standard auth form
+  const availableRoles = roles.filter(
+    (r) => r.id !== "admin" && (mode !== "signup" || !r.signInOnly)
+  );
 
-  // Reset to user if admin selected and switching to signup
   const handleModeSwitch = () => {
     const next = mode === "signin" ? "signup" : "signin";
     setMode(next);
@@ -192,7 +191,7 @@ export function AuthPage() {
               <p className="text-[0.72rem] font-bold uppercase tracking-wider text-gray-500 mb-2">
                 {mode === "signin" ? "Sign in as" : "I want to join as"}
               </p>
-              <div className="grid grid-cols-3 gap-2">
+              <div className={`grid gap-2 ${availableRoles.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
                 {availableRoles.map((role) => (
                   <button
                     key={role.id}

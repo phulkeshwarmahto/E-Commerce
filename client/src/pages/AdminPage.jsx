@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   createProductRequest,
   getDashboardRequest,
@@ -46,13 +47,45 @@ import { ProductTable } from "../components/admin/ProductTable";
 import { StatCard } from "../components/admin/StatCard";
 import { Modal } from "../components/ui/Modal";
 import { Pagination } from "../components/ui/Pagination";
+import { Spinner } from "../components/ui/Spinner";
 import { useAppContext } from "../hooks/useAppContext";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 import { ImageUploadZone } from "../components/admin/ImageUploadZone";
 
 export function AdminPage() {
-  const { user, notify, categories, reloadCategories, confirm } = useAppContext();
+  const navigate = useNavigate();
+  const { user, login, logout, notify, categories, reloadCategories, confirm } = useAppContext();
   const [section, setSection] = useState("overview");
+
+  // Admin login states
+  const [adminEmail, setAdminEmail] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleAdminLogin = async (e) => {
+    e.preventDefault();
+    setLoginError("");
+    if (!adminEmail.trim() || !adminPassword) {
+      setLoginError("Please enter both email and password.");
+      return;
+    }
+    setLoginLoading(true);
+    try {
+      const loggedInUser = await login({ email: adminEmail.trim(), password: adminPassword });
+      if (loggedInUser.role !== "admin") {
+        setLoginError("Access denied. Admin credentials required.");
+        await logout();
+      } else {
+        notify("Welcome back, Administrator! 🛠️");
+      }
+    } catch (err) {
+      setLoginError(err?.message || "Invalid credentials.");
+    } finally {
+      setLoginLoading(false);
+    }
+  };
 
   // Seller Verification states
   const [sellersList, setSellersList] = useState([]);
@@ -684,9 +717,73 @@ export function AdminPage() {
 
   if (!user || user.role !== "admin") {
     return (
-      <section className="page-content">
-        <p>Admin access required.</p>
-      </section>
+      <div className="min-h-screen bg-[#111827] flex items-center justify-center px-4 py-12">
+        <div className="max-w-md w-full space-y-8 bg-[#1f2937] p-8 rounded-2xl border border-gray-700 shadow-2xl">
+          <div>
+            <div className="flex justify-center text-4xl mb-3">🛠️</div>
+            <h2 className="text-center text-2xl font-extrabold text-white">
+              GaramBazaar Admin Portal
+            </h2>
+            <p className="mt-2 text-center text-sm text-gray-400">
+              Sign in to manage the platform settings, users, and listings
+            </p>
+          </div>
+          <form className="mt-8 space-y-6" onSubmit={handleAdminLogin}>
+            {loginError && (
+              <div className="bg-red-900/50 border border-red-500 text-red-200 text-xs rounded-xl p-3 text-center font-medium">
+                {loginError}
+              </div>
+            )}
+            <div className="rounded-md shadow-sm space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-gray-300 block mb-1">
+                  Admin Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  placeholder="admin@garambazaar.com"
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  className="w-full bg-[#374151] border border-gray-600 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-300 block mb-1">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    placeholder="••••••••"
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    className="w-full bg-[#374151] border border-gray-600 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-200 text-xs font-semibold"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                disabled={loginLoading}
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
+              >
+                {loginLoading ? "Authenticating..." : "Sign In to Admin Portal →"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     );
   }
 
