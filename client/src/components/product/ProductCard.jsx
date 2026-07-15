@@ -224,17 +224,13 @@ export function ProductCard({ product }) {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSubmit={async ({ email, phone }) => {
-            try {
-              await trackAffiliateClickRequest(product.id, email, phone);
-              localStorage.setItem("guestEmail", email);
-              if (phone) {
-                localStorage.setItem("guestPhone", phone);
-              }
-              setIsModalOpen(false);
-              window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
-            } catch (err) {
-              throw err;
+            await trackAffiliateClickRequest(product.id, email, phone);
+            localStorage.setItem("guestEmail", email);
+            if (phone) {
+              localStorage.setItem("guestPhone", phone);
             }
+            setIsModalOpen(false);
+            window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
           }}
           product={product}
         />

@@ -263,14 +263,6 @@ export function ProductDetailPage() {
     }
   };
 
-  if (loading || !product) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Spinner />
-      </div>
-    );
-  }
-
   const [selectedVariant, setSelectedVariant] = useState(null);
 
   useEffect(() => {
@@ -280,6 +272,14 @@ export function ProductDetailPage() {
       setSelectedVariant(null);
     }
   }, [product]);
+
+  if (loading || !product) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
 
   const displayPrice = selectedVariant ? selectedVariant.price : product.price;
   const displayOriginalPrice = selectedVariant ? selectedVariant.originalPrice : product.originalPrice;
@@ -747,17 +747,13 @@ export function ProductDetailPage() {
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             onSubmit={async ({ email, phone }) => {
-              try {
-                await trackAffiliateClickRequest(product.id, email, phone);
-                localStorage.setItem("guestEmail", email);
-                if (phone) {
-                  localStorage.setItem("guestPhone", phone);
-                }
-                setIsModalOpen(false);
-                window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
-              } catch (err) {
-                throw err;
+              await trackAffiliateClickRequest(product.id, email, phone);
+              localStorage.setItem("guestEmail", email);
+              if (phone) {
+                localStorage.setItem("guestPhone", phone);
               }
+              setIsModalOpen(false);
+              window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
             }}
             product={product}
           />
