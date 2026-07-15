@@ -145,8 +145,8 @@ export function ProductDetailPage() {
 
   // SEO Dynamic Metadata
   useDocumentMetadata({
-    title: product ? `${product.name} - Buy Online` : "Loading Product...",
-    description: product ? `${product.description.slice(0, 150)}... Sourced directly from local partners, secure payments, free shipping on orders above ₹500.` : "Loading product details...",
+    title: product ? `${product.name} | GaramBazaar` : "Loading Product...",
+    description: product ? `${product.description.slice(0, 150)}... Sourced directly from GaramBazaar, secure payments, fast setup.` : "Loading product details...",
     schema: product ? {
       "@context": "https://schema.org",
       "@type": "Product",
@@ -636,11 +636,21 @@ export function ProductDetailPage() {
                     rel="noopener noreferrer"
                     className="w-full block py-3 rounded-xl font-bold text-sm text-center transition-all bg-amber-500 hover:bg-amber-600 text-white shadow-sm cursor-pointer"
                   >
-                    Buy on Amazon
+                    {product.source === "chrome-extension"
+                      ? "Install Extension"
+                      : product.source === "web-app"
+                      ? "Try Web App"
+                      : product.source === "play-store"
+                      ? "Get on Play Store"
+                      : product.source === "amazon"
+                      ? "Buy on Amazon"
+                      : "Visit Product"}
                   </a>
-                  <p className="text-[10px] text-gray-500 text-center leading-snug italic px-1">
-                    *As an Amazon Associate I earn from qualifying purchases.*
-                  </p>
+                  {product.source === "amazon" && (
+                    <p className="text-[10px] text-gray-500 text-center leading-snug italic px-1">
+                      *As an Amazon Associate I earn from qualifying purchases.*
+                    </p>
+                  )}
                 </div>
               ) : user?.role === "seller" ? (
                 <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-4 text-center text-xs font-semibold leading-relaxed shadow-sm">

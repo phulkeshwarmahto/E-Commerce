@@ -58,6 +58,8 @@ async function importProducts() {
       const category = (row.category || "Pantry").trim();
       const description = (row.description || "").trim();
 
+      const source = (row.source || "amazon").trim().toLowerCase();
+
       if (!title || !imageUrl || !affiliateLink) {
         console.warn(`[SKIP] Missing required fields for row: ${JSON.stringify(row)}`);
         failed++;
@@ -85,7 +87,7 @@ async function importProducts() {
           description,
           images: [{ url: imageUrl, alt: title }],
           productType: "affiliate",
-          source: "amazon",
+          source,
           inStock: true,
           isPublished: true,
           stockCount: 999 // Unlimited virtual stock for affiliate items

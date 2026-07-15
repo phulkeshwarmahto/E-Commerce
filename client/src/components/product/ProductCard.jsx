@@ -155,7 +155,15 @@ export function ProductCard({ product }) {
               className="w-full block py-2 rounded text-sm font-semibold text-center transition-all duration-150
                           border-2 border-amber-500 bg-amber-500 text-white hover:bg-amber-600 active:scale-[0.98]"
             >
-              Buy on Amazon
+              {product.source === "chrome-extension"
+                ? "Install Extension"
+                : product.source === "web-app"
+                ? "Try Web App"
+                : product.source === "play-store"
+                ? "Get on Play Store"
+                : product.source === "amazon"
+                ? "Buy on Amazon"
+                : "Visit Product"}
             </a>
           ) : user?.role === "seller" ? (
             <Link
