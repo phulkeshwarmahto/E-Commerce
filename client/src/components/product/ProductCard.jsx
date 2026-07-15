@@ -147,7 +147,17 @@ export function ProductCard({ product }) {
 
         {/* Add to Cart — slides in on hover */}
         <div className="mt-auto">
-          {user?.role === "seller" ? (
+          {product.productType === "affiliate" ? (
+            <a
+              href={product.affiliateLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full block py-2 rounded text-sm font-semibold text-center transition-all duration-150
+                          border-2 border-amber-500 bg-amber-500 text-white hover:bg-amber-600 active:scale-[0.98]"
+            >
+              Buy on Amazon
+            </a>
+          ) : user?.role === "seller" ? (
             <Link
               to={`/products/${product.slug}`}
               className="w-full block py-2 rounded text-sm font-semibold text-center transition-all duration-150

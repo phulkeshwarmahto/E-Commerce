@@ -589,39 +589,60 @@ export function ProductDetailPage() {
                 ))}
               </div>
 
-              {/* Pincode check */}
-              <div>
-                <p className="text-[0.75rem] font-semibold text-gray-700 mb-1.5">Check delivery availability</p>
-                <div className="flex gap-2">
-                  <input
-                    placeholder="Enter pincode"
-                    value={pincode}
-                    onChange={(e) => setPincode(e.target.value)}
-                    maxLength={6}
-                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm
-                               focus:outline-none focus:border-[#c4622d] focus:ring-1 focus:ring-[#c4622d]/30"
-                  />
-                  <button
-                    onClick={() =>
-                      setPinMessage(
-                        validatePincode(pincode)
-                          ? "✅ Delivery by Tue, 2–4 days."
-                          : "❌ Enter valid 6-digit pincode."
-                      )
-                    }
-                    className="bg-gray-800 hover:bg-gray-900 text-white text-sm font-semibold
-                               px-4 py-2 rounded-lg transition-colors"
-                  >
-                    Check
-                  </button>
+              {/* Pincode check or Affiliate Info */}
+              {product.productType === "affiliate" ? (
+                <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-3 text-xs leading-relaxed text-gray-600">
+                  <span className="font-bold text-gray-800 block mb-1">Affiliate Product</span>
+                  This item is listed via Amazon Associates. Clicking below will open the Amazon product page in a new window.
                 </div>
-                {pinMessage && (
-                  <p className="text-[0.75rem] mt-1.5 font-medium text-gray-700">{pinMessage}</p>
-                )}
-              </div>
+              ) : (
+                <div>
+                  <p className="text-[0.75rem] font-semibold text-gray-700 mb-1.5">Check delivery availability</p>
+                  <div className="flex gap-2">
+                    <input
+                      placeholder="Enter pincode"
+                      value={pincode}
+                      onChange={(e) => setPincode(e.target.value)}
+                      maxLength={6}
+                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm
+                                 focus:outline-none focus:border-[#c4622d] focus:ring-1 focus:ring-[#c4622d]/30"
+                    />
+                    <button
+                      onClick={() =>
+                        setPinMessage(
+                          validatePincode(pincode)
+                            ? "✅ Delivery by Tue, 2–4 days."
+                            : "❌ Enter valid 6-digit pincode."
+                        )
+                      }
+                      className="bg-gray-800 hover:bg-gray-900 text-white text-sm font-semibold
+                                 px-4 py-2 rounded-lg transition-colors"
+                    >
+                      Check
+                    </button>
+                  </div>
+                  {pinMessage && (
+                    <p className="text-[0.75rem] mt-1.5 font-medium text-gray-700">{pinMessage}</p>
+                  )}
+                </div>
+              )}
 
               {/* CTA Buttons */}
-              {user?.role === "seller" ? (
+              {product.productType === "affiliate" ? (
+                <div className="space-y-3 pt-1">
+                  <a
+                    href={product.affiliateLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full block py-3 rounded-xl font-bold text-sm text-center transition-all bg-amber-500 hover:bg-amber-600 text-white shadow-sm cursor-pointer"
+                  >
+                    Buy on Amazon
+                  </a>
+                  <p className="text-[10px] text-gray-500 text-center leading-snug italic px-1">
+                    *As an Amazon Associate I earn from qualifying purchases.*
+                  </p>
+                </div>
+              ) : user?.role === "seller" ? (
                 <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-4 text-center text-xs font-semibold leading-relaxed shadow-sm">
                   🏪 Merchant Viewing Mode: <br /> Sellers are restricted from purchasing products.
                 </div>

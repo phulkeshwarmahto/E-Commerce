@@ -169,8 +169,11 @@ export function Footer() {
       </footer>
 
       {/* ── Footer Bottom Bar ────────────────────────────────────── */}
-      <div className="bg-[#0d1117] text-gray-500 text-[0.72rem] text-center py-3 px-4">
-        © 2026 GaramBazaar Pvt. Ltd. · All rights reserved · Built with care in India 🇮🇳
+      <div className="bg-[#0d1117] text-gray-500 text-[0.72rem] text-center py-4 px-4 space-y-1.5">
+        <p>© 2026 GaramBazaar Pvt. Ltd. · All rights reserved · Built with care in India 🇮🇳</p>
+        <p className="text-gray-600 italic">
+          *As an Amazon Associate I earn from qualifying purchases.*
+        </p>
       </div>
     </>
   );

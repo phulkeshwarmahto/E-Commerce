@@ -47,6 +47,9 @@ const productSchema = new mongoose.Schema(
         discountPercent: { type: Number, min: 1, max: 99, required: true },
       }
     ],
+    productType: { type: String, enum: ["organic", "affiliate"], default: "organic" },
+    affiliateLink: { type: String, unique: true, sparse: true, trim: true },
+    source: { type: String, trim: true, default: "" },
   },
   { timestamps: true },
 );
