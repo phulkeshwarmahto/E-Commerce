@@ -32,7 +32,7 @@ const makeFetch = async (url, fetchOptions) => {
     throw new Error(payload?.message || `Request failed with status ${response.status}`);
   }
 
-  return payload.data;
+  return payload.data !== null && payload.data !== undefined ? payload.data : payload;
 };
 
 export async function apiRequest(path, options = {}) {

@@ -382,8 +382,8 @@ export function CheckoutPage() {
 
   if (!isAuthenticated) {
     return (
-      <section className="page-content">
-        <p>Please sign in before checkout.</p>
+      <section className="page-content" style={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "1rem", minHeight: "60vh" }} >
+        <p className="text-gray-600 font-medium">Please sign in before checkout.</p>
         <Button onClick={() => navigate("/auth")}>Go to sign in</Button>
       </section>
     );
