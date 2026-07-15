@@ -107,7 +107,11 @@ export const getProducts = async (req, res) => {
 
   const totalPages = Math.ceil(totalItems / limit);
 
-  res.setHeader("Cache-Control", "public, max-age=30, s-maxage=120, stale-while-revalidate=59");
+  if (process.env.NODE_ENV !== "development") {
+    res.setHeader("Cache-Control", "public, max-age=30, s-maxage=120, stale-while-revalidate=59");
+  } else {
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  }
   res.json(
     new ApiResponse(true, "Products fetched.", {
       products: products.map((product) => product.toClient()),

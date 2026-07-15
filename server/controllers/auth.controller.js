@@ -14,8 +14,13 @@ export const register = async (req, res) => {
   const email = req.body.email.trim().toLowerCase();
   const existingUser = await User.findOne({ email });
 
+  let user;
   if (existingUser) {
-    return res.status(409).json(new ApiResponse(false, "User already exists."));
+    if (existingUser.isGuest) {
+      user = existingUser;
+    } else {
+      return res.status(409).json(new ApiResponse(false, "User already exists."));
+    }
   }
 
   const passwordHash = await bcrypt.hash(
@@ -36,25 +41,43 @@ export const register = async (req, res) => {
     }
   }
 
-  let referralCode;
-  let isUnique = false;
-  while (!isUnique) {
-    const namePart = req.body.name.trim().replace(/[^a-zA-Z0-9]/g, "").substring(0, 5).toUpperCase();
-    const randPart = Math.random().toString(36).substring(2, 6).toUpperCase();
-    referralCode = `${namePart}-${randPart}`;
-    const check = await User.findOne({ referralCode });
-    if (!check) isUnique = true;
+  let referralCode = user?.referralCode;
+  if (!referralCode) {
+    let isUnique = false;
+    while (!isUnique) {
+      const namePart = req.body.name.trim().replace(/[^a-zA-Z0-9]/g, "").substring(0, 5).toUpperCase();
+      const randPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+      referralCode = `${namePart}-${randPart}`;
+      const check = await User.findOne({ referralCode });
+      if (!check) isUnique = true;
+    }
   }
 
-  const user = await User.create({
-    name: req.body.name.trim(),
-    email,
-    passwordHash,
-    role,
-    membership: "Silver",
-    referralCode,
-    referredBy,
-  });
+  if (user) {
+    // Upgrade guest user
+    user.name = req.body.name.trim();
+    user.passwordHash = passwordHash;
+    user.role = role;
+    user.isGuest = false;
+    user.referralCode = referralCode;
+    user.referredBy = referredBy;
+    if (req.body.phone) {
+      user.phone = req.body.phone.trim();
+    }
+    await user.save();
+  } else {
+    // Create new user
+    user = await User.create({
+      name: req.body.name.trim(),
+      email,
+      passwordHash,
+      role,
+      membership: "Silver",
+      referralCode,
+      referredBy,
+      phone: req.body.phone ? req.body.phone.trim() : "",
+    });
+  }
 
   // Send email verification on registration
   try {

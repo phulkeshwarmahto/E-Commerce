@@ -9,9 +9,20 @@ import { Order } from "../models/Order.model.js";
 
 // Set node environment to test
 process.env.NODE_ENV = "test";
-process.env.MONGODB_URI = process.env.MONGODB_URI 
-  ? `${process.env.MONGODB_URI}_test` 
-  : "mongodb://127.0.0.1:27017/GaramBazaar_test";
+
+const originalUri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/GaramBazaar";
+let testUri;
+if (originalUri.includes("?")) {
+  const [base, query] = originalUri.split("?");
+  if (base.endsWith("/")) {
+    testUri = `${base}GaramBazaar_test?${query}`;
+  } else {
+    testUri = `${base}/GaramBazaar_test?${query}`;
+  }
+} else {
+  testUri = `${originalUri}/GaramBazaar_test`;
+}
+process.env.MONGODB_URI = testUri;
 
 let server;
 let baseUrl;

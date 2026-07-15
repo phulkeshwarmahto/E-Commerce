@@ -32,8 +32,10 @@ const slugify = (text) => {
 
 async function importProducts() {
   try {
+    console.log("Connecting to:", MONGO_URI);
     await mongoose.connect(MONGO_URI);
-    console.log("Connected to MongoDB.");
+    console.log("Connected Host:", mongoose.connection.host);
+    console.log("Connected DB Name:", mongoose.connection.name);
 
     const rows = [];
     await new Promise((resolve, reject) => {
