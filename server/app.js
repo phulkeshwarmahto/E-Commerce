@@ -26,6 +26,7 @@ import supportRoutes from "./routes/support.routes.js";
 import newsletterRoutes from "./routes/newsletter.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import settingsRoutes from "./routes/settings.routes.js";
+import chatRoutes from "./routes/chat.routes.js";
 import { apiRateLimiter } from "./middleware/rateLimit.middleware.js";
 import { errorHandler } from "./middleware/errorHandler.middleware.js";
 
@@ -73,6 +74,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/chat", chatRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/brands", brandRoutes);
 app.use("/api/admin", adminRoutes);

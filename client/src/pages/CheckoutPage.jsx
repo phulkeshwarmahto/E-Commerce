@@ -499,6 +499,28 @@ export function CheckoutPage() {
     }
   };
 
+  const handleSimulatePayment = async () => {
+    if (!simulatingOrder) return;
+    setPlacingOrder(true);
+    try {
+      await verifyPaymentRequest({
+        orderId: simulatingOrder.id || simulatingOrder._id,
+        razorpayOrderId: "simulated",
+        razorpayPaymentId: "simulated",
+        signature: "simulated_payment_signature",
+      });
+      cart.clearCart();
+      notify("Payment verified successfully (Simulated)!");
+      const targetOrder = simulatingOrder;
+      setSimulatingOrder(null);
+      navigate(`/order-success/${targetOrder.orderNumber}`);
+    } catch (err) {
+      notify(err.message || "Failed to verify simulated payment.");
+    } finally {
+      setPlacingOrder(false);
+    }
+  };
+
   return (
     <section className="page-content">
       <div className="checkout-layout">

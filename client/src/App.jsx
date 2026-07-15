@@ -18,6 +18,7 @@ import { getStoredWishlist, setStoredWishlist } from "./store/wishlistStore";
 import { getWishlistRequest, toggleWishlistRequest } from "./api/wishlist.api";
 import { getCategoriesRequest } from "./api/category.api";
 import { CookieBanner } from "./components/ui/CookieBanner";
+import { ChatbotWidget } from "./components/ui/ChatbotWidget";
 
 // Lazy loaded page components for optimal initial bundle sizes and fast page loads
 const AccountPage = lazy(() => import("./pages/AccountPage").then(m => ({ default: m.AccountPage })));
@@ -239,6 +240,7 @@ export default function App() {
           <Toast message={toastMessage} onClose={() => setToastMessage("")} />
           <ConfirmationModal config={modalConfig} />
           <CookieBanner />
+          <ChatbotWidget />
         </div>
       </BrowserRouter>
     </AppContext.Provider>

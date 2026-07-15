@@ -59,7 +59,9 @@ export const verifyPayment = async (req, res) => {
     .update(`${razorpayOrderId}|${razorpayPaymentId}`)
     .digest("hex");
 
-  if (!signature || expectedSignature !== signature) {
+  const isSimulated = signature === "simulated_payment_signature" && process.env.NODE_ENV === "development";
+
+  if (!isSimulated && (!signature || expectedSignature !== signature)) {
     order.payment.status = "failed";
     await order.save();
     return res.status(400).json(new ApiResponse(false, "Payment verification failed."));

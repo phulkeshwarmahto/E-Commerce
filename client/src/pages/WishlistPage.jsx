@@ -15,7 +15,7 @@ export function WishlistPage() {
 
   return (
     <section className="page-content">
-      <div className="wishlist-page">
+      <div className="wishlist-page" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
         <h2>❤️ My Wishlist ({items.length})</h2>
         {items.length ? (
           <ProductGrid products={items} />
