@@ -14,6 +14,8 @@ import { notifyMeStockRequest } from "../api/products.api";
 import { ReportModal } from "../components/ui/ReportModal";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 import { optimizeCloudinaryUrl } from "../utils/optimizeImage";
+import { TrackHistoryModal } from "../components/product/TrackHistoryModal";
+import { trackAffiliateClickRequest } from "../api/affiliate.api";
 
 // Star SVGs
 function Star({ filled, half }) {
@@ -56,6 +58,7 @@ export function ProductDetailPage() {
   const [isInCompare, setIsInCompare] = useState(false);
   const [compareList, setCompareList] = useState([]);
   const [showCompareModal, setShowCompareModal] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Track recently viewed
   useEffect(() => {
@@ -630,10 +633,35 @@ export function ProductDetailPage() {
               {/* CTA Buttons */}
               {product.productType === "affiliate" ? (
                 <div className="space-y-3 pt-1">
-                  <a
-                    href={product.affiliateLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={async () => {
+                      // If logged in
+                      if (user) {
+                        try {
+                          await trackAffiliateClickRequest(product.id);
+                        } catch (err) {
+                          console.error("Failed to track affiliate click:", err);
+                        }
+                        window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
+                        return;
+                      }
+
+                      // If guest credentials cached
+                      const guestEmail = localStorage.getItem("guestEmail");
+                      const guestPhone = localStorage.getItem("guestPhone") || "";
+                      if (guestEmail) {
+                        try {
+                          await trackAffiliateClickRequest(product.id, guestEmail, guestPhone);
+                        } catch (err) {
+                          console.error("Failed to track guest click:", err);
+                        }
+                        window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
+                        return;
+                      }
+
+                      // Show modal
+                      setIsModalOpen(true);
+                    }}
                     className="w-full block py-3 rounded-xl font-bold text-sm text-center transition-all bg-amber-500 hover:bg-amber-600 text-white shadow-sm cursor-pointer"
                   >
                     {product.source === "chrome-extension"
@@ -645,7 +673,7 @@ export function ProductDetailPage() {
                       : product.source === "amazon"
                       ? "Buy on Amazon"
                       : "Visit Product"}
-                  </a>
+                  </button>
                   {product.source === "amazon" && (
                     <p className="text-[10px] text-gray-500 text-center leading-snug italic px-1">
                       *As an Amazon Associate I earn from qualifying purchases.*
@@ -714,6 +742,26 @@ export function ProductDetailPage() {
             </div>
           </div>
         </div>
+        {isModalOpen && (
+          <TrackHistoryModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSubmit={async ({ email, phone }) => {
+              try {
+                await trackAffiliateClickRequest(product.id, email, phone);
+                localStorage.setItem("guestEmail", email);
+                if (phone) {
+                  localStorage.setItem("guestPhone", phone);
+                }
+                setIsModalOpen(false);
+                window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
+              } catch (err) {
+                throw err;
+              }
+            }}
+            product={product}
+          />
+        )}
 
         {/* ── Reviews Section ── */}
         <section className="mt-10 bg-white rounded-2xl border border-gray-200 p-5 md:p-8">

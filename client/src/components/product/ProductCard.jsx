@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useAppContext } from "../../hooks/useAppContext";
 import { calculateDiscount } from "../../utils/calculateDiscount";
 import { formatCurrency } from "../../utils/formatCurrency";
+import { TrackHistoryModal } from "./TrackHistoryModal";
+import { trackAffiliateClickRequest } from "../../api/affiliate.api";
 
 // Filled star SVG
 function StarFilled() {
@@ -34,6 +36,7 @@ import { optimizeCloudinaryUrl } from "../../utils/optimizeImage";
 
 export function ProductCard({ product }) {
   const [imageError, setImageError] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { cart, wishlistIds, toggleWishlist, notify, user } = useAppContext();
   const discount = calculateDiscount(product.price, product.originalPrice);
   const isWishlisted = wishlistIds.includes(product.id);
@@ -148,12 +151,37 @@ export function ProductCard({ product }) {
         {/* Add to Cart — slides in on hover */}
         <div className="mt-auto">
           {product.productType === "affiliate" ? (
-            <a
-              href={product.affiliateLink}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={async () => {
+                // If logged in
+                if (user) {
+                  try {
+                    await trackAffiliateClickRequest(product.id);
+                  } catch (err) {
+                    console.error("Failed to track affiliate click:", err);
+                  }
+                  window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
+                  return;
+                }
+
+                // If guest credentials cached
+                const guestEmail = localStorage.getItem("guestEmail");
+                const guestPhone = localStorage.getItem("guestPhone") || "";
+                if (guestEmail) {
+                  try {
+                    await trackAffiliateClickRequest(product.id, guestEmail, guestPhone);
+                  } catch (err) {
+                    console.error("Failed to track guest click:", err);
+                  }
+                  window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
+                  return;
+                }
+
+                // Show modal
+                setIsModalOpen(true);
+              }}
               className="w-full block py-2 rounded text-sm font-semibold text-center transition-all duration-150
-                          border-2 border-amber-500 bg-amber-500 text-white hover:bg-amber-600 active:scale-[0.98]"
+                          border-2 border-amber-500 bg-amber-500 text-white hover:bg-amber-600 active:scale-[0.98] cursor-pointer"
             >
               {product.source === "chrome-extension"
                 ? "Install Extension"
@@ -164,7 +192,7 @@ export function ProductCard({ product }) {
                 : product.source === "amazon"
                 ? "Buy on Amazon"
                 : "Visit Product"}
-            </a>
+            </button>
           ) : user?.role === "seller" ? (
             <Link
               to={`/products/${product.slug}`}
@@ -191,6 +219,26 @@ export function ProductCard({ product }) {
           )}
         </div>
       </div>
+      {isModalOpen && (
+        <TrackHistoryModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={async ({ email, phone }) => {
+            try {
+              await trackAffiliateClickRequest(product.id, email, phone);
+              localStorage.setItem("guestEmail", email);
+              if (phone) {
+                localStorage.setItem("guestPhone", phone);
+              }
+              setIsModalOpen(false);
+              window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
+            } catch (err) {
+              throw err;
+            }
+          }}
+          product={product}
+        />
+      )}
     </article>
   );
 }
