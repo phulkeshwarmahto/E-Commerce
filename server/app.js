@@ -31,7 +31,7 @@ import { apiRateLimiter } from "./middleware/rateLimit.middleware.js";
 import { errorHandler } from "./middleware/errorHandler.middleware.js";
 
 const app = express();
-
+// Force restart nodemon again to ensure reload
 app.use(compression());
 
 const allowedOrigins = [
