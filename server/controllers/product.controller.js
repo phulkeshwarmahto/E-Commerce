@@ -19,8 +19,13 @@ const buildMongoQuery = (req) => {
     filters.$text = { $search: search };
   }
 
-  if (category !== "All") {
-    filters.category = category;
+  if (category === "Software") {
+    filters.productType = "affiliate";
+  } else {
+    filters.productType = "organic";
+    if (category !== "All") {
+      filters.category = category;
+    }
   }
 
   if (featured) {
@@ -102,7 +107,7 @@ export const getProducts = async (req, res) => {
   const [products, totalItems, featured] = await Promise.all([
     Product.find(mongoQuery, queryProj).sort(sortOption).skip(skip).limit(limit),
     Product.countDocuments(mongoQuery),
-    Product.find({ isFeatured: true, isPublished: true }).sort({ rating: -1 }).limit(12),
+    Product.find({ isFeatured: true, isPublished: true, productType: mongoQuery.productType }).sort({ rating: -1 }).limit(12),
   ]);
 
   const totalPages = Math.ceil(totalItems / limit);
