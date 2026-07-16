@@ -433,7 +433,7 @@ export function CheckoutPage() {
       if (paymentMethod === "cod") {
         cart.clearCart();
         notify(`Order ${order.id} placed.`);
-        navigate(`/order-success/${order.id}`);
+        navigate(`/order-success/${order.id}`, { state: { justPlaced: true } });
         return;
       }
 
@@ -461,7 +461,7 @@ export function CheckoutPage() {
             });
             cart.clearCart();
             notify(`Payment received for ${order.id}.`);
-            navigate(`/order-success/${order.id}`);
+            navigate(`/order-success/${order.id}`, { state: { justPlaced: true } });
           },
         };
 
@@ -514,7 +514,7 @@ export function CheckoutPage() {
       notify("Payment verified successfully (Simulated)!");
       const targetOrder = simulatingOrder;
       setSimulatingOrder(null);
-      navigate(`/order-success/${targetOrder.orderNumber}`);
+      navigate(`/order-success/${targetOrder.orderNumber}`, { state: { justPlaced: true } });
     } catch (err) {
       notify(err.message || "Failed to verify simulated payment.");
     } finally {
