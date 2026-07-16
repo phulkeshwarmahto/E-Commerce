@@ -37,6 +37,27 @@ export function SellerPage() {
 
   // AI draft states
   const [loadingAIDraft, setLoadingAIDraft] = useState({});
+  const [reviewDrafts, setReviewDrafts] = useState({});
+  const [loadingReviewDraft, setLoadingReviewDraft] = useState({});
+
+  const handleAIDraftReview = async (reviewId, rating, body) => {
+    setLoadingReviewDraft((prev) => ({ ...prev, [reviewId]: true }));
+    try {
+      const data = await apiRequest("/ai/reply-review", {
+        method: "POST",
+        body: { rating, reviewText: body, productId: selectedReviewProductId }
+      });
+      if (data && data.reply) {
+        setReviewDrafts((prev) => ({ ...prev, [reviewId]: data.reply }));
+        notify("✨ Review reply drafted with AI!");
+      }
+    } catch (err) {
+      console.error("AI Review Reply Draft error:", err);
+      notify(err.message || "Failed to generate reply draft.");
+    } finally {
+      setLoadingReviewDraft((prev) => ({ ...prev, [reviewId]: false }));
+    }
+  };
 
   const handleAIDraftAnswer = async (faqId, question, productId) => {
     setLoadingAIDraft((prev) => ({ ...prev, [faqId]: true }));
@@ -999,6 +1020,35 @@ export function SellerPage() {
                         </div>
                       </div>
                       <p className="text-xs text-gray-600 leading-relaxed mt-1">{rev.body}</p>
+                      
+                      <div className="mt-3 flex flex-col gap-2 pt-2.5 border-t border-gray-200/50">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleAIDraftReview(rev.id, rev.rating, rev.body)}
+                            disabled={loadingReviewDraft[rev.id]}
+                            className="bg-transparent border border-[#c4622d] hover:bg-[#c4622d]/5 text-[#c4622d] hover:text-[#a95223] font-bold py-1 px-3 rounded-lg text-[10px] transition-colors cursor-pointer flex items-center gap-1"
+                          >
+                            {loadingReviewDraft[rev.id] ? "⏳ Generating..." : "✨ Draft Reply with AI"}
+                          </button>
+                        </div>
+                        {reviewDrafts[rev.id] && (
+                          <div className="bg-amber-50/50 border border-amber-200 rounded-xl p-3 text-xs leading-relaxed text-gray-700 flex flex-col gap-2 relative">
+                            <span className="font-bold text-[#c4622d] text-[10px] uppercase tracking-wider text-left">AI Suggested Reply:</span>
+                            <p className="m-0 italic">"{reviewDrafts[rev.id]}"</p>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(reviewDrafts[rev.id]);
+                                notify("📋 Copied to clipboard!");
+                              }}
+                              className="self-end px-2.5 py-1 bg-[#c4622d] hover:bg-[#a95223] text-white rounded-lg text-[10px] font-bold border-0 cursor-pointer shadow-sm transition-colors"
+                            >
+                              📋 Copy Reply
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </article>
                   ))}
                 </div>

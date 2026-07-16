@@ -51,11 +51,185 @@ import { Spinner } from "../components/ui/Spinner";
 import { useAppContext } from "../hooks/useAppContext";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 import { ImageUploadZone } from "../components/admin/ImageUploadZone";
+import { apiRequest } from "../api/axios";
 
 export function AdminPage() {
   const navigate = useNavigate();
   const { user, login, logout, notify, categories, reloadCategories, confirm } = useAppContext();
   const [section, setSection] = useState("overview");
+
+  // AI-Assisted States & Handlers
+  const [loadingBroadcastAI, setLoadingBroadcastAI] = useState(false);
+  const [loadingIndividualAI, setLoadingIndividualAI] = useState(false);
+  
+  // Newsletter compose states
+  const [newsletterTheme, setNewsletterTheme] = useState("");
+  const [newsletterSubject, setNewsletterSubject] = useState("");
+  const [newsletterBody, setNewsletterBody] = useState("");
+  const [loadingNewsletterAI, setLoadingNewsletterAI] = useState(false);
+  const [sendingNewsletter, setSendingNewsletter] = useState(false);
+
+  // Spotlights / Brand ad AI
+  const [loadingSpotlightAI, setLoadingSpotlightAI] = useState(false);
+
+  // Site Settings AI
+  const [loadingSettingsAI, setLoadingSettingsAI] = useState(false);
+
+  // Handlers
+  const handleAIDraftBroadcast = async () => {
+    const theme = window.prompt("Enter theme or topic for broadcast announcement (e.g. Diwali Fest, Weekend discount):");
+    if (!theme || !theme.trim()) return;
+    setLoadingBroadcastAI(true);
+    try {
+      const data = await apiRequest("/ai/draft-broadcast", {
+        method: "POST",
+        body: { theme: theme.trim() }
+      });
+      if (data) {
+        setBroadcastTitle(data.title || "");
+        setBroadcastBody(data.body || "");
+        notify("✨ Broadcast announcement drafted with AI!");
+      }
+    } catch (err) {
+      console.error(err);
+      notify(err.message || "Failed to generate broadcast draft.");
+    } finally {
+      setLoadingBroadcastAI(false);
+    }
+  };
+
+  const handleAIDraftIndividual = async () => {
+    if (!individualUserId) {
+      notify("Please select a target user first.");
+      return;
+    }
+    const selectedUser = usersList.find(u => u.id === individualUserId);
+    const context = window.prompt(`Enter message context/reason for ${selectedUser?.name || "this user"} (e.g. coupon loyalty reward, unpaid order nudge):`);
+    if (!context || !context.trim()) return;
+    setLoadingIndividualAI(true);
+    try {
+      const data = await apiRequest("/ai/draft-user-message", {
+        method: "POST",
+        body: { userName: selectedUser?.name || "Customer", context: context.trim() }
+      });
+      if (data) {
+        setIndividualTitle(`Special update regarding ${context.trim()}`);
+        setIndividualBody(data.message || "");
+        notify("✨ Personal direct message drafted with AI!");
+      }
+    } catch (err) {
+      console.error(err);
+      notify(err.message || "Failed to generate message draft.");
+    } finally {
+      setLoadingIndividualAI(false);
+    }
+  };
+
+  const handleAIDraftNewsletter = async () => {
+    if (!newsletterTheme.trim()) {
+      notify("Please enter a promotion/newsletter theme first.");
+      return;
+    }
+    setLoadingNewsletterAI(true);
+    try {
+      const data = await apiRequest("/ai/draft-newsletter", {
+        method: "POST",
+        body: { theme: newsletterTheme.trim() }
+      });
+      if (data) {
+        setNewsletterSubject(data.subject || "");
+        setNewsletterBody(data.body || "");
+        notify("✨ Newsletter draft generated with AI!");
+      }
+    } catch (err) {
+      console.error(err);
+      notify(err.message || "Failed to draft newsletter.");
+    } finally {
+      setLoadingNewsletterAI(false);
+    }
+  };
+
+  const handleSendNewsletter = async (e) => {
+    e.preventDefault();
+    if (!newsletterSubject.trim() || !newsletterBody.trim()) {
+      notify("Subject and email body are required.");
+      return;
+    }
+    setSendingNewsletter(true);
+    try {
+      const data = await apiRequest("/newsletter/send", {
+        method: "POST",
+        body: { subject: newsletterSubject.trim(), html: newsletterBody.trim() }
+      });
+      if (data) {
+        notify("📧 Newsletter successfully sent to all subscribers!");
+        setNewsletterTheme("");
+        setNewsletterSubject("");
+        setNewsletterBody("");
+      }
+    } catch (err) {
+      console.error(err);
+      notify(err.message || "Failed to send newsletter.");
+    } finally {
+      setSendingNewsletter(false);
+    }
+  };
+
+  const handleAIDraftSpotlight = async () => {
+    if (!newBrand.brand.trim()) {
+      notify("Please enter the Brand Name first.");
+      return;
+    }
+    const highlight = window.prompt(`Enter spotlight highlights or focus for ${newBrand.brand} (e.g. organic skincare, 20% off all spices):`);
+    if (!highlight || !highlight.trim()) return;
+    setLoadingSpotlightAI(true);
+    try {
+      const data = await apiRequest("/ai/draft-spotlight", {
+        method: "POST",
+        body: { brandName: newBrand.brand.trim(), highlight: highlight.trim() }
+      });
+      if (data) {
+        setNewBrand((current) => ({
+          ...current,
+          title: data.title || "",
+          copy: data.copy || "",
+          offer: data.offer || "",
+          accent: data.accent || "#c4622d"
+        }));
+        notify("✨ Spotlight banner suggestions drafted with AI!");
+      }
+    } catch (err) {
+      console.error(err);
+      notify(err.message || "Failed to draft spotlight banner.");
+    } finally {
+      setLoadingSpotlightAI(false);
+    }
+  };
+
+  const handleAISiteSettings = async () => {
+    const theme = window.prompt("Enter banner campaign theme (e.g. Monsoon Deals, Winter Spices):");
+    if (!theme || !theme.trim()) return;
+    setLoadingSettingsAI(true);
+    try {
+      const data = await apiRequest("/ai/suggest-site-settings", {
+        method: "POST",
+        body: { season: theme.trim() }
+      });
+      if (data) {
+        setNewBanner((current) => ({
+          ...current,
+          title: data.heroHeadline || data.announcementBarText || "",
+          linkUrl: "/shop",
+        }));
+        notify("✨ Banner suggestions populated in the Add Banner form!");
+      }
+    } catch (err) {
+      console.error(err);
+      notify(err.message || "Failed to generate banner suggestions.");
+    } finally {
+      setLoadingSettingsAI(false);
+    }
+  };
 
   // Admin login states
   const [adminEmail, setAdminEmail] = useState("");
@@ -1555,12 +1729,22 @@ export function AdminPage() {
 
               {messagingMode === "broadcast" ? (
                 <form onSubmit={handleBroadcast} className="bg-gray-50 rounded-xl border border-gray-150 p-5 stack text-sm">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-2xl">📢</span>
-                    <div>
-                      <h3 className="text-sm font-bold text-gray-900 m-0">Broadcast to All Users</h3>
-                      <p className="text-[11px] text-gray-500 m-0">This will send a notification to every registered user{usersList.length > 0 ? ` (${usersList.length} users)` : ""}.</p>
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">📢</span>
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-900 m-0">Broadcast to All Users</h3>
+                        <p className="text-[11px] text-gray-500 m-0">This will send a notification to every registered user{usersList.length > 0 ? ` (${usersList.length} users)` : ""}.</p>
+                      </div>
                     </div>
+                    <button
+                      type="button"
+                      onClick={handleAIDraftBroadcast}
+                      disabled={loadingBroadcastAI}
+                      className="border border-[#c4622d] hover:bg-[#c4622d]/5 text-[#c4622d] font-bold py-1.5 px-3 rounded-lg text-xs transition-colors cursor-pointer bg-white shrink-0"
+                    >
+                      {loadingBroadcastAI ? "⏳ Drafting..." : "✨ Draft with AI"}
+                    </button>
                   </div>
                   <div className="field">
                     <label className="label text-xs font-semibold text-gray-700">Subject / Title</label>
@@ -1603,12 +1787,22 @@ export function AdminPage() {
                 </form>
               ) : (
                 <form onSubmit={handleIndividualMessage} className="bg-gray-50 rounded-xl border border-gray-150 p-5 stack text-sm">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-2xl">✉️</span>
-                    <div>
-                      <h3 className="text-sm font-bold text-gray-900 m-0">Message Individual User</h3>
-                      <p className="text-[11px] text-gray-500 m-0">Send a personal notification and/or email to a specific user.</p>
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">✉️</span>
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-900 m-0">Message Individual User</h3>
+                        <p className="text-[11px] text-gray-500 m-0">Send a personal notification and/or email to a specific user.</p>
+                      </div>
                     </div>
+                    <button
+                      type="button"
+                      onClick={handleAIDraftIndividual}
+                      disabled={loadingIndividualAI}
+                      className="border border-[#c4622d] hover:bg-[#c4622d]/5 text-[#c4622d] font-bold py-1.5 px-3 rounded-lg text-xs transition-colors cursor-pointer bg-white shrink-0"
+                    >
+                      {loadingIndividualAI ? "⏳ Drafting..." : "✨ Draft with AI"}
+                    </button>
                   </div>
                   <div className="field">
                     <label className="label text-xs font-semibold text-gray-700">Select User</label>
@@ -1677,6 +1871,72 @@ export function AdminPage() {
                   <p className="text-xs text-gray-500">View and manage email list registrations for newsletters and product promotions.</p>
                 </div>
               </div>
+
+              {/* Compose & Send Newsletter Form */}
+              <form onSubmit={handleSendNewsletter} className="bg-gray-50 rounded-xl border border-gray-150 p-5 stack text-sm mb-8">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-2xl">📧</span>
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900 m-0">Compose Email Newsletter</h3>
+                    <p className="text-[11px] text-gray-500 m-0">Write or draft a newsletter campaign using AI and send it to all active subscribers.</p>
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label className="label text-xs font-bold text-gray-700">1. Newsletter Theme / Goal (for AI Suggestion)</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      className="input py-2 flex-grow"
+                      placeholder="e.g. Monsoon Organic Spices Sale 15% off"
+                      value={newsletterTheme}
+                      onChange={(e) => setNewsletterTheme(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAIDraftNewsletter}
+                      disabled={loadingNewsletterAI || !newsletterTheme.trim()}
+                      className="border border-[#c4622d] hover:bg-[#c4622d]/5 text-[#c4622d] font-bold py-2 px-4 rounded-xl text-xs transition-colors cursor-pointer bg-white whitespace-nowrap"
+                    >
+                      {loadingNewsletterAI ? "⏳ Drafting..." : "✨ Draft with AI"}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label className="label text-xs font-bold text-gray-700">2. Subject Line</label>
+                  <input
+                    type="text"
+                    className="input py-2"
+                    required
+                    placeholder="Catchy subject line..."
+                    value={newsletterSubject}
+                    onChange={(e) => setNewsletterSubject(e.target.value)}
+                  />
+                </div>
+
+                <div className="field">
+                  <label className="label text-xs font-bold text-gray-700">3. Email HTML Body</label>
+                  <textarea
+                    className="input min-h-[160px] py-2 font-mono text-xs"
+                    required
+                    placeholder="HTML template body..."
+                    value={newsletterBody}
+                    onChange={(e) => setNewsletterBody(e.target.value)}
+                  />
+                  <span className="text-[10px] text-gray-400 mt-1 block">Supports HTML styling (e.g. &lt;h2&gt;, &lt;p&gt;, &lt;a&gt;, inline css).</span>
+                </div>
+
+                <div className="flex justify-end pt-2">
+                  <button
+                    type="submit"
+                    className="button button-primary py-2 font-semibold"
+                    disabled={sendingNewsletter || !newsletterSubject.trim() || !newsletterBody.trim()}
+                  >
+                    {sendingNewsletter ? "📧 Sending..." : "✉️ Send Newsletter to Subscribers"}
+                  </button>
+                </div>
+              </form>
 
               {loadingSubscribers ? (
                 <p className="text-sm text-gray-500 py-6 text-center animate-pulse">Loading subscribers...</p>
@@ -1840,7 +2100,19 @@ export function AdminPage() {
               {/* Add Brand Form */}
               <form onSubmit={handleCreateBrand} className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-5 rounded-xl border border-gray-150 mb-6 text-sm">
                 <div className="field">
-                  <label className="label text-xs font-semibold text-gray-700">Brand Name</label>
+                  <div className="flex justify-between items-center w-full">
+                    <label className="label text-xs font-semibold text-gray-700 m-0">Brand Name</label>
+                    {newBrand.brand.trim() && (
+                      <button
+                        type="button"
+                        onClick={handleAIDraftSpotlight}
+                        disabled={loadingSpotlightAI}
+                        className="text-xs text-amber-600 hover:text-amber-700 font-bold flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0 mb-1"
+                      >
+                        {loadingSpotlightAI ? "⏳ Drafting..." : "✨ Generate Spotlight with AI"}
+                      </button>
+                    )}
+                  </div>
                   <input
                     type="text"
                     className="input py-2"
@@ -2178,9 +2450,19 @@ export function AdminPage() {
 
                   {/* Promo Banners */}
                   <div className="space-y-6">
-                    <div>
-                      <h3 className="text-sm font-black uppercase tracking-wider text-[#9b6b3a] mb-1">🖼_ Homepage Carousel Banners</h3>
-                      <p className="text-xs text-gray-500">Add or remove promotional slider banners displayed on the homepage hero section.</p>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h3 className="text-sm font-black uppercase tracking-wider text-[#9b6b3a] mb-1">🖼️ Homepage Carousel Banners</h3>
+                        <p className="text-xs text-gray-500">Add or remove promotional slider banners displayed on the homepage hero section.</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleAISiteSettings}
+                        disabled={loadingSettingsAI}
+                        className="border border-[#c4622d] hover:bg-[#c4622d]/5 text-[#c4622d] font-bold py-1.5 px-3 rounded-lg text-xs transition-colors cursor-pointer bg-white shrink-0"
+                      >
+                        {loadingSettingsAI ? "⏳ Drafting..." : "✨ Draft Banner with AI"}
+                      </button>
                     </div>
 
                     {/* Add Banner Form */}
