@@ -58,6 +58,9 @@ export function AdminPage() {
   const { user, login, logout, notify, categories, reloadCategories, confirm } = useAppContext();
   const [section, setSection] = useState("overview");
 
+  // Prompt configuration for premium custom popups instead of window.prompt
+  const [promptConfig, setPromptConfig] = useState(null); 
+
   // AI-Assisted States & Handlers
   const [loadingBroadcastAI, setLoadingBroadcastAI] = useState(false);
   const [loadingIndividualAI, setLoadingIndividualAI] = useState(false);
@@ -76,53 +79,65 @@ export function AdminPage() {
   const [loadingSettingsAI, setLoadingSettingsAI] = useState(false);
 
   // Handlers
-  const handleAIDraftBroadcast = async () => {
-    const theme = window.prompt("Enter theme or topic for broadcast announcement (e.g. Diwali Fest, Weekend discount):");
-    if (!theme || !theme.trim()) return;
-    setLoadingBroadcastAI(true);
-    try {
-      const data = await apiRequest("/ai/draft-broadcast", {
-        method: "POST",
-        body: { theme: theme.trim() }
-      });
-      if (data) {
-        setBroadcastTitle(data.title || "");
-        setBroadcastBody(data.body || "");
-        notify("✨ Broadcast announcement drafted with AI!");
+  const handleAIDraftBroadcast = () => {
+    setPromptConfig({
+      title: "Draft Broadcast Announcement",
+      description: "Enter the theme or topic of the broadcast announcement you want the AI to write (e.g., 'Diwali Special Sale' or 'Free delivery this Sunday').",
+      placeholder: "e.g. Diwali Fest Weekend Discount",
+      onSubmit: async (theme) => {
+        if (!theme || !theme.trim()) return;
+        setLoadingBroadcastAI(true);
+        try {
+          const data = await apiRequest("/ai/draft-broadcast", {
+            method: "POST",
+            body: { theme: theme.trim() }
+          });
+          if (data) {
+            setBroadcastTitle(data.title || "");
+            setBroadcastBody(data.body || "");
+            notify("✨ Broadcast announcement drafted with AI!");
+          }
+        } catch (err) {
+          console.error(err);
+          notify(err.message || "Failed to generate broadcast draft.");
+        } finally {
+          setLoadingBroadcastAI(false);
+        }
       }
-    } catch (err) {
-      console.error(err);
-      notify(err.message || "Failed to generate broadcast draft.");
-    } finally {
-      setLoadingBroadcastAI(false);
-    }
+    });
   };
 
-  const handleAIDraftIndividual = async () => {
+  const handleAIDraftIndividual = () => {
     if (!individualUserId) {
       notify("Please select a target user first.");
       return;
     }
     const selectedUser = usersList.find(u => u.id === individualUserId);
-    const context = window.prompt(`Enter message context/reason for ${selectedUser?.name || "this user"} (e.g. coupon loyalty reward, unpaid order nudge):`);
-    if (!context || !context.trim()) return;
-    setLoadingIndividualAI(true);
-    try {
-      const data = await apiRequest("/ai/draft-user-message", {
-        method: "POST",
-        body: { userName: selectedUser?.name || "Customer", context: context.trim() }
-      });
-      if (data) {
-        setIndividualTitle(`Special update regarding ${context.trim()}`);
-        setIndividualBody(data.message || "");
-        notify("✨ Personal direct message drafted with AI!");
+    setPromptConfig({
+      title: `Draft Message for ${selectedUser?.name || "Customer"}`,
+      description: `Enter the message context/reason for sending this message to ${selectedUser?.name || "this user"} (e.g. 'coupon loyalty reward', 'unpaid order nudge').`,
+      placeholder: "e.g. coupon loyalty reward",
+      onSubmit: async (context) => {
+        if (!context || !context.trim()) return;
+        setLoadingIndividualAI(true);
+        try {
+          const data = await apiRequest("/ai/draft-user-message", {
+            method: "POST",
+            body: { userName: selectedUser?.name || "Customer", context: context.trim() }
+          });
+          if (data) {
+            setIndividualTitle(`Special update regarding ${context.trim()}`);
+            setIndividualBody(data.message || "");
+            notify("✨ Personal direct message drafted with AI!");
+          }
+        } catch (err) {
+          console.error(err);
+          notify(err.message || "Failed to generate message draft.");
+        } finally {
+          setLoadingIndividualAI(false);
+        }
       }
-    } catch (err) {
-      console.error(err);
-      notify(err.message || "Failed to generate message draft.");
-    } finally {
-      setLoadingIndividualAI(false);
-    }
+    });
   };
 
   const handleAIDraftNewsletter = async () => {
@@ -175,60 +190,72 @@ export function AdminPage() {
     }
   };
 
-  const handleAIDraftSpotlight = async () => {
+  const handleAIDraftSpotlight = () => {
     if (!newBrand.brand.trim()) {
       notify("Please enter the Brand Name first.");
       return;
     }
-    const highlight = window.prompt(`Enter spotlight highlights or focus for ${newBrand.brand} (e.g. organic skincare, 20% off all spices):`);
-    if (!highlight || !highlight.trim()) return;
-    setLoadingSpotlightAI(true);
-    try {
-      const data = await apiRequest("/ai/draft-spotlight", {
-        method: "POST",
-        body: { brandName: newBrand.brand.trim(), highlight: highlight.trim() }
-      });
-      if (data) {
-        setNewBrand((current) => ({
-          ...current,
-          title: data.title || "",
-          copy: data.copy || "",
-          offer: data.offer || "",
-          accent: data.accent || "#c4622d"
-        }));
-        notify("✨ Spotlight banner suggestions drafted with AI!");
+    setPromptConfig({
+      title: `Draft Spotlight for ${newBrand.brand}`,
+      description: `Enter campaign highlights or products to focus on for ${newBrand.brand} (e.g. 'organic skincare, 20% off all spices').`,
+      placeholder: "e.g. organic skincare, 20% off all spices",
+      onSubmit: async (highlight) => {
+        if (!highlight || !highlight.trim()) return;
+        setLoadingSpotlightAI(true);
+        try {
+          const data = await apiRequest("/ai/draft-spotlight", {
+            method: "POST",
+            body: { brandName: newBrand.brand.trim(), highlight: highlight.trim() }
+          });
+          if (data) {
+            setNewBrand((current) => ({
+              ...current,
+              title: data.title || "",
+              copy: data.copy || "",
+              offer: data.offer || "",
+              accent: data.accent || "#c4622d"
+            }));
+            notify("✨ Spotlight banner suggestions drafted with AI!");
+          }
+        } catch (err) {
+          console.error(err);
+          notify(err.message || "Failed to draft spotlight banner.");
+        } finally {
+          setLoadingSpotlightAI(false);
+        }
       }
-    } catch (err) {
-      console.error(err);
-      notify(err.message || "Failed to draft spotlight banner.");
-    } finally {
-      setLoadingSpotlightAI(false);
-    }
+    });
   };
 
-  const handleAISiteSettings = async () => {
-    const theme = window.prompt("Enter banner campaign theme (e.g. Monsoon Deals, Winter Spices):");
-    if (!theme || !theme.trim()) return;
-    setLoadingSettingsAI(true);
-    try {
-      const data = await apiRequest("/ai/suggest-site-settings", {
-        method: "POST",
-        body: { season: theme.trim() }
-      });
-      if (data) {
-        setNewBanner((current) => ({
-          ...current,
-          title: data.heroHeadline || data.announcementBarText || "",
-          linkUrl: "/shop",
-        }));
-        notify("✨ Banner suggestions populated in the Add Banner form!");
+  const handleAISiteSettings = () => {
+    setPromptConfig({
+      title: "Draft Banner Suggestions",
+      description: "Enter a seasonal theme or campaign name to auto-populate the homepage banner title and redirect link with AI suggestions.",
+      placeholder: "e.g. Monsoon Deals, Winter Spices",
+      onSubmit: async (theme) => {
+        if (!theme || !theme.trim()) return;
+        setLoadingSettingsAI(true);
+        try {
+          const data = await apiRequest("/ai/suggest-site-settings", {
+            method: "POST",
+            body: { season: theme.trim() }
+          });
+          if (data) {
+            setNewBanner((current) => ({
+              ...current,
+              title: data.heroHeadline || data.announcementBarText || "",
+              linkUrl: "/shop",
+            }));
+            notify("✨ Banner suggestions populated in the Add Banner form!");
+          }
+        } catch (err) {
+          console.error(err);
+          notify(err.message || "Failed to generate banner suggestions.");
+        } finally {
+          setLoadingSettingsAI(false);
+        }
       }
-    } catch (err) {
-      console.error(err);
-      notify(err.message || "Failed to generate banner suggestions.");
-    } finally {
-      setLoadingSettingsAI(false);
-    }
+    });
   };
 
   // Admin login states
@@ -2637,6 +2664,60 @@ export function AdminPage() {
             </div>
           </form>
         </Modal>
+      ) : null}
+
+      {promptConfig ? (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-dk/50 backdrop-blur-md transition-opacity duration-300 ease-out animate-fade-in" onClick={() => setPromptConfig(null)}>
+          <div className="relative transform overflow-hidden rounded-3xl bg-white p-6 shadow-2xl border border-bd/30 transition-all sm:w-full sm:max-w-md animate-fadeUp text-left" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-4">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 text-[#c4622d] border border-amber-100 shadow-sm mb-4">
+                <span className="text-2xl">✨</span>
+              </div>
+              <h3 className="text-xl font-bold leading-6 text-dk font-serif mb-2">
+                {promptConfig.title}
+              </h3>
+              <p className="text-sm text-gray-500 font-semibold leading-relaxed mb-4">
+                {promptConfig.description}
+              </p>
+              <div className="field">
+                <input
+                  type="text"
+                  className="input py-2.5 w-full text-sm rounded-xl border border-gray-250 focus:border-amber-500 focus:ring-amber-500 outline-none"
+                  placeholder={promptConfig.placeholder}
+                  id="modalPromptInput"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const val = e.target.value;
+                      promptConfig.onSubmit(val);
+                      setPromptConfig(null);
+                    }
+                  }}
+                />
+              </div>
+            </div>
+            <div className="mt-6 flex flex-col-reverse sm:flex-row gap-3 justify-end">
+              <button
+                type="button"
+                className="inline-flex w-full sm:w-auto justify-center rounded-xl bg-warm px-5 py-2.5 text-sm font-bold text-gray-700 shadow-sm border border-bd/50 hover:bg-cream/40 transition-colors cursor-pointer"
+                onClick={() => setPromptConfig(null)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="inline-flex w-full sm:w-auto justify-center rounded-xl px-5 py-2.5 text-sm font-bold text-white shadow-md bg-tc hover:bg-tcl hover:shadow-lg transition-all cursor-pointer border-0"
+                onClick={() => {
+                  const val = document.getElementById("modalPromptInput")?.value;
+                  promptConfig.onSubmit(val);
+                  setPromptConfig(null);
+                }}
+              >
+                Draft with AI
+              </button>
+            </div>
+          </div>
+        </div>
       ) : null}
     </section>
   );
