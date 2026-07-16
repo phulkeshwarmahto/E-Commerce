@@ -83,6 +83,7 @@ export function CheckoutPage() {
     title: "Secure Checkout",
     description: "Complete your order safely on GaramBazaar. Secure payment options and nationwide delivery."
   });
+  const [showGuestPrompt, setShowGuestPrompt] = useState(!isAuthenticated);
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [placingOrder, setPlacingOrder] = useState(false);
@@ -92,6 +93,7 @@ export function CheckoutPage() {
   const [specialInstructions, setSpecialInstructions] = useState("");
   const [form, setForm] = useState({
     name: user?.name || "",
+    email: user?.email || "",
     phone: user?.phone || "",
     line1: user?.address?.line1 || "",
     city: user?.address?.city || "",
@@ -183,6 +185,7 @@ export function CheckoutPage() {
     if (user) {
       setForm((prev) => ({
         name: prev.name || user.name || "",
+        email: prev.email || user.email || "",
         phone: prev.phone || user.phone || "",
         line1: prev.line1 || user.address?.line1 || "",
         city: prev.city || user.address?.city || "",
@@ -196,6 +199,7 @@ export function CheckoutPage() {
     if (user) {
       setForm({
         name: user.name || "",
+        email: user.email || "",
         phone: user.phone || "",
         line1: user.address?.line1 || "",
         city: user.address?.city || "",
@@ -211,6 +215,10 @@ export function CheckoutPage() {
   const handleContinueToPayment = async () => {
     if (!form.name?.trim()) {
       notify("Full name is required.");
+      return;
+    }
+    if (!form.email?.trim()) {
+      notify("Email address is required.");
       return;
     }
     if (!form.phone?.trim()) {
@@ -380,14 +388,7 @@ export function CheckoutPage() {
 
   const orderTotal = Math.max(itemsSubtotal + shippingFee - promo.discount - loyaltyDiscount, 0);
 
-  if (!isAuthenticated) {
-    return (
-      <section className="page-content" style={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "1rem", minHeight: "60vh" }} >
-        <p className="text-gray-600 font-medium">Please sign in before checkout.</p>
-        <Button onClick={() => navigate("/auth")}>Go to sign in</Button>
-      </section>
-    );
-  }
+
 
   if (user?.role === "seller") {
     return (
@@ -592,7 +593,11 @@ export function CheckoutPage() {
               )}
               <div className="form-row">
                 <Input label="Full name" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} required />
+                <Input label="Email address" type="email" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} required />
+              </div>
+              <div className="form-row">
                 <Input label="Phone" value={form.phone} onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))} required />
+                <Input label="Pincode" value={form.pincode} onChange={(event) => setForm((current) => ({ ...current, pincode: event.target.value }))} required />
               </div>
               <div className="form-row full">
                 <Input label="Address line" value={form.line1} onChange={(event) => setForm((current) => ({ ...current, line1: event.target.value }))} required />
@@ -600,9 +605,6 @@ export function CheckoutPage() {
               <div className="form-row">
                 <Input label="City" value={form.city} onChange={(event) => setForm((current) => ({ ...current, city: event.target.value }))} required />
                 <Input label="State" value={form.state} onChange={(event) => setForm((current) => ({ ...current, state: event.target.value }))} required />
-              </div>
-              <div className="form-row full">
-                <Input label="Pincode" value={form.pincode} onChange={(event) => setForm((current) => ({ ...current, pincode: event.target.value }))} required />
               </div>
               <div className="flex items-center gap-2 mb-4 mt-3 select-none">
                 <input
@@ -992,6 +994,30 @@ export function CheckoutPage() {
                 onClick={() => setSimulatingOrder(null)}
               >
                 Cancel and Return
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {showGuestPrompt && (
+        <Modal title="🔐 Save Your History & Earn Rewards!" onClose={() => setShowGuestPrompt(false)}>
+          <div className="flex flex-col gap-5 text-center py-2 max-w-sm mx-auto">
+            <span className="text-5xl">🎁</span>
+            <h3 className="text-lg font-black text-[#2c1a0e] m-0">Sign in to save your history</h3>
+            <p className="text-sm text-gray-600 leading-relaxed m-0">
+              Create an account or sign in to save your purchase history, earn loyalty credits, and easily track your delivery in real-time.
+            </p>
+            <div className="flex flex-col gap-2.5 pt-2">
+              <Button type="button" className="w-full py-3 font-bold bg-[#c4622d] hover:bg-[#e07a4a] text-white rounded-xl border-0" onClick={() => navigate("/auth")}>
+                🔑 Sign In / Create Account
+              </Button>
+              <button
+                type="button"
+                className="w-full py-3 text-sm text-[#c4622d] hover:bg-orange-50 font-bold rounded-xl border border-gray-200 bg-white transition-colors cursor-pointer"
+                onClick={() => setShowGuestPrompt(false)}
+              >
+                Proceed as Guest →
               </button>
             </div>
           </div>

@@ -175,7 +175,7 @@ export const createOrder = async (req, res) => {
   const { discount, couponCode } = await calculateDiscount(req.body.couponCode, orderItems);
 
   // Loyalty Discount Calculation
-  const loyaltyPoints = req.user.loyaltyPoints || 0;
+  const loyaltyPoints = req.user?.loyaltyPoints || 0;
   let loyaltyDiscountPercent = 0;
   if (loyaltyPoints > 1500) {
     loyaltyDiscountPercent = 10;
@@ -209,7 +209,7 @@ export const createOrder = async (req, res) => {
         [
           {
             orderNumber,
-            userId: req.user._id,
+            userId: req.user?._id || undefined,
             items: orderItems.map(({ product, quantity, variantName, price }) => ({
               productId: product._id,
               name: product.name,
@@ -262,7 +262,9 @@ export const createOrder = async (req, res) => {
       }
 
       // Clear cart inside transaction
-      await Cart.findOneAndUpdate({ userId: req.user._id }, { $set: { items: [] } }, { session });
+      if (req.user) {
+        await Cart.findOneAndUpdate({ userId: req.user._id }, { $set: { items: [] } }, { session });
+      }
     });
   } catch (txError) {
     // Check if error is related to transactions not supported
@@ -278,7 +280,7 @@ export const createOrder = async (req, res) => {
       // Fallback: Non-transactional execution
       order = await Order.create({
         orderNumber,
-        userId: req.user._id,
+        userId: req.user?._id || undefined,
         items: orderItems.map(({ product, quantity, variantName, price }) => ({
           productId: product._id,
           name: product.name,
@@ -323,7 +325,9 @@ export const createOrder = async (req, res) => {
         }
       }
 
-      await Cart.findOneAndUpdate({ userId: req.user._id }, { $set: { items: [] } }, { upsert: true });
+      if (req.user) {
+        await Cart.findOneAndUpdate({ userId: req.user._id }, { $set: { items: [] } }, { upsert: true });
+      }
     } else {
       throw txError;
     }
@@ -332,7 +336,7 @@ export const createOrder = async (req, res) => {
   }
 
   // Check if it's the user's first order
-  const isFirstOrder = (await Order.countDocuments({ userId: req.user._id })) === 1;
+  const isFirstOrder = req.user ? (await Order.countDocuments({ userId: req.user._id })) === 1 : false;
   if (isFirstOrder && req.user.referredBy) {
     const referrer = await User.findById(req.user.referredBy);
     if (referrer) {
@@ -377,25 +381,27 @@ export const createOrder = async (req, res) => {
   }
 
   // Credit loyalty points
-  const pointsEarned = Math.floor(total / 100);
-  if (pointsEarned > 0) {
-    await User.updateOne({ _id: req.user._id }, { $inc: { loyaltyPoints: pointsEarned } });
-    const updatedUser = await User.findById(req.user._id);
-    let newMembership = "Silver";
-    if (updatedUser.loyaltyPoints > 1500) {
-      newMembership = "Platinum";
-    } else if (updatedUser.loyaltyPoints > 500) {
-      newMembership = "Gold";
-    }
-    if (updatedUser.membership !== newMembership) {
-      updatedUser.membership = newMembership;
-      await updatedUser.save();
+  if (req.user) {
+    const pointsEarned = Math.floor(total / 100);
+    if (pointsEarned > 0) {
+      await User.updateOne({ _id: req.user._id }, { $inc: { loyaltyPoints: pointsEarned } });
+      const updatedUser = await User.findById(req.user._id);
+      let newMembership = "Silver";
+      if (updatedUser.loyaltyPoints > 1500) {
+        newMembership = "Platinum";
+      } else if (updatedUser.loyaltyPoints > 500) {
+        newMembership = "Gold";
+      }
+      if (updatedUser.membership !== newMembership) {
+        updatedUser.membership = newMembership;
+        await updatedUser.save();
 
-      await Notification.create({
-        userId: req.user._id,
-        title: "🎉 Membership Upgraded!",
-        message: `Congratulations! You have been upgraded to ${newMembership} status. Enjoy additional perks and checkout discounts.`,
-      });
+        await Notification.create({
+          userId: req.user._id,
+          title: "🎉 Membership Upgraded!",
+          message: `Congratulations! You have been upgraded to ${newMembership} status. Enjoy additional perks and checkout discounts.`,
+        });
+      }
     }
   }
 
@@ -449,17 +455,20 @@ export const createOrder = async (req, res) => {
     }
   }
 
-  await Cart.findOneAndUpdate({ userId: req.user._id }, { $set: { items: [] } }, { upsert: true });
+  if (req.user) {
+    await Cart.findOneAndUpdate({ userId: req.user._id }, { $set: { items: [] } }, { upsert: true });
+  }
 
   // Notify product sellers of the new order purchase
   try {
     const notifications = [];
+    const customerName = req.user ? (req.user.name || req.user.email) : (order.shippingAddress?.name || "Guest Buyer");
     for (const item of orderItems) {
       if (item.product.seller) {
         notifications.push({
           userId: item.product.seller,
           title: "📦 New Store Order Placed",
-          message: `Hurray! Customer ${req.user.name || req.user.email} has purchased your product "${item.product.name}"${item.variantName ? ` (${item.variantName})` : ""} (Qty: ${item.quantity}). Order Ref: ${order.orderNumber}. Prepare the item for shipment!`,
+          message: `Hurray! Customer ${customerName} has purchased your product "${item.product.name}"${item.variantName ? ` (${item.variantName})` : ""} (Qty: ${item.quantity}). Order Ref: ${order.orderNumber}. Prepare the item for shipment!`,
         });
       }
     }
@@ -470,14 +479,17 @@ export const createOrder = async (req, res) => {
     console.error("Error creating notifications for sellers on order placement:", notifErr);
   }
 
-  try {
-    await sendEmail({
-      to: req.user.email,
-      subject: `Order ${order.orderNumber} confirmed`,
-      text: `Your GaramBazaar order ${order.orderNumber} has been placed.`,
-    });
-  } catch (emailError) {
-    console.error("Gracefully caught mail sending failure:", emailError.message);
+  const emailTo = req.user?.email || order.shippingAddress?.email || "";
+  if (emailTo) {
+    try {
+      await sendEmail({
+        to: emailTo,
+        subject: `Order ${order.orderNumber} confirmed`,
+        text: `Your GaramBazaar order ${order.orderNumber} has been placed.`,
+      });
+    } catch (emailError) {
+      console.error("Gracefully caught mail sending failure:", emailError.message);
+    }
   }
 
   res.status(201).json(new ApiResponse(true, "Order placed.", { order: order.toClient() }));
@@ -491,8 +503,17 @@ export const cancelOrder = async (req, res) => {
     return res.status(404).json(new ApiResponse(false, "Order not found."));
   }
 
-  const isOwner = order.userId.toString() === req.user._id.toString();
-  const isAdmin = req.user.role === "admin";
+  let isOwner = false;
+  let isAdmin = false;
+  if (!order.userId) {
+    isOwner = true;
+  } else {
+    if (!req.user) {
+      return res.status(401).json(new ApiResponse(false, "Authentication required."));
+    }
+    isOwner = order.userId.toString() === req.user._id.toString();
+    isAdmin = req.user.role === "admin";
+  }
 
   if (!isOwner && !isAdmin) {
     return res.status(403).json(new ApiResponse(false, "Unauthorized to cancel this order."));
@@ -549,13 +570,22 @@ export const cancelOrder = async (req, res) => {
 
 export const getOrderById = async (req, res) => {
   const { id } = req.params;
-  const order = await Order.findOne({ orderNumber: id });
+  const lookup = id.match(/^[a-f\d]{24}$/i) ? { $or: [{ _id: id }, { orderNumber: id }] } : { orderNumber: id };
+  const order = await Order.findOne(lookup);
 
   if (!order) {
     return res.status(404).json(new ApiResponse(false, "Order not found."));
   }
 
-  const isOwner = order.userId.toString() === req.user._id.toString();
+  if (!order.userId) {
+    return res.json(new ApiResponse(true, "Order fetched successfully.", { order: order.toClient() }));
+  }
+
+  if (!req.user) {
+    return res.status(401).json(new ApiResponse(false, "Authentication required."));
+  }
+
+  const isOwner = order.userId && order.userId.toString() === req.user._id.toString();
   const isAdmin = req.user.role === "admin";
   let isSellerForOrder = false;
 

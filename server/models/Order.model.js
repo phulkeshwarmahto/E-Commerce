@@ -30,7 +30,7 @@ const statusHistorySchema = new mongoose.Schema(
 const orderSchema = new mongoose.Schema(
   {
     orderNumber: { type: String, required: true, unique: true },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },
     items: { type: [orderItemSchema], required: true },
     shippingAddress: {
       name: { type: String, required: true },

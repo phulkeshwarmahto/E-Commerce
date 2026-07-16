@@ -102,6 +102,9 @@ export function InvoiceModal({ isOpen, onClose, order }) {
               {order.payment.razorpayPaymentId && (
                 <p className="text-gray-600">Transaction ID: <code className="bg-gray-50 border border-gray-200 px-1 py-0.5 rounded font-mono text-[10px] text-gray-800">{order.payment.razorpayPaymentId}</code></p>
               )}
+              <p className="text-gray-600 mt-2 pt-1 border-t border-gray-100/50">
+                Live Tracking: <a href={`${window.location.origin}/order-success/${order.orderNumber}`} className="text-[#c4622d] font-bold hover:underline" target="_blank" rel="noreferrer">{`${window.location.origin}/order-success/${order.orderNumber}`}</a>
+              </p>
             </div>
           </div>
 
