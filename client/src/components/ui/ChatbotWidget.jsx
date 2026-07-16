@@ -67,7 +67,7 @@ export function ChatbotWidget() {
       console.error("Chat error:", err);
       setMessages((prev) => [
         ...prev,
-        { sender: "bot", text: "⚠️ Sorry, I ran into an error connecting to the server. Please check your connection." }
+        { sender: "bot", text: `⚠️ ${err.message || "Sorry, I ran into an error connecting to the server. Please check your connection."}` }
       ]);
     } finally {
       setLoading(false);
