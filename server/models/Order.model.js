@@ -70,7 +70,7 @@ orderSchema.methods.toClient = function toClient() {
   return {
     ...raw,
     id: this.orderNumber,
-    userId: this.userId.toString(),
+    userId: this.userId ? this.userId.toString() : null,
     items: raw.items.map((item) => ({
       ...item,
       productId: item.productId.toString(),
