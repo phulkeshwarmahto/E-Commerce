@@ -17,13 +17,11 @@ const PORT = Number(process.env.PORT || 5001);
 let server;
 connectDB().then(async () => {
   await seedCategories();
-  try {
-    await importProducts(false);
-  } catch (err) {
-    console.error("Failed to import affiliate products on startup:", err);
-  }
   server = app.listen(PORT, () => {
     console.log(`GaramBazaar server listening on http://localhost:${PORT}`);
+  });
+  importProducts(false).catch((err) => {
+    console.error("Failed to import affiliate products in background:", err);
   });
 });
 
