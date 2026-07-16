@@ -301,7 +301,7 @@ export function SellerPage() {
   const handleExportCSV = async () => {
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:5001";
-      const session = JSON.parse(localStorage.getItem("GaramBazaar_session") || "{}");
+      const session = JSON.parse(localStorage.getItem("GaramBazaar_auth") || "{}");
       const token = session?.token;
       if (!token) throw new Error("Authentication required.");
 
