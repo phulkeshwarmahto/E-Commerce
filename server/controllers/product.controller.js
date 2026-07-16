@@ -21,11 +21,9 @@ const buildMongoQuery = (req) => {
 
   if (category === "Software") {
     filters.productType = "affiliate";
-  } else {
+  } else if (category !== "All") {
     filters.productType = "organic";
-    if (category !== "All") {
-      filters.category = category;
-    }
+    filters.category = category;
   }
 
   if (featured) {
