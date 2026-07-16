@@ -157,7 +157,7 @@ export function ChatbotWidget() {
       {/* Floating Action Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-tr from-[#c4622d] to-[#ea580c] text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-108 active:scale-95 transition-all duration-300 cursor-pointer group"
+        className="fixed bottom-6 right-6 z-[999] w-14 h-14 bg-gradient-to-tr from-[#c4622d] to-[#ea580c] text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-108 active:scale-95 transition-all duration-300 cursor-pointer group"
         aria-label="Open support chat"
       >
         {isOpen ? (
@@ -175,7 +175,7 @@ export function ChatbotWidget() {
 
       {/* Chat Window Drawer */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-[360px] h-[500px] bg-white/95 backdrop-blur-md rounded-2xl border border-gray-150 shadow-2xl flex flex-col overflow-hidden animate-[slideUp_0.25s_ease-out] font-sans">
+        <div className="fixed bottom-24 right-6 z-[999] w-[360px] h-[500px] bg-white/95 backdrop-blur-md rounded-2xl border border-gray-150 shadow-2xl flex flex-col overflow-hidden animate-[slideUp_0.25s_ease-out] font-sans">
           
           {/* Header */}
           <div className="bg-[#2c1a0e] text-white p-4 flex items-center justify-between border-b border-gray-800">
