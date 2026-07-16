@@ -30,12 +30,14 @@ const slugify = (text) => {
     .replace(/\-\-+/g, "-"); // Replace multiple - with single -
 };
 
-async function importProducts() {
+export async function importProducts(disconnect = true) {
   try {
-    console.log("Connecting to:", MONGO_URI);
-    await mongoose.connect(MONGO_URI);
-    console.log("Connected Host:", mongoose.connection.host);
-    console.log("Connected DB Name:", mongoose.connection.name);
+    if (mongoose.connection.readyState !== 1) {
+      console.log("Connecting to:", MONGO_URI);
+      await mongoose.connect(MONGO_URI);
+      console.log("Connected Host:", mongoose.connection.host);
+      console.log("Connected DB Name:", mongoose.connection.name);
+    }
 
     const rows = [];
     await new Promise((resolve, reject) => {
@@ -57,7 +59,7 @@ async function importProducts() {
       const imageUrl = (row.imageUrl || "").trim();
       const affiliateLink = (row.affiliateLink || "").trim();
       const price = Number(row.price) || 0;
-      const category = (row.category || "Pantry").trim();
+      const category = "Software";
       const description = (row.description || "").trim();
 
       const source = (row.source || "amazon").trim().toLowerCase();
@@ -123,9 +125,13 @@ async function importProducts() {
   } catch (error) {
     console.error("Database connection or parsing error:", error);
   } finally {
-    await mongoose.disconnect();
-    console.log("Disconnected from MongoDB.");
+    if (disconnect) {
+      await mongoose.disconnect();
+      console.log("Disconnected from MongoDB.");
+    }
   }
 }
 
-importProducts();
+if (process.argv[1] && (process.argv[1].endsWith("importAffiliateProducts.js") || process.argv[1].endsWith("importAffiliateProducts"))) {
+  importProducts(true);
+}
