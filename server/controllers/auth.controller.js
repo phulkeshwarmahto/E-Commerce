@@ -115,6 +115,7 @@ export const register = async (req, res) => {
   return res.status(201).json(
     new ApiResponse(true, "Account created.", {
       user: user.toClient(),
+      token,
     }),
   );
 };
@@ -136,6 +137,7 @@ export const login = async (req, res) => {
   return res.json(
     new ApiResponse(true, "Login successful.", {
       user: user.toClient(),
+      token,
     }),
   );
 };
@@ -245,6 +247,7 @@ export const googleLogin = async (req, res) => {
     return res.json(
       new ApiResponse(true, "Google login successful.", {
         user: user.toClient(),
+        token,
       }),
     );
   } catch (error) {
