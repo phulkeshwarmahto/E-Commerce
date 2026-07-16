@@ -157,7 +157,7 @@ export function ProductCard({ product }) {
             >
               View Details
             </Link>
-          ) : (
+          ) : product.productType === "affiliate" ? (
             <button
               disabled={!product.inStock}
               onClick={async () => {
@@ -170,12 +170,7 @@ export function ProductCard({ product }) {
                     } else if (email) {
                       await trackAffiliateClickRequest(product.id, email, phone);
                     }
-                    
-                    if (product.productType === "affiliate") {
-                      window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
-                    } else {
-                      notify(`🎉 Order processed! Added to your order history.`);
-                    }
+                    window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
                   } catch (err) {
                     console.error("Action tracking failed:", err);
                     notify(err.message || "Failed to process order.");
@@ -199,24 +194,34 @@ export function ProductCard({ product }) {
               className={`w-full py-2 rounded text-sm font-semibold transition-all duration-150 border-2 cursor-pointer
                           ${!product.inStock
                             ? "opacity-40 cursor-not-allowed text-gray-400 border-gray-300"
-                            : product.productType === "affiliate"
-                            ? "border-amber-500 bg-amber-500 text-white hover:bg-amber-600 active:scale-[0.98]"
-                            : "border-[#c4622d] text-[#c4622d] hover:bg-[#c4622d] hover:text-white active:scale-[0.98]"
+                            : "border-amber-500 bg-amber-500 text-white hover:bg-amber-600 active:scale-[0.98]"
                           }`}
             >
               {!product.inStock
                 ? "Out of Stock"
-                : product.productType === "affiliate"
-                ? product.source === "chrome-extension"
-                  ? "Install Extension"
-                  : product.source === "web-app"
-                  ? "Try Web App"
-                  : product.source === "play-store"
-                  ? "Get on Play Store"
-                  : product.source === "amazon"
-                  ? "Buy on Amazon"
-                  : "Visit Product"
-                : "Order & Track"}
+                : product.source === "chrome-extension"
+                ? "Install Extension"
+                : product.source === "web-app"
+                ? "Try Web App"
+                : product.source === "play-store"
+                ? "Get on Play Store"
+                : product.source === "amazon"
+                ? "Buy on Amazon"
+                : "Visit Product"}
+            </button>
+          ) : (
+            <button
+              disabled={!product.inStock}
+              onClick={() => {
+                cart.addToCart(product);
+                notify(`${product.name} added to cart.`);
+              }}
+              className={`w-full py-2 rounded text-sm font-semibold transition-all duration-150 border-2 cursor-pointer
+                          ${product.inStock
+                            ? "border-[#c4622d] text-[#c4622d] hover:bg-[#c4622d] hover:text-white active:scale-[0.98]"
+                            : "opacity-40 cursor-not-allowed text-gray-400 border-gray-300"}`}
+            >
+              {product.inStock ? "Add to Cart" : "Out of Stock"}
             </button>
           )}
         </div>

@@ -680,63 +680,89 @@ export function ProductDetailPage() {
                     </button>
                   ) : (
                     <>
-                      <button
-                        onClick={async () => {
-                          const triggerAction = async (email = null, phone = null) => {
-                            try {
+                      {product.productType === "affiliate" ? (
+                        <>
+                          <button
+                            onClick={async () => {
+                              const triggerAction = async (email = null, phone = null) => {
+                                try {
+                                  if (user) {
+                                    await trackAffiliateClickRequest(product.id);
+                                  } else if (email) {
+                                    await trackAffiliateClickRequest(product.id, email, phone);
+                                  }
+                                  window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
+                                } catch (err) {
+                                  console.error("Action tracking failed:", err);
+                                  notify(err.message || "Failed to process order.");
+                                }
+                              };
+
                               if (user) {
-                                await trackAffiliateClickRequest(product.id);
-                              } else if (email) {
-                                await trackAffiliateClickRequest(product.id, email, phone);
+                                await triggerAction();
+                                return;
                               }
-                              
-                              if (product.productType === "affiliate") {
-                                window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
-                              } else {
-                                notify(`🎉 Order processed! Added to your order history.`);
+
+                              const guestEmail = localStorage.getItem("guestEmail");
+                              const guestPhone = localStorage.getItem("guestPhone") || "";
+                              if (guestEmail) {
+                                await triggerAction(guestEmail, guestPhone);
+                                return;
                               }
-                            } catch (err) {
-                              console.error("Action tracking failed:", err);
-                              notify(err.message || "Failed to process order.");
-                            }
-                          };
 
-                          if (user) {
-                            await triggerAction();
-                            return;
-                          }
-
-                          const guestEmail = localStorage.getItem("guestEmail");
-                          const guestPhone = localStorage.getItem("guestPhone") || "";
-                          if (guestEmail) {
-                            await triggerAction(guestEmail, guestPhone);
-                            return;
-                          }
-
-                          setIsModalOpen(true);
-                        }}
-                        className={`w-full py-3 rounded-xl font-bold text-sm transition-all text-center shadow-sm cursor-pointer border-2
-                          ${product.productType === "affiliate"
-                            ? "border-amber-500 bg-amber-500 hover:bg-amber-600 text-white"
-                            : "border-[#c4622d] bg-[#c4622d] hover:bg-[#e07a4a] text-white"
-                          }`}
-                      >
-                        {product.productType === "affiliate"
-                          ? product.source === "chrome-extension"
-                            ? "Install Extension"
-                            : product.source === "web-app"
-                            ? "Try Web App"
-                            : product.source === "play-store"
-                            ? "Get on Play Store"
-                            : product.source === "amazon"
-                            ? "Buy on Amazon"
-                            : "Visit Product"
-                          : "Order & Track"}
-                      </button>
-                      {product.productType === "affiliate" && product.source === "amazon" && (
-                        <p className="text-[10px] text-gray-500 text-center leading-snug italic px-1">
-                          *As an Amazon Associate I earn from qualifying purchases.*
-                        </p>
+                              setIsModalOpen(true);
+                            }}
+                            className="w-full py-3 rounded-xl font-bold text-sm transition-all text-center shadow-sm cursor-pointer border-2 border-amber-500 bg-amber-500 hover:bg-amber-600 text-white"
+                          >
+                            {product.source === "chrome-extension"
+                              ? "Install Extension"
+                              : product.source === "web-app"
+                              ? "Try Web App"
+                              : product.source === "play-store"
+                              ? "Get on Play Store"
+                              : product.source === "amazon"
+                              ? "Buy on Amazon"
+                              : "Visit Product"}
+                          </button>
+                          {product.source === "amazon" && (
+                            <p className="text-[10px] text-gray-500 text-center leading-snug italic px-1">
+                              *As an Amazon Associate I earn from qualifying purchases.*
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <button
+                            onClick={() => {
+                              const itemToCart = {
+                                ...product,
+                                price: displayPrice,
+                                originalPrice: displayOriginalPrice,
+                                variantName: selectedVariant ? selectedVariant.name : undefined,
+                              };
+                              cart.addToCart(itemToCart);
+                              notify(`${product.name}${selectedVariant ? ` (${selectedVariant.name})` : ""} added to cart.`);
+                            }}
+                            className="w-full py-3 rounded-xl font-bold text-sm border-2 transition-all border-[#c4622d] text-[#c4622d] hover:bg-[#c4622d] hover:text-white cursor-pointer bg-transparent"
+                          >
+                            🛒 Add to Cart
+                          </button>
+                          <button
+                            onClick={() => {
+                              const itemToCart = {
+                                ...product,
+                                price: displayPrice,
+                                originalPrice: displayOriginalPrice,
+                                variantName: selectedVariant ? selectedVariant.name : undefined,
+                              };
+                              cart.addToCart(itemToCart);
+                              navigate("/cart");
+                            }}
+                            className="w-full py-3 rounded-xl font-bold text-sm transition-all bg-[#c4622d] hover:bg-[#e07a4a] text-white shadow-sm cursor-pointer border-0"
+                          >
+                            ⚡ Buy Now
+                          </button>
+                        </div>
                       )}
                     </>
                   )}
