@@ -66,7 +66,14 @@ export async function apiRequest(path, options = {}) {
   try {
     return await makeFetch(relativeUrl, fetchOptions);
   } catch (error) {
-    if (API_BASE_URL === "/api" && !relativeUrl.startsWith("http") && directUrl) {
+    // Only fallback to direct URL for network-level failures (e.g. proxy down),
+    // not for server-returned errors (e.g. 429 rate limit, 500 backend error)
+    const isNetworkError = error.message?.includes("Failed to fetch") ||
+                           error.message?.includes("NetworkError") ||
+                           error.message?.includes("Load failed") ||
+                           error.message?.includes("received HTML/text");
+
+    if (isNetworkError && API_BASE_URL === "/api" && !relativeUrl.startsWith("http") && directUrl) {
       try {
         return await makeFetch(directUrl, fetchOptions);
       } catch (directError) {
