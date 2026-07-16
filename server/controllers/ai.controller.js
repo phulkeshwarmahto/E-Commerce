@@ -19,7 +19,7 @@ const callGemini = async (prompt, systemInstruction = null, responseMimeType = "
     payload.systemInstruction = { parts: [{ text: systemInstruction }] };
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
   const fetchOptions = {
     method: "POST",
     headers: { "Content-Type": "application/json" },
