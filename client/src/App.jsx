@@ -105,8 +105,9 @@ export default function App() {
   const reloadCategories = useCallback(async () => {
     try {
       const res = await getCategoriesRequest();
-      if (res.success && res.data) {
-        setCategories(res.data);
+      const data = res?.data || (Array.isArray(res) ? res : null);
+      if (data) {
+        setCategories(data);
       }
     } catch (err) {
       console.error("Failed to load categories:", err);
@@ -121,8 +122,9 @@ export default function App() {
     if (auth.token) {
       getWishlistRequest()
         .then((res) => {
-          if (res.success && res.data) {
-            setWishlistIds(res.data.products.map((p) => p.id));
+          const data = res?.data || res;
+          if (data && data.products) {
+            setWishlistIds(data.products.map((p) => p.id));
           }
         })
         .catch(() => {});
