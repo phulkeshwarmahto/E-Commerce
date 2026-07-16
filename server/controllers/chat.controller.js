@@ -235,19 +235,33 @@ export const handleChat = async (req, res) => {
   
   try {
     while (iterations < 5) {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents, systemInstruction, tools })
-        }
-      );
+      // Retry-aware fetch for Gemini with backoff on 429
+      let geminiResponse = null;
+      for (let retryAttempt = 0; retryAttempt < 3; retryAttempt++) {
+        geminiResponse = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contents, systemInstruction, tools })
+          }
+        );
 
-      if (!response.ok) {
-        const errorText = await response.text();
+        if (geminiResponse.status === 429) {
+          const waitMs = Math.min(1000 * Math.pow(2, retryAttempt), 8000);
+          console.warn(`Chat Gemini 429 rate limit (attempt ${retryAttempt + 1}/3), retrying in ${waitMs}ms...`);
+          await new Promise((r) => setTimeout(r, waitMs));
+          continue;
+        }
+        break;
+      }
+
+      const response = geminiResponse;
+
+      if (!response || !response.ok) {
+        const errorText = response ? await response.text() : "No response after retries";
         console.error("Gemini API error:", errorText);
-        return res.status(502).json(new ApiResponse(false, "Error communicating with AI service."));
+        return res.status(502).json(new ApiResponse(false, "Error communicating with AI service. Please try again in a moment."));
       }
 
       const responseData = await response.json();

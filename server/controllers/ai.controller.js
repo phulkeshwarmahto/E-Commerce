@@ -1,7 +1,7 @@
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Product } from "../models/Product.model.js";
 
-// Helper to make API calls to Gemini
+// Helper to make API calls to Gemini with retry on rate limits
 const callGemini = async (prompt, systemInstruction = null, responseMimeType = "application/json") => {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -19,29 +19,47 @@ const callGemini = async (prompt, systemInstruction = null, responseMimeType = "
     payload.systemInstruction = { parts: [{ text: systemInstruction }] };
   }
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const fetchOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  };
+
+  const MAX_RETRIES = 3;
+  let lastError = null;
+
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    const response = await fetch(url, fetchOptions);
+
+    if (response.status === 429) {
+      // Rate limited — wait and retry with exponential backoff
+      const waitMs = Math.min(1000 * Math.pow(2, attempt), 8000); // 1s, 2s, 4s
+      console.warn(`Gemini 429 rate limit hit (attempt ${attempt + 1}/${MAX_RETRIES}), retrying in ${waitMs}ms...`);
+      await new Promise((resolve) => setTimeout(resolve, waitMs));
+      lastError = new Error("Gemini API rate limit exceeded (429). Please wait a moment and try again.");
+      continue;
     }
-  );
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Gemini API call failed:", errorText);
-    throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Gemini API call failed:", errorText);
+      throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) {
+      throw new Error("Empty response received from Gemini.");
+    }
+
+    return text;
   }
 
-  const data = await response.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) {
-    throw new Error("Empty response received from Gemini.");
-  }
-
-  return text;
+  // All retries exhausted
+  throw lastError || new Error("Gemini API rate limit exceeded after retries.");
 };
+
 
 // 1. Suggest Product Configuration
 export const suggestProduct = async (req, res) => {
