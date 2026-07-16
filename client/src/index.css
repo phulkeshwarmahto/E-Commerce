@@ -967,10 +967,22 @@
   }
 
   @media (min-width: 768px) {
-    .filter-sidebar,
-    .admin-sidebar {
+    .filter-sidebar {
       top: 130px;
       @apply mb-0 p-[1.2rem];
+    }
+    .admin-sidebar {
+      top: 100px;
+      position: sticky;
+      height: calc(100vh - 120px);
+      max-height: 450px;
+      overflow-y: auto;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE and Edge */
+      @apply mb-0 p-[1.2rem];
+    }
+    .admin-sidebar::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
     }
   }
 

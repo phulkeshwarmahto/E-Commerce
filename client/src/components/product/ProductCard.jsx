@@ -148,52 +148,8 @@ export function ProductCard({ product }) {
           </span>
         </div>
 
-        {/* Add to Cart — slides in on hover */}
         <div className="mt-auto">
-          {product.productType === "affiliate" ? (
-            <button
-              onClick={async () => {
-                // If logged in
-                if (user) {
-                  try {
-                    await trackAffiliateClickRequest(product.id);
-                  } catch (err) {
-                    console.error("Failed to track affiliate click:", err);
-                  }
-                  window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
-                  return;
-                }
-
-                // If guest credentials cached
-                const guestEmail = localStorage.getItem("guestEmail");
-                const guestPhone = localStorage.getItem("guestPhone") || "";
-                if (guestEmail) {
-                  try {
-                    await trackAffiliateClickRequest(product.id, guestEmail, guestPhone);
-                  } catch (err) {
-                    console.error("Failed to track guest click:", err);
-                  }
-                  window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
-                  return;
-                }
-
-                // Show modal
-                setIsModalOpen(true);
-              }}
-              className="w-full block py-2 rounded text-sm font-semibold text-center transition-all duration-150
-                          border-2 border-amber-500 bg-amber-500 text-white hover:bg-amber-600 active:scale-[0.98] cursor-pointer"
-            >
-              {product.source === "chrome-extension"
-                ? "Install Extension"
-                : product.source === "web-app"
-                ? "Try Web App"
-                : product.source === "play-store"
-                ? "Get on Play Store"
-                : product.source === "amazon"
-                ? "Buy on Amazon"
-                : "Visit Product"}
-            </button>
-          ) : user?.role === "seller" ? (
+          {user?.role === "seller" ? (
             <Link
               to={`/products/${product.slug}`}
               className="w-full block py-2 rounded text-sm font-semibold text-center transition-all duration-150
@@ -204,17 +160,63 @@ export function ProductCard({ product }) {
           ) : (
             <button
               disabled={!product.inStock}
-              onClick={() => {
-                cart.addToCart(product);
-                notify(`${product.name} added to cart.`);
+              onClick={async () => {
+                if (!product.inStock) return;
+
+                const triggerAction = async (email = null, phone = null) => {
+                  try {
+                    if (user) {
+                      await trackAffiliateClickRequest(product.id);
+                    } else if (email) {
+                      await trackAffiliateClickRequest(product.id, email, phone);
+                    }
+                    
+                    if (product.productType === "affiliate") {
+                      window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
+                    } else {
+                      notify(`🎉 Order processed! Added to your order history.`);
+                    }
+                  } catch (err) {
+                    console.error("Action tracking failed:", err);
+                    notify(err.message || "Failed to process order.");
+                  }
+                };
+
+                if (user) {
+                  await triggerAction();
+                  return;
+                }
+
+                const guestEmail = localStorage.getItem("guestEmail");
+                const guestPhone = localStorage.getItem("guestPhone") || "";
+                if (guestEmail) {
+                  await triggerAction(guestEmail, guestPhone);
+                  return;
+                }
+
+                setIsModalOpen(true);
               }}
-              className={`w-full py-2 rounded text-sm font-semibold transition-all duration-150
-                          border-2 border-[#c4622d]
-                          ${product.inStock
-                            ? "text-[#c4622d] hover:bg-[#c4622d] hover:text-white active:scale-[0.98]"
-                            : "opacity-40 cursor-not-allowed text-gray-400 border-gray-300"}`}
+              className={`w-full py-2 rounded text-sm font-semibold transition-all duration-150 border-2 cursor-pointer
+                          ${!product.inStock
+                            ? "opacity-40 cursor-not-allowed text-gray-400 border-gray-300"
+                            : product.productType === "affiliate"
+                            ? "border-amber-500 bg-amber-500 text-white hover:bg-amber-600 active:scale-[0.98]"
+                            : "border-[#c4622d] text-[#c4622d] hover:bg-[#c4622d] hover:text-white active:scale-[0.98]"
+                          }`}
             >
-              {product.inStock ? "Add to Cart" : "Out of Stock"}
+              {!product.inStock
+                ? "Out of Stock"
+                : product.productType === "affiliate"
+                ? product.source === "chrome-extension"
+                  ? "Install Extension"
+                  : product.source === "web-app"
+                  ? "Try Web App"
+                  : product.source === "play-store"
+                  ? "Get on Play Store"
+                  : product.source === "amazon"
+                  ? "Buy on Amazon"
+                  : "Visit Product"
+                : "Order & Track"}
             </button>
           )}
         </div>
@@ -224,13 +226,23 @@ export function ProductCard({ product }) {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSubmit={async ({ email, phone }) => {
-            await trackAffiliateClickRequest(product.id, email, phone);
             localStorage.setItem("guestEmail", email);
             if (phone) {
               localStorage.setItem("guestPhone", phone);
             }
             setIsModalOpen(false);
-            window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
+
+            try {
+              await trackAffiliateClickRequest(product.id, email, phone);
+              if (product.productType === "affiliate") {
+                window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
+              } else {
+                notify(`🎉 Order processed! Added to your order history.`);
+              }
+            } catch (err) {
+              console.error("Action tracking failed:", err);
+              notify(err.message || "Failed to process order.");
+            }
           }}
           product={product}
         />

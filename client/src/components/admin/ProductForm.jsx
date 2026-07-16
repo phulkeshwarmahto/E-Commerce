@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppContext } from "../../hooks/useAppContext";
 import { Button } from "../ui/Button";
 import { ImageUploadZone } from "./ImageUploadZone";
+import { apiRequest } from "../../api/axios";
 
 const baseState = {
   name: "",
@@ -21,8 +22,40 @@ const baseState = {
 };
 
 export function ProductForm({ product, onSubmit, onClose }) {
-  const { categories, alert } = useAppContext();
+  const { categories, alert, notify } = useAppContext();
   const [form, setForm] = useState(baseState);
+  const [loadingAI, setLoadingAI] = useState(false);
+
+  const handleAIFill = async () => {
+    if (!form.name.trim()) return;
+    setLoadingAI(true);
+    try {
+      const data = await apiRequest("/ai/suggest-product", {
+        method: "POST",
+        body: { name: form.name.trim() },
+      });
+      if (data) {
+        setForm((current) => ({
+          ...current,
+          description: data.description || current.description,
+          category: data.category || current.category,
+          price: data.price !== undefined ? data.price : current.price,
+          originalPrice: data.originalPrice !== null ? data.originalPrice : "",
+          stockCount: data.stockCount !== undefined ? data.stockCount : current.stockCount,
+          deliveryFee: data.deliveryFee !== undefined ? data.deliveryFee : current.deliveryFee,
+          sku: data.sku || current.sku,
+          barcode: data.barcode || current.barcode,
+          emoji: data.emoji || current.emoji || "📦",
+        }));
+        notify("✨ Product details auto-filled successfully!");
+      }
+    } catch (err) {
+      console.error("AI Auto-fill error:", err);
+      notify(err.message || "Failed to auto-fill details.");
+    } finally {
+      setLoadingAI(false);
+    }
+  };
   const [newVariant, setNewVariant] = useState({
     name: "",
     price: "",
@@ -135,7 +168,19 @@ export function ProductForm({ product, onSubmit, onClose }) {
     <form className="product-form" onSubmit={handleSubmit}>
       <div className="form-row">
         <label className="field">
-          <span className="field-label">Name</span>
+          <div className="flex justify-between items-center w-full">
+            <span className="field-label">Name</span>
+            {form.name.trim() && (
+              <button
+                type="button"
+                onClick={handleAIFill}
+                disabled={loadingAI}
+                className="text-xs text-amber-600 hover:text-amber-700 font-bold flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0 mb-1"
+              >
+                {loadingAI ? "⏳ Analyzing..." : "✨ Auto-Fill with AI"}
+              </button>
+            )}
+          </div>
           <input
             className="input"
             value={form.name}

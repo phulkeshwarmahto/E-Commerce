@@ -28,11 +28,34 @@ import { formatCurrency } from "../utils/formatCurrency";
 import { ReportModal } from "../components/ui/ReportModal";
 import { OrderChatDrawer } from "../components/ui/OrderChatDrawer";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
+import { apiRequest } from "../api/axios";
 
 export function SellerPage() {
   const { user, notify, confirm } = useAppContext();
   const navigate = useNavigate();
   const [section, setSection] = useState("overview");
+
+  // AI draft states
+  const [loadingAIDraft, setLoadingAIDraft] = useState({});
+
+  const handleAIDraftAnswer = async (faqId, question, productId) => {
+    setLoadingAIDraft((prev) => ({ ...prev, [faqId]: true }));
+    try {
+      const data = await apiRequest("/ai/reply-qna", {
+        method: "POST",
+        body: { question, productId }
+      });
+      if (data && data.reply) {
+        setAnswerDrafts((prev) => ({ ...prev, [faqId]: data.reply }));
+        notify("✨ Answer drafted with AI!");
+      }
+    } catch (err) {
+      console.error("AI Draft error:", err);
+      notify(err.message || "Failed to generate draft answer.");
+    } finally {
+      setLoadingAIDraft((prev) => ({ ...prev, [faqId]: false }));
+    }
+  };
 
   // Coupon states
   const [couponsList, setCouponsList] = useState([]);
@@ -1035,13 +1058,23 @@ export function SellerPage() {
                                     onChange={(e) => setAnswerDrafts((prev) => ({ ...prev, [faq.id]: e.target.value }))}
                                     className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#c4622d] transition-all bg-white min-h-[70px] resize-y"
                                   />
-                                  <button
-                                    onClick={() => handleAnswerSubmit(faq.id)}
-                                    disabled={submittingAnswers[faq.id] || !answerDrafts[faq.id]?.trim()}
-                                    className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-xl text-xs transition-all shadow-sm border-0 cursor-pointer"
-                                  >
-                                    {submittingAnswers[faq.id] ? "Submitting..." : "Submit Answer"}
-                                  </button>
+                                  <div className="flex gap-2 items-center">
+                                    <button
+                                      onClick={() => handleAnswerSubmit(faq.id)}
+                                      disabled={submittingAnswers[faq.id] || !answerDrafts[faq.id]?.trim()}
+                                      className="bg-[#c4622d] hover:bg-[#a95223] disabled:opacity-50 text-white font-bold py-2 px-4 rounded-xl text-xs transition-all shadow-sm border-0 cursor-pointer"
+                                    >
+                                      {submittingAnswers[faq.id] ? "Submitting..." : "Submit Answer"}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleAIDraftAnswer(faq.id, faq.question, faq.productId)}
+                                      disabled={loadingAIDraft[faq.id]}
+                                      className="border border-purple-300 hover:bg-purple-50 text-purple-700 font-bold py-2 px-4 rounded-xl text-xs transition-all shadow-sm bg-white cursor-pointer"
+                                    >
+                                      {loadingAIDraft[faq.id] ? "⏳ Drafting..." : "✨ Draft with AI"}
+                                    </button>
+                                  </div>
                                 </div>
                               )}
                             </div>

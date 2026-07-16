@@ -14,7 +14,7 @@ const users = [
   },
   {
     name: "GaramBazaar Admin",
-    email: "admin@GaramBazaar.in",
+    email: "admin@garambazaar.in",
     password: process.env.SEED_ADMIN_PASSWORD,
     role: "admin",
     membership: "Platinum",

@@ -16,6 +16,7 @@ import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 import { optimizeCloudinaryUrl } from "../utils/optimizeImage";
 import { TrackHistoryModal } from "../components/product/TrackHistoryModal";
 import { trackAffiliateClickRequest } from "../api/affiliate.api";
+import { apiRequest } from "../api/axios";
 
 // Star SVGs
 function Star({ filled, half }) {
@@ -52,6 +53,39 @@ export function ProductDetailPage() {
   const [selectedThumb, setSelectedThumb] = useState(0);
   const [offersExpanded, setOffersExpanded] = useState(false);
   const [specsOpen, setSpecsOpen] = useState(true);
+
+  // AI Review Summary States & Effects
+  const [summaryData, setSummaryData] = useState(null);
+  const [loadingSummary, setLoadingSummary] = useState(false);
+  const [summaryError, setSummaryError] = useState("");
+
+  const fetchSummary = async () => {
+    if (!reviews || reviews.length < 5) return;
+    setLoadingSummary(true);
+    setSummaryError("");
+    try {
+      const data = await apiRequest("/ai/summarize-reviews", {
+        method: "POST",
+        body: { reviews: reviews.map((r) => ({ rating: r.rating, comment: r.body })) },
+      });
+      if (data) {
+        setSummaryData(data);
+      }
+    } catch (err) {
+      console.error("AI Summary error:", err);
+      setSummaryError(err.message || "Failed to generate review summary.");
+    } finally {
+      setLoadingSummary(false);
+    }
+  };
+
+  useEffect(() => {
+    if (reviews && reviews.length >= 5) {
+      fetchSummary();
+    } else {
+      setSummaryData(null);
+    }
+  }, [reviews]);
 
   // Recently Viewed & Comparison States
   const [recentlyViewed, setRecentlyViewed] = useState([]);
@@ -631,61 +665,12 @@ export function ProductDetailPage() {
               )}
 
               {/* CTA Buttons */}
-              {product.productType === "affiliate" ? (
-                <div className="space-y-3 pt-1">
-                  <button
-                    onClick={async () => {
-                      // If logged in
-                      if (user) {
-                        try {
-                          await trackAffiliateClickRequest(product.id);
-                        } catch (err) {
-                          console.error("Failed to track affiliate click:", err);
-                        }
-                        window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
-                        return;
-                      }
-
-                      // If guest credentials cached
-                      const guestEmail = localStorage.getItem("guestEmail");
-                      const guestPhone = localStorage.getItem("guestPhone") || "";
-                      if (guestEmail) {
-                        try {
-                          await trackAffiliateClickRequest(product.id, guestEmail, guestPhone);
-                        } catch (err) {
-                          console.error("Failed to track guest click:", err);
-                        }
-                        window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
-                        return;
-                      }
-
-                      // Show modal
-                      setIsModalOpen(true);
-                    }}
-                    className="w-full block py-3 rounded-xl font-bold text-sm text-center transition-all bg-amber-500 hover:bg-amber-600 text-white shadow-sm cursor-pointer"
-                  >
-                    {product.source === "chrome-extension"
-                      ? "Install Extension"
-                      : product.source === "web-app"
-                      ? "Try Web App"
-                      : product.source === "play-store"
-                      ? "Get on Play Store"
-                      : product.source === "amazon"
-                      ? "Buy on Amazon"
-                      : "Visit Product"}
-                  </button>
-                  {product.source === "amazon" && (
-                    <p className="text-[10px] text-gray-500 text-center leading-snug italic px-1">
-                      *As an Amazon Associate I earn from qualifying purchases.*
-                    </p>
-                  )}
-                </div>
-              ) : user?.role === "seller" ? (
+              {user?.role === "seller" ? (
                 <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-4 text-center text-xs font-semibold leading-relaxed shadow-sm">
                   🏪 Merchant Viewing Mode: <br /> Sellers are restricted from purchasing products.
                 </div>
               ) : (
-                <div className="space-y-2.5 pt-1">
+                <div className="space-y-3 pt-1">
                   {!displayInStock ? (
                     <button
                       onClick={handleNotifyMe}
@@ -696,35 +681,63 @@ export function ProductDetailPage() {
                   ) : (
                     <>
                       <button
-                        onClick={() => {
-                          const itemToCart = {
-                            ...product,
-                            price: displayPrice,
-                            originalPrice: displayOriginalPrice,
-                            variantName: selectedVariant ? selectedVariant.name : undefined,
+                        onClick={async () => {
+                          const triggerAction = async (email = null, phone = null) => {
+                            try {
+                              if (user) {
+                                await trackAffiliateClickRequest(product.id);
+                              } else if (email) {
+                                await trackAffiliateClickRequest(product.id, email, phone);
+                              }
+                              
+                              if (product.productType === "affiliate") {
+                                window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
+                              } else {
+                                notify(`🎉 Order processed! Added to your order history.`);
+                              }
+                            } catch (err) {
+                              console.error("Action tracking failed:", err);
+                              notify(err.message || "Failed to process order.");
+                            }
                           };
-                          cart.addToCart(itemToCart);
-                          notify(`${product.name}${selectedVariant ? ` (${selectedVariant.name})` : ""} added to cart.`);
+
+                          if (user) {
+                            await triggerAction();
+                            return;
+                          }
+
+                          const guestEmail = localStorage.getItem("guestEmail");
+                          const guestPhone = localStorage.getItem("guestPhone") || "";
+                          if (guestEmail) {
+                            await triggerAction(guestEmail, guestPhone);
+                            return;
+                          }
+
+                          setIsModalOpen(true);
                         }}
-                        className="w-full py-3 rounded-xl font-bold text-sm border-2 transition-all border-[#c4622d] text-[#c4622d] hover:bg-[#c4622d] hover:text-white cursor-pointer"
+                        className={`w-full py-3 rounded-xl font-bold text-sm transition-all text-center shadow-sm cursor-pointer border-2
+                          ${product.productType === "affiliate"
+                            ? "border-amber-500 bg-amber-500 hover:bg-amber-600 text-white"
+                            : "border-[#c4622d] bg-[#c4622d] hover:bg-[#e07a4a] text-white"
+                          }`}
                       >
-                        🛒 Add to Cart
+                        {product.productType === "affiliate"
+                          ? product.source === "chrome-extension"
+                            ? "Install Extension"
+                            : product.source === "web-app"
+                            ? "Try Web App"
+                            : product.source === "play-store"
+                            ? "Get on Play Store"
+                            : product.source === "amazon"
+                            ? "Buy on Amazon"
+                            : "Visit Product"
+                          : "Order & Track"}
                       </button>
-                      <button
-                        onClick={() => {
-                          const itemToCart = {
-                            ...product,
-                            price: displayPrice,
-                            originalPrice: displayOriginalPrice,
-                            variantName: selectedVariant ? selectedVariant.name : undefined,
-                          };
-                          cart.addToCart(itemToCart);
-                          navigate("/cart");
-                        }}
-                        className="w-full py-3 rounded-xl font-bold text-sm transition-all bg-[#c4622d] hover:bg-[#e07a4a] text-white shadow-sm cursor-pointer"
-                      >
-                        ⚡ Buy Now
-                      </button>
+                      {product.productType === "affiliate" && product.source === "amazon" && (
+                        <p className="text-[10px] text-gray-500 text-center leading-snug italic px-1">
+                          *As an Amazon Associate I earn from qualifying purchases.*
+                        </p>
+                      )}
                     </>
                   )}
                 </div>
@@ -747,13 +760,23 @@ export function ProductDetailPage() {
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             onSubmit={async ({ email, phone }) => {
-              await trackAffiliateClickRequest(product.id, email, phone);
               localStorage.setItem("guestEmail", email);
               if (phone) {
                 localStorage.setItem("guestPhone", phone);
               }
               setIsModalOpen(false);
-              window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
+
+              try {
+                await trackAffiliateClickRequest(product.id, email, phone);
+                if (product.productType === "affiliate") {
+                  window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
+                } else {
+                  notify(`🎉 Order processed! Added to your order history.`);
+                }
+              } catch (err) {
+                console.error("Action tracking failed:", err);
+                notify(err.message || "Failed to process order.");
+              }
             }}
             product={product}
           />
@@ -837,6 +860,65 @@ export function ProductDetailPage() {
           ) : (
             <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-6 text-sm text-blue-700">
               <button onClick={() => navigate("/auth")} className="font-semibold underline">Sign in</button> to leave a review.
+            </div>
+          )}
+
+          {/* AI Review Summary */}
+          {reviews.length >= 5 && (
+            <div className="mb-6 p-6 rounded-2xl bg-gradient-to-br from-amber-50/50 to-orange-50/30 border border-amber-200/60 shadow-sm backdrop-blur-md relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-xl">✨</span>
+                <h3 className="text-sm font-black text-[#2c1a0e] tracking-tight uppercase">AI Review Summary</h3>
+                <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full ml-auto">
+                  Powered by Gemini
+                </span>
+              </div>
+              
+              {loadingSummary ? (
+                <div className="py-6 flex flex-col items-center justify-center gap-2 text-xs font-bold text-gray-500">
+                  <div className="w-5 h-5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+                  Analyzing {reviews.length} reviews...
+                </div>
+              ) : summaryError ? (
+                <div className="text-xs text-red-600 font-semibold flex items-center gap-2 py-2">
+                  <span>⚠️</span> {summaryError}
+                  <button type="button" onClick={fetchSummary} className="underline text-amber-700 hover:text-amber-800 ml-auto cursor-pointer border-0 bg-transparent font-bold">Retry</button>
+                </div>
+              ) : summaryData ? (
+                <div className="space-y-4 text-xs">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {summaryData.pros?.length > 0 && (
+                      <div>
+                        <h4 className="font-bold text-emerald-800 flex items-center gap-1.5 mb-2">
+                          👍 Pros
+                        </h4>
+                        <ul className="list-disc pl-4 space-y-1 text-gray-700 font-medium">
+                          {summaryData.pros.map((p, i) => <li key={i}>{p}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                    {summaryData.cons?.length > 0 && (
+                      <div>
+                        <h4 className="font-bold text-rose-800 flex items-center gap-1.5 mb-2">
+                          👎 Cons
+                        </h4>
+                        <ul className="list-disc pl-4 space-y-1 text-gray-700 font-medium">
+                          {summaryData.cons.map((c, i) => <li key={i}>{c}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                  {summaryData.verdict && (
+                    <div className="pt-3 border-t border-amber-200/50">
+                      <h4 className="font-bold text-[#2c1a0e] mb-1">📢 AI Verdict</h4>
+                      <p className="text-gray-700 italic font-semibold leading-relaxed">
+                        "{summaryData.verdict}"
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : null}
             </div>
           )}
 
