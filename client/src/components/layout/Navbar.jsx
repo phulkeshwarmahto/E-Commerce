@@ -78,6 +78,24 @@ const BellIcon = () => (
   </svg>
 );
 
+const OrdersIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+    className="w-6 h-6">
+    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <path d="M16 10a4 4 0 0 1-8 0" />
+  </svg>
+);
+
+const ChevronDownIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+    className="w-3.5 h-3.5">
+    <path d="M6 9l6 6 6-6" />
+  </svg>
+);
+
 // ── NavIconButton ─────────────────────────────────────────────────────────────
 function NavIconBtn({ icon, label, badge, onClick }) {
   return (
@@ -109,7 +127,11 @@ export function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { cart, wishlistIds, user, categories } = useAppContext();
-  const categoryNames = ["All", ...categories.map((c) => c.name)];
+  const allCatList = categories.map((c) => c.name);
+  const primaryCategories = allCatList.slice(0, 5);
+  const moreCategories = allCatList.slice(5);
+  const categoryNames = ["All", ...allCatList];
+  const [showMoreCategories, setShowMoreCategories] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
@@ -289,6 +311,15 @@ export function Navbar() {
             />
           )}
 
+          {/* Orders */}
+          {user?.role !== "seller" && (
+            <NavIconBtn
+              icon={<OrdersIcon />}
+              label="Orders"
+              onClick={() => navigate(user ? "/orders" : "/auth")}
+            />
+          )}
+
           {/* Wishlist */}
           <NavIconBtn
             icon={<HeartIcon filled={wishlistIds.length > 0} />}
@@ -306,7 +337,6 @@ export function Navbar() {
               onClick={() => navigate("/cart")}
             />
           )}
-
 
           {/* Mobile hamburger */}
           <button
@@ -356,9 +386,9 @@ export function Navbar() {
       )}
 
       {/* ── Categories Nav Bar ───────────────────────────────────────────── */}
-      <nav className="bg-[#232f3e] overflow-x-auto">
+      <nav className="bg-[#232f3e] relative z-[150]">
         {/* Desktop */}
-        <div className="hidden md:flex items-center gap-1 px-4 min-h-[38px]">
+        <div className="hidden md:flex items-center gap-1 px-4 min-h-[40px]">
           <NavLink
             to="/"
             className={({ isActive }) =>
@@ -382,32 +412,80 @@ export function Navbar() {
             Shop All
           </NavLink>
           <div className="w-px h-4 bg-white/20 mx-1" />
-          {categoryNames.filter(c => c !== "All").map((cat) => (
+
+          {/* Primary categories */}
+          {primaryCategories.map((cat) => (
             <NavLink
               key={cat}
               to={`/shop?category=${encodeURIComponent(cat)}`}
               className={({ isActive }) =>
-                `px-3 py-1.5 text-[0.82rem] whitespace-nowrap rounded
+                `px-3 py-1.5 text-[0.82rem] font-medium whitespace-nowrap rounded
                  transition-colors ${isActive
-                  ? "text-amber-400 bg-white/10"
-                  : "text-white/70 hover:text-white hover:bg-white/10"}`
+                  ? "text-amber-400 bg-white/10 font-bold"
+                  : "text-white/80 hover:text-white hover:bg-white/10"}`
               }
             >
               {cat}
             </NavLink>
           ))}
-          <div className="ml-auto flex items-center gap-1">
+
+          {/* More Categories Dropdown */}
+          {moreCategories.length > 0 && (
+            <div
+              className="relative"
+              onMouseEnter={() => setShowMoreCategories(true)}
+              onMouseLeave={() => setShowMoreCategories(false)}
+            >
+              <button
+                type="button"
+                onClick={() => setShowMoreCategories(!showMoreCategories)}
+                className={`flex items-center gap-1 px-3 py-1.5 text-[0.82rem] font-medium rounded transition-colors ${
+                  showMoreCategories
+                    ? "text-amber-400 bg-white/10"
+                    : "text-white/80 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                <span>More Categories</span>
+                <ChevronDownIcon />
+              </button>
+
+              {showMoreCategories && (
+                <div className="absolute top-full left-0 mt-0.5 w-56 bg-[#232f3e] border border-white/15 rounded-lg shadow-2xl py-2 z-[300] grid grid-cols-1 divide-y divide-white/5">
+                  {moreCategories.map((cat) => (
+                    <NavLink
+                      key={cat}
+                      to={`/shop?category=${encodeURIComponent(cat)}`}
+                      onClick={() => setShowMoreCategories(false)}
+                      className={({ isActive }) =>
+                        `px-4 py-2 text-xs transition-colors ${
+                          isActive
+                            ? "text-amber-400 bg-white/10 font-bold"
+                            : "text-white/80 hover:text-amber-400 hover:bg-white/10 font-medium"
+                        }`
+                      }
+                    >
+                      {cat}
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Right-aligned My Orders */}
+          <div className="ml-auto flex items-center gap-2">
             {user?.role !== "seller" && (
               <NavLink
                 to="/orders"
                 className={({ isActive }) =>
-                  `px-3 py-1.5 text-[0.82rem] whitespace-nowrap rounded
-                   transition-colors ${isActive
-                    ? "text-amber-400 bg-white/10"
-                    : "text-white/70 hover:text-white hover:bg-white/10"}`
+                  `flex items-center gap-1.5 px-3 py-1 text-[0.82rem] font-bold whitespace-nowrap rounded-md
+                   transition-all duration-150 ${isActive
+                    ? "text-amber-400 bg-amber-400/20 border border-amber-400/50 shadow-sm"
+                    : "text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-400/50"}`
                 }
               >
-                My Orders
+                <span>📦</span>
+                <span>My Orders</span>
               </NavLink>
             )}
           </div>
