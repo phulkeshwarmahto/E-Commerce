@@ -12,7 +12,7 @@ export default {
         mid: "#5a3a1a",
         lt: "#9b6b3a",
         sage: "#6b8f71",
-        gold: "#c9a84c",
+        gold: "#926c05",
         bd: "#e0d5c5",
         danger: "#dc2626",
         success: "#16a34a",

@@ -212,6 +212,7 @@ export function ProductCard({ product }) {
           ) : (
             <button
               disabled={!product.inStock}
+              aria-label={product.inStock ? `Add ${product.name} to cart` : `${product.name} is out of stock`}
               onClick={() => {
                 cart.addToCart(product);
                 notify(`${product.name} added to cart.`);

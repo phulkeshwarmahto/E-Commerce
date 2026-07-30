@@ -1,0 +1,59 @@
+name: GaramBazaar CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-server:
+    name: Backend Tests & Security Checks
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Server Dependencies
+        run: npm ci --prefix server
+
+      - name: Execute Server Integration Tests
+        env:
+          NODE_ENV: test
+          MONGODB_URI: mongodb://127.0.0.1:27017/GaramBazaar_test
+          JWT_ACCESS_SECRET: test_jwt_access_secret_32_characters_minimum
+          BCRYPT_SALT_ROUNDS: 4
+        run: npm test --prefix server
+
+  build-client:
+    name: Frontend Build & Bundle Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Client Dependencies
+        run: npm ci --prefix client
+
+      - name: Build Vite Production Bundle
+        run: npm run build --prefix client
