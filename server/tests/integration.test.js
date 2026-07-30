@@ -233,4 +233,58 @@ test("Integration Test Suite: Auth, Webhooks, and Multi-Vendor Order Isolation",
     const data = await res.json();
     assert.strictEqual(data.success, false);
   });
+
+  await t.test("7. Security hardening: query string token in URL is rejected for authentication", async () => {
+    // Attempting to stream notifications with token in query string (without cookie/header)
+    const fakeToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.somesignature";
+    const res = await fetch(`${baseUrl}/notifications/stream?token=${fakeToken}`);
+    assert.strictEqual(res.status, 401);
+  });
+
+  await t.test("8. Atomic Stock Isolation: placing order exceeding remaining stock fails cleanly", async () => {
+    // Create a product with only 1 item in stock
+    const sellerA = await User.findOne({ email: "sellerA@test.com" });
+    const scarceProduct = await Product.create({
+      name: "Scarce Item",
+      slug: "scarce-item",
+      description: "Only 1 available",
+      category: "Pantry",
+      price: 500,
+      seller: sellerA._id,
+      inStock: true,
+      stockCount: 1,
+      isPublished: true
+    });
+
+    // Attempt to order 2 units of scarce product
+    const res = await fetch(`${baseUrl}/orders`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Cookie": customerCookie
+      },
+      body: JSON.stringify({
+        items: [
+          { productId: scarceProduct._id.toString(), quantity: 2 }
+        ],
+        shippingAddress: {
+          name: "Test Customer",
+          phone: "9876543210",
+          line1: "123 Test Street",
+          city: "Mumbai",
+          state: "Maharashtra",
+          pincode: "400001"
+        },
+        paymentMethod: "cod"
+      })
+    });
+
+    const data = await res.json();
+    assert.strictEqual(res.status, 500); // Thrown error captured by errorHandler or 400
+    assert.strictEqual(data.success, false);
+    
+    // Check that stock was preserved at 1 and not decremented into negative numbers
+    const rechecked = await Product.findById(scarceProduct._id);
+    assert.strictEqual(rechecked.stockCount, 1);
+  });
 });

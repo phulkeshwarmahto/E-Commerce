@@ -137,7 +137,7 @@ export default function App() {
     if (!auth.token) return;
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:5001";
-    const eventSource = new EventSource(`${backendUrl}/api/notifications/stream?token=${auth.token}`);
+    const eventSource = new EventSource(`${backendUrl}/api/notifications/stream`, { withCredentials: true });
 
     eventSource.onmessage = (event) => {
       try {

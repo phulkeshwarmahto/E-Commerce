@@ -241,24 +241,43 @@ export const createOrder = async (req, res) => {
       );
       order = ordersCreated[0];
 
-      // Decrement stock levels inside transaction
+      // Decrement stock levels atomically inside transaction with stock availability check
       for (const item of orderItems) {
+        let updateResult;
         if (item.variantName) {
-          await Product.updateOne(
-            { _id: item.product._id, "variants.name": item.variantName },
+          updateResult = await Product.updateOne(
+            { 
+              _id: item.product._id, 
+              "variants.name": item.variantName,
+              "variants.stockCount": { $gte: item.quantity }
+            },
             { $inc: { "variants.$.stockCount": -item.quantity } },
             { session }
           );
         } else {
-          await Product.updateOne(
-            { _id: item.product._id },
+          updateResult = await Product.updateOne(
+            { 
+              _id: item.product._id,
+              stockCount: { $gte: item.quantity },
+              inStock: true
+            },
             {
-              $inc: { stockCount: -item.quantity },
-              $set: { inStock: item.product.stockCount - item.quantity > 0 },
+              $inc: { stockCount: -item.quantity }
             },
             { session }
           );
         }
+
+        if (updateResult.matchedCount === 0) {
+          throw new Error(`Product "${item.product.name}" was just sold out or does not have enough stock.`);
+        }
+
+        // Sync inStock flag if product stock hits zero
+        await Product.updateOne(
+          { _id: item.product._id, stockCount: { $lte: 0 } },
+          { $set: { inStock: false } },
+          { session }
+        );
       }
 
       // Clear cart inside transaction
@@ -309,20 +328,39 @@ export const createOrder = async (req, res) => {
       });
 
       for (const item of orderItems) {
+        let updateResult;
         if (item.variantName) {
-          await Product.updateOne(
-            { _id: item.product._id, "variants.name": item.variantName },
+          updateResult = await Product.updateOne(
+            { 
+              _id: item.product._id, 
+              "variants.name": item.variantName,
+              "variants.stockCount": { $gte: item.quantity }
+            },
             { $inc: { "variants.$.stockCount": -item.quantity } }
           );
         } else {
-          await Product.updateOne(
-            { _id: item.product._id },
+          updateResult = await Product.updateOne(
+            { 
+              _id: item.product._id,
+              stockCount: { $gte: item.quantity },
+              inStock: true
+            },
             {
-              $inc: { stockCount: -item.quantity },
-              $set: { inStock: item.product.stockCount - item.quantity > 0 },
+              $inc: { stockCount: -item.quantity }
             }
           );
         }
+
+        if (updateResult.matchedCount === 0) {
+          // If stock decrement fails in non-transactional mode, delete created order to avoid orphan order
+          await Order.deleteOne({ _id: order._id });
+          return res.status(400).json(new ApiResponse(false, `Product "${item.product.name}" was just sold out or does not have enough stock.`));
+        }
+
+        await Product.updateOne(
+          { _id: item.product._id, stockCount: { $lte: 0 } },
+          { $set: { inStock: false } }
+        );
       }
 
       if (req.user) {

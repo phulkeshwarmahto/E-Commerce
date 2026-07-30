@@ -7,9 +7,6 @@ export const requireAuth = async (req, res, next) => {
     const header = req.headers.authorization || "";
     token = header.startsWith("Bearer ") ? header.slice(7) : "";
   }
-  if (!token && req.query.token) {
-    token = req.query.token;
-  }
   const tokenUser = parseToken(token);
 
   if (!tokenUser?.id) {
