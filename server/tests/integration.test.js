@@ -12,15 +12,21 @@ process.env.NODE_ENV = "test";
 
 const originalUri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/GaramBazaar";
 let testUri;
-if (originalUri.includes("?")) {
-  const [base, query] = originalUri.split("?");
-  if (base.endsWith("/")) {
-    testUri = `${base}GaramBazaar_test?${query}`;
+try {
+  // Use URL to safely set the pathname (DB name); this preserves query/options if present.
+  const url = new URL(originalUri);
+  // Ensure pathname is exactly the test DB (no double segments)
+  url.pathname = "/GaramBazaar_test";
+  testUri = url.toString();
+} catch (err) {
+  // Fallback for any unexpected URI formats: replace last path segment (if present) or append.
+  if (originalUri.includes("?")) {
+    const [base, query] = originalUri.split("?");
+    const baseNoDb = base.replace(/\/[^\/]*$/, ""); // remove trailing DB segment if any
+    testUri = `${baseNoDb}/GaramBazaar_test?${query}`;
   } else {
-    testUri = `${base}/GaramBazaar_test?${query}`;
+    testUri = originalUri.replace(/\/[^\/]*$/, "") + "/GaramBazaar_test";
   }
-} else {
-  testUri = `${originalUri}/GaramBazaar_test`;
 }
 process.env.MONGODB_URI = testUri;
 
