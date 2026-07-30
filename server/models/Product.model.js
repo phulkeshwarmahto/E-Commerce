@@ -55,6 +55,9 @@ const productSchema = new mongoose.Schema(
 );
 productSchema.index({ seller: 1 });
 productSchema.index({ name: "text", description: "text", tags: "text" });
+productSchema.index({ category: 1, isPublished: 1, price: 1 });
+productSchema.index({ productType: 1, isPublished: 1, isFeatured: 1 });
+productSchema.index({ createdAt: -1 });
 
 
 productSchema.methods.toClient = function toClient() {

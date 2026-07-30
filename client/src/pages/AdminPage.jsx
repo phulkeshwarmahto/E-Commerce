@@ -51,6 +51,10 @@ import { Spinner } from "../components/ui/Spinner";
 import { useAppContext } from "../hooks/useAppContext";
 import { useDocumentMetadata } from "../hooks/useDocumentMetadata";
 import { ImageUploadZone } from "../components/admin/ImageUploadZone";
+import { AdminReportsTab } from "../components/admin/AdminReportsTab";
+import { AdminCouponsTab } from "../components/admin/AdminCouponsTab";
+import { AdminCategoriesTab } from "../components/admin/AdminCategoriesTab";
+import { AdminSupportTab } from "../components/admin/AdminSupportTab";
 import { apiRequest } from "../api/axios";
 
 export function AdminPage() {
@@ -1523,94 +1527,15 @@ export function AdminPage() {
           ) : null}
 
           {section === "reports" ? (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 stack">
-              <h2 className="text-lg font-bold text-gray-900 mb-1">⚠️ Reports Moderation Dashboard</h2>
-              <p className="text-xs text-gray-500 mb-4">Investigate and handle reports on products or reviews from users.</p>
-
-              {loadingReports ? (
-                <p className="text-sm text-gray-500 py-6 text-center animate-pulse">Loading reports...</p>
-              ) : reportsList.length > 0 ? (
-                <div className="table-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto mt-4">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="bg-gray-50 border-b-2 border-gray-200">
-                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Reported By</th>
-                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Target Type</th>
-                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Reason</th>
-                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Date</th>
-                        <th className="!py-3 !px-4 text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {reportsList.map((rpt) => (
-                        <tr key={rpt.id} className="hover:bg-amber-50/40 transition-colors">
-                          <td className="!py-3 !px-4 text-sm font-semibold text-gray-900 whitespace-nowrap">
-                            {rpt.reporterName} ({rpt.reporterEmail})
-                          </td>
-                          <td className="!py-3 !px-4 whitespace-nowrap">
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                              rpt.targetType === "product" ? "bg-amber-100 text-amber-800" : "bg-blue-100 text-blue-800"
-                            }`}>
-                              {rpt.targetType}
-                            </span>
-                          </td>
-                          <td className="!py-3 !px-4 text-gray-700 text-xs">{rpt.reason}</td>
-                          <td className="!py-3 !px-4 text-gray-505 text-xs whitespace-nowrap">
-                            {new Date(rpt.createdAt).toLocaleDateString()}
-                          </td>
-                          <td className="!py-3 !px-4">
-                            <div className="flex gap-2">
-                              <button
-                                type="button"
-                                className="button text-[10px] px-2.5 py-1.5 font-bold bg-gray-500 hover:bg-gray-600 text-white rounded-lg border-0 cursor-pointer"
-                                onClick={async () => {
-                                  try {
-                                    await resolveReportRequest(rpt.id, "resolve");
-                                    notify("Report marked as resolved.");
-                                    loadReports(reportsPage).catch(() => {});
-                                  } catch (err) {
-                                    notify(err.message || "Failed to resolve report.");
-                                  }
-                                }}
-                              >
-                                Dismiss
-                              </button>
-                              <button
-                                type="button"
-                                className="button text-[10px] px-2.5 py-1.5 font-bold bg-red-600 hover:bg-red-700 text-white rounded-lg border-0 cursor-pointer"
-                                onClick={async () => {
-                                  if (await confirm(`Are you sure you want to resolve and DELETE the reported ${rpt.targetType}?`)) {
-                                    try {
-                                      await resolveReportRequest(rpt.id, "deleteTarget");
-                                      notify(`Report resolved and target ${rpt.targetType} deleted.`);
-                                      loadReports(reportsPage).catch(() => {});
-                                      loadDashboard().catch(() => {});
-                                    } catch (err) {
-                                      notify(err.message || "Failed to delete target.");
-                                    }
-                                  }
-                                }}
-                              >
-                                Delete Target
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <Pagination
-                    currentPage={reportsPagination.currentPage}
-                    totalPages={reportsPagination.totalPages}
-                    onPageChange={(p) => setReportsPage(p)}
-                  />
-                </div>
-              ) : (
-                <p className="text-sm text-gray-500 py-10 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                  No active reports to moderate.
-                </p>
-              )}
-            </div>
+            <AdminReportsTab
+              loadingReports={loadingReports}
+              reportsList={reportsList}
+              reportsPage={reportsPage}
+              loadReports={loadReports}
+              loadDashboard={loadDashboard}
+              notify={notify}
+              confirm={confirm}
+            />
           ) : null}
 
           {section === "returns" ? (
@@ -2007,112 +1932,15 @@ export function AdminPage() {
           ) : null}
 
           {section === "coupons" ? (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 stack">
-              <div className="section-head mb-4">
-                <div>
-                  <h2 className="text-lg font-bold text-gray-900">🎟️ Coupon Code Generator</h2>
-                  <p className="text-xs text-gray-500">Create and delete store discount coupons. Users can apply these codes during checkout.</p>
-                </div>
-              </div>
-
-              {/* Create Coupon Form */}
-              <form onSubmit={handleCreateCoupon} className="bg-gray-50 rounded-xl border border-gray-150 p-5 grid grid-cols-1 md:grid-cols-5 gap-4 items-end mb-6 text-sm">
-                <div className="field">
-                  <label className="label text-xs font-semibold text-gray-700">Code (uppercase)</label>
-                  <input
-                    type="text"
-                    className="input py-2"
-                    required
-                    placeholder="e.g. SAVE25"
-                    value={newCoupon.code}
-                    onChange={(e) => setNewCoupon({ ...newCoupon, code: e.target.value.toUpperCase().trim() })}
-                  />
-                </div>
-                <div className="field">
-                  <label className="label text-xs font-semibold text-gray-700">Discount Type</label>
-                  <select
-                    className="input py-2"
-                    value={newCoupon.discountType}
-                    onChange={(e) => setNewCoupon({ ...newCoupon, discountType: e.target.value })}
-                  >
-                    <option value="percent">Percentage (%)</option>
-                    <option value="flat">Flat Amount (₹)</option>
-                  </select>
-                </div>
-                <div className="field">
-                  <label className="label text-xs font-semibold text-gray-700">Value ({newCoupon.discountType === "percent" ? "%" : "₹"})</label>
-                  <input
-                    type="number"
-                    min="1"
-                    className="input py-2"
-                    required
-                    placeholder="e.g. 20"
-                    value={newCoupon.discountValue}
-                    onChange={(e) => setNewCoupon({ ...newCoupon, discountValue: e.target.value })}
-                  />
-                </div>
-                <div className="field">
-                  <label className="label text-xs font-semibold text-gray-700">Min Order (₹)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    className="input py-2"
-                    placeholder="e.g. 500"
-                    value={newCoupon.minOrderAmount}
-                    onChange={(e) => setNewCoupon({ ...newCoupon, minOrderAmount: e.target.value })}
-                  />
-                </div>
-                <div className="field flex justify-end">
-                  <button type="submit" className="button button-primary w-full py-2 font-semibold">
-                    Generate
-                  </button>
-                </div>
-              </form>
-
-              {/* Coupons List */}
-              {loadingCoupons ? (
-                <p className="text-sm text-gray-500 py-6 text-center animate-pulse">Loading coupons...</p>
-              ) : couponsList.length > 0 ? (
-                <div className="table-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Code</th>
-                        <th>Type</th>
-                        <th>Value</th>
-                        <th>Min Order</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {couponsList.map((cpn) => (
-                        <tr key={cpn.id}>
-                          <td className="font-bold text-[#c4622d] tracking-wider">{cpn.code}</td>
-                          <td className="text-xs capitalize font-medium text-gray-600">{cpn.discountType}</td>
-                          <td className="font-semibold text-gray-900">
-                            {cpn.discountType === "percent" ? `${cpn.discountValue}%` : `₹${cpn.discountValue}`}
-                          </td>
-                          <td className="text-gray-600">₹{cpn.minOrderAmount || 0}</td>
-                          <td>
-                            <button
-                              type="button"
-                              className="text-red-500 hover:text-red-700 font-semibold text-xs transition-colors"
-                              onClick={() => handleDeleteCoupon(cpn.id)}
-                            >
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="text-sm text-gray-500 py-10 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                  No coupons generated yet. Fill in the form above to generate one.
-                </p>
-              )}
-            </div>
+            <AdminCouponsTab
+              couponsList={couponsList}
+              loadingCoupons={loadingCoupons}
+              newCoupon={newCoupon}
+              setNewCoupon={setNewCoupon}
+              loadCoupons={loadCoupons}
+              notify={notify}
+              confirm={confirm}
+            />
           ) : null}
 
           {section === "brands" ? (
@@ -2263,25 +2091,12 @@ export function AdminPage() {
           ) : null}
 
           {section === "categories" ? (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 stack">
-              <div className="section-head mb-4">
-                <div>
-                  <h2 className="text-lg font-bold text-gray-900">📁 Category Management</h2>
-                  <p className="text-xs text-gray-500">Manage categories in the store catalog. Dynamic updates propagate storefront-wide immediately.</p>
-                </div>
-              </div>
-
-              {/* Create Category Form */}
-              <CategoryFormSection onCreated={reloadCategories} notify={notify} />
-
-              {/* Categories List */}
-              <CategoryListSection
-                categories={categories}
-                onUpdated={reloadCategories}
-                onDeleted={reloadCategories}
-                notify={notify}
-              />
-            </div>
+            <AdminCategoriesTab
+              categories={categories}
+              reloadCategories={reloadCategories}
+              notify={notify}
+              confirm={confirm}
+            />
           ) : null}
 
           {section === "seller-verifications" ? (
@@ -2417,7 +2232,13 @@ export function AdminPage() {
           ) : null}
 
           {section === "support-tickets" ? (
-            <AdminSupportTicketsSection notify={notify} />
+            <AdminSupportTab
+              loadingTickets={loadingTickets}
+              ticketsList={ticketsList}
+              loadSupportTickets={loadSupportTickets}
+              notify={notify}
+              confirm={confirm}
+            />
           ) : null}
 
           {section === "settings" ? (
