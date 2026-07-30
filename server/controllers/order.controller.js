@@ -286,12 +286,16 @@ export const createOrder = async (req, res) => {
       }
     });
   } catch (txError) {
-    // Check if error is related to transactions not supported
+    // Check if error is related to transactions or standalone MongoDB not supported
+    const errString = `${txError.message || ""} ${txError.codeName || ""} ${txError.originalError?.message || ""} ${txError.errorResponse?.errmsg || ""}`;
     const isUnsupported =
-      txError.message?.includes("ReplicaSetNoPrimary") ||
-      txError.codeName === "CommandNotSupportedOnReplicaSetMemberWithoutArbiter" ||
-      txError.message?.includes("transaction") ||
-      txError.code === 20;
+      errString.includes("ReplicaSetNoPrimary") ||
+      errString.includes("retryable writes") ||
+      errString.includes("Transaction numbers") ||
+      errString.includes("transaction") ||
+      errString.includes("IllegalOperation") ||
+      txError.code === 20 ||
+      txError.originalError?.code === 20;
 
     if (isUnsupported) {
       console.warn("Transactions not supported. Falling back to non-transactional order creation.");

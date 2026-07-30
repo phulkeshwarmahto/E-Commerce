@@ -16,6 +16,11 @@ jobs:
         image: mongo:6.0
         ports:
           - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'rs.status().ok || rs.initiate()'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout Repository
@@ -35,6 +40,10 @@ jobs:
           NODE_ENV: test
           MONGODB_URI: mongodb://127.0.0.1:27017/GaramBazaar_test
           JWT_ACCESS_SECRET: test_jwt_access_secret_32_characters_minimum
+          JWT_REFRESH_SECRET: test_jwt_refresh_secret_32_characters_minimum
+          RAZORPAY_KEY_ID: rzp_test_SvEh0YYYQInBbE
+          RAZORPAY_KEY_SECRET: J75JlaKrhqpUUGL9KC6b0n0i
+          RAZORPAY_WEBHOOK_SECRET: myGaramBazaarWebhook@2026!secure
           BCRYPT_SALT_ROUNDS: 4
         run: npm test --prefix server
 
