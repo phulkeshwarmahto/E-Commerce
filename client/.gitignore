@@ -1,24 +1,41 @@
-# Logs
-logs
+﻿# Local history & editor backups (VS Code Local History)
+.history/
+**/.history/
+**/.history/*
+*_202*
+
+# Editor & System Clutter
+.vscode/
+**/.vscode/
+.idea/
+**/.idea/
+.DS_Store
+Thumbs.db
+
+# Dependencies & Build Artifacts
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+**/build/
+.next/
+**/.next/
+.out/
+**/.out/
+.astro/
+**/.astro/
+.pnpm-store/
+
+# Archives & Logs
+*.zip
+*.tar.gz
+*.crx
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Environment & Secrets
+.env
+.env.*
+*.pem
