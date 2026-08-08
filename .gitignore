@@ -39,3 +39,7 @@ yarn-debug.log*
 .env
 .env.*
 *.pem
+# Auto-added standard ignores
+__pycache__/
+.venv/
+.env.local
