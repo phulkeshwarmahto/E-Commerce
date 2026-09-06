@@ -1,4 +1,4 @@
-﻿# Local history & editor backups (VS Code Local History)
+# Local history & editor backups (VS Code Local History)
 .history/
 **/.history/
 **/.history/*
@@ -43,3 +43,7 @@ yarn-debug.log*
 __pycache__/
 .venv/
 .env.local
+
+# Learning & Study Guides
+learning/
+**/learning/

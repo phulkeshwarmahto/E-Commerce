@@ -1,4 +1,4 @@
-﻿# Local history & editor backups (VS Code Local History)
+# Local history & editor backups (VS Code Local History)
 .history/
 **/.history/
 **/.history/*
@@ -39,3 +39,7 @@ yarn-debug.log*
 .env
 .env.*
 *.pem
+
+# Learning & Study Guides
+learning/
+**/learning/
